@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexManager | CRM Jurídico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. DESIGN SYSTEM --- */
+        :root {
+            --primary: #4F46E5;
+            --primary-gradient: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%);
+            --bg-body: #F3F4F6; --bg-surface: #FFFFFF;
+            --text-main: #111827; --text-secondary: #6B7280; --text-muted: #9CA3AF;
+            --border-color: #E5E7EB;
+            --danger: #EF4444; --warning: #F59E0B; --success: #10B981; --info: #3B82F6;
+            --radius-md: 12px; --radius-lg: 20px; --radius-xl: 28px;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05);
+            --font-main: 'Inter', system-ui, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode {
+            --primary: #6366F1; --primary-gradient: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+            --bg-body: #0B0F19; --bg-surface: #111827;
+            --text-main: #F9FAFB; --text-secondary: #9CA3AF; --border-color: #1F2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; transition: var(--transition); font-size: 14px; }
+
+        /* --- LAYOUT --- */
+        aside { width: 260px; background-color: var(--bg-surface); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 24px 16px; transition: var(--transition); z-index: 50; flex-shrink: 0; }
+        .logo { font-size: 1.25rem; font-weight: 700; margin-bottom: 40px; padding: 0 12px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
+        .logo svg { width: 28px; height: 28px; fill: var(--primary); }
+        
+        nav button { background: transparent; border: none; color: var(--text-secondary); width: 100%; padding: 12px 16px; text-align: left; cursor: pointer; border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 0.95rem; transition: var(--transition); position: relative; margin-bottom: 4px; }
+        nav button:hover { background-color: var(--bg-body); color: var(--text-main); }
+        nav button.active { background-color: var(--bg-body); color: var(--primary); font-weight: 600; }
+        nav button.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 20px; width: 4px; background: var(--primary); border-radius: 0 4px 4px 0; }
+        nav button svg { width: 20px; height: 20px; fill: currentColor; opacity: 0.8; }
+
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .app-topbar { height: 70px; background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; flex-shrink: 0; }
+        .content-scroll { flex: 1; overflow-y: auto; padding: 32px; }
+
+        /* --- COMPONENTS --- */
+        .card { background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 24px; margin-bottom: 24px; transition: var(--transition); }
+        .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: #D1D5DB; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .stat-card { background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; min-height: 140px; transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-icon-bg { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .stat-icon-bg svg { width: 24px; height: 24px; }
+        .stat-title { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 2.25rem; font-weight: 700; color: var(--text-main); margin: 8px 0 4px 0; }
+        
+        .card-blue .stat-icon-bg { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
+        .card-red .stat-icon-bg { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .stat-value.text-danger { color: var(--danger); }
+        .card-green .stat-icon-bg { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-value.text-success { color: var(--success); }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th { text-align: left; padding: 16px 20px; color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); position: sticky; top: 0; }
+        td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; vertical-align: middle; }
+        tr:hover td { background-color: var(--bg-body); }
+
+        .badge { padding: 6px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; cursor: pointer; transition: transform 0.2s; }
+        .badge:hover { transform: scale(1.05); }
+        .badge-blue { background: rgba(59, 130, 246, 0.1); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-green { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-red { background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-gray { background: rgba(107, 114, 128, 0.1); color: #4b5563; border: 1px solid rgba(107, 114, 128, 0.2); }
+
+        .btn { padding: 10px 20px; border-radius: var(--radius-md); border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow-sm); }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-body); border-color: var(--text-secondary); }
+        .btn-danger { background: var(--bg-surface); border: 1px solid var(--danger); color: var(--danger); }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
+        .btn-icon { padding: 12px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .btn-icon:hover { border-color: var(--primary); background: var(--bg-body); }
+        .btn-icon svg { width: 20px; height: 20px; fill: var(--primary); }
+
+        input, select, textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-body); color: var(--text-main); font-family: var(--font-main); font-size: 0.95rem; margin-bottom: 16px; transition: var(--transition); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: var(--bg-surface); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+
+        /* --- WIDGETS --- */
+        .calendar-widget { display: grid; grid-template-columns: 1fr 320px; gap: 32px; }
+        .calendar-list { border-right: 1px solid var(--border-color); padding-right: 24px; max-height: 350px; overflow-y: auto; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+        .calendar-day-header { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; padding-bottom: 8px; }
+        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 0.9rem; cursor: pointer; transition: 0.2s; color: var(--text-main); position: relative; }
+        .calendar-day:hover { background: var(--bg-body); }
+        .calendar-day.today { border: 2px solid var(--primary); color: var(--primary); font-weight: 700; }
+        .calendar-dots { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; justify-content: center; max-width: 80%; }
+        .calendar-dot { width: 5px; height: 5px; border-radius: 50%; }
+        .dot-deadline { background-color: var(--danger); }
+        .dot-task { background-color: var(--info); }
+        .calendar-legend { display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-secondary); }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+
+        /* IA Visual */
+        .smart-summary { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; cursor: pointer; transition: 0.2s; }
+        .smart-summary:hover { box-shadow: var(--shadow-sm); border-color: #cbd5e1; }
+        .smart-summary.procedente { background: #f0fdf4; border-color: #86efac; }
+        .smart-summary.improcedente { background: #fef2f2; border-color: #fca5a5; }
+        .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .summary-tag { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; }
+        .tag-blue { background: #1e40af; color: white; }
+        .raw-text-content { display: none; }
+
+        /* Analysis Grid */
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; margin-bottom: 15px; }
+        .analysis-item { display: flex; flex-direction: column; }
+        .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .analysis-val { font-weight: 500; color: var(--text-main); }
+        .client-summary-box { background: #fffbeb; border: 1px solid #fcd34d; padding: 15px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; color: #92400e; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-surface); padding: 32px; border-radius: var(--radius-xl); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .pub-view-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .pub-full-text { background: var(--bg-body); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary); max-height: 300px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border-color); }
+
+        .status-dropdown { position: absolute; background: var(--bg-surface); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); border-radius: 12px; z-index: 100; display: none; min-width: 180px; padding: 6px; }
+        .status-dropdown.show { display: block; }
+        .status-option { padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        .status-option:hover { background: var(--bg-body); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-gap { display: flex; gap: 16px; }
+        .hidden { display: none !important; }
+        .clickable-link { color: var(--primary); font-weight: 600; cursor: pointer; }
+        .clickable-link:hover { text-decoration: underline; }
+        
+        .receipt-paper { background: #fff; padding: 40px; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-family: 'Courier New', monospace; color: #333; position: relative; }
+        .finance-summary-bar { margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 8px; border: 1px solid var(--border); }
+        .finance-progress { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 10px 0; overflow: hidden; display: flex; }
+        .progress-received { background: var(--success); height: 100%; } .progress-pending { background: var(--warning); height: 100%; }
+        .finance-values { display: flex; justify-content: space-between; font-size: 0.85rem; }
+        
+        .full-timeline { position: relative; margin-top: 2rem; }
+        .full-timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+        .ft-item { position: relative; margin-bottom: 2rem; padding-left: 50px; }
+        .ft-icon { position: absolute; left: 6px; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border: 4px solid var(--bg-light); z-index: 2; cursor: pointer; }
+        .ft-icon.finance { background: var(--success); } .ft-icon.create { background: var(--secondary); } .ft-icon.update { background: var(--info); }
+        .ft-card { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); cursor: pointer; transition: 0.2s; }
+        .ft-card:hover { transform: translateX(5px); border-color: var(--primary); }
+        .ft-date { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; display: block; font-weight: 600; }
+
+        .menu-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; box-shadow: var(--shadow-lg); z-index: 100; font-size: 24px; align-items: center; justify-content: center; border: none; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 768px) { aside { position: fixed; height: 100%; left: -280px; box-shadow: var(--shadow-lg); } aside.active { left: 0; } .menu-toggle { display: flex; } .calendar-widget { grid-template-columns: 1fr; } .app-topbar { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" onclick="app.toggleSidebar()">☰</button>
+
+    <aside id="sidebar">
+        <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.5L19.5 19h-15L12 5.5z"/></svg> LexManager</div>
+        <nav>
+            <button onclick="app.navigate('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</button>
+            <button onclick="app.navigate('updates')" id="nav-updates">📢 Publicações</button>
+            <button onclick="app.navigate('cases')" id="nav-cases">⚖️ Processos</button>
+            <button onclick="app.navigate('clients')" id="nav-clients">👥 Clientes</button>
+            <button onclick="app.navigate('deadlines')" id="nav-deadlines">⏳ Prazos</button>
+            <button onclick="app.navigate('tasks')" id="nav-tasks">📝 Tarefas</button>
+            <button onclick="app.navigate('finance')" id="nav-finance">💰 Financeiro</button>
+            <button onclick="app.navigate('settings')" id="nav-settings">⚙️ Configurações</button>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="app-topbar">
+            <div style="font-weight:600; font-size:1.1rem;">Painel Executivo</div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-icon" style="min-width:auto; padding:8px;" onclick="app.toggleDarkMode()">🌙</button>
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem;">Dr</div>
+            </div>
+        </div>
+
+        <div class="content-scroll">
+            
+            <section id="view-dashboard">
+                <div class="dash-header">
+                    <div><h2>Olá, Doutor(a)</h2><p style="color:var(--text-secondary)">Resumo estratégico do escritório.</p></div>
+                    <div class="quick-actions">
+                        <button class="btn-icon" onclick="app.openModal('modal-case')">➕ Proc.</button>
+                        <button class="btn-icon" onclick="app.navigate('deadlines'); setTimeout(()=>app.openModal('modal-deadline'),100);">⏱ Prazo</button>
+                        <button class="btn-icon" onclick="app.openModal('modal-import')">📋 Import.</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card card-blue"><div class="stat-icon-bg"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" fill="currentColor"/></svg></div><div class="stat-title">Ativos</div><div class="stat-value" id="dash-active">0</div></div>
+                    <div class="stat-card card-red"><div class="stat-icon-bg"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/></svg></div><div class="stat-title">Prazos Hoje</div><div class="stat-value text-danger" id="dash-today">0</div></div>
+                    <div class="stat-card card-green"><div class="stat-icon-bg"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" fill="currentColor"/></svg></div><div class="stat-title">Recebido (Total)</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="flex-between" style="margin-bottom: 1rem;"><h3>📅 Agenda</h3><span id="calendar-month-label" style="font-weight:700; color:var(--primary)"></span></div>
+                    <div class="calendar-widget">
+                        <div class="calendar-list" id="calendar-list-content"></div>
+                        <div>
+                            <div class="calendar-grid" style="margin-bottom:5px;"><div class="calendar-day-header">D</div><div class="calendar-day-header">S</div><div class="calendar-day-header">T</div><div class="calendar-day-header">Q</div><div class="calendar-day-header">Q</div><div class="calendar-day-header">S</div><div class="calendar-day-header">S</div></div>
+                            <div class="calendar-grid" id="calendar-grid-content"></div>
+                            <div class="calendar-legend">
+                                <div class="legend-item"><div class="calendar-dot dot-deadline"></div> Prazo</div>
+                                <div class="legend-item"><div class="calendar-dot dot-task"></div> Tarefa</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-cases" class="hidden">
+                <div class="flex-between" style="margin-bottom:1.5rem;"><h2>Processos</h2><div class="flex-gap"><button class="btn btn-outline" onclick="document.getElementById('filter-container').classList.toggle('hidden')">🔍 Filtros</button><button class="btn btn-primary" onclick="app.openModal('modal-case')">+ Novo</button></div></div>
+                <div id="filter-container" class="card hidden" style="padding:1rem;"><div class="flex-gap"><input type="text" id="search-case" placeholder="Buscar..." onkeyup="app.renderCases()" style="flex:2; margin:0;"><select id="filter-lawyer" onchange="app.renderCases()" style="flex:1; margin:0;"><option value="">Advogado</option></select><select id="filter-area" onchange="app.renderCases()" style="flex:1; margin:0;"><option value="">Área</option></select></div></div>
+                <div class="card" style="overflow-x:auto; padding:0;"><table style="width:100%"><thead><tr><th>Número</th><th>Cliente</th><th>Área</th><th>Status</th><th>Ações</th></tr></thead><tbody id="cases-table-body"></tbody></table></div>
+            </section>
+
+            <section id="view-updates" class="hidden">
+                <div class="dash-header">
+                    <div>
+                        <button class="btn btn-outline btn-sm" onclick="app.navigate('dashboard')" style="margin-bottom:10px;">← Voltar</button>
+                        <h2>Central de Publicações</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.openModal('modal-import')">📋 Importar Novo</button>
+                </div>
+                <div id="updates-list-full"></div>
+            </section>
+
+            <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Base de Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
+            <section id="view-finance" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Controle Financeiro</h2></div><div class="stats-grid"><div class="stat-card" style="border-top: 4px solid var(--warning)"><div class="stat-title">Total a Receber</div><div class="stat-value" id="fin-pending">R$ 0,00</div></div><div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Total Recebido</div><div class="stat-value text-success" id="fin-received">R$ 0,00</div></div></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Registrar</th></tr></thead><tbody id="finance-table-body"></tbody></table></div></section>
+            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
+            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
+            <section id="view-settings" class="hidden"><h2>Configurações</h2><div class="card"><label>Chave API Gemini</label><div class="flex-gap"><input type="password" id="api-key-input"><button class="btn btn-primary" onclick="app.saveApiKey()">Salvar</button></div></div><button class="btn btn-outline" onclick="app.toggleDarkMode()">Alternar Tema</button><button class="btn btn-danger" onclick="app.clearData()">Limpar Dados</button></section>
+            <section id="view-case-detail" class="hidden"><button class="btn btn-outline" onclick="app.navigate('cases')" style="margin-bottom:1rem;">← Voltar</button><div id="case-detail-content"></div></section>
+        </div>
+
+        <div id="status-menu" class="status-dropdown">
+            <div class="status-option" onclick="app.changeStatus('Em andamento')"><div class="status-dot" style="background:#2563eb"></div>Em andamento</div>
+            <div class="status-option" onclick="app.changeStatus('Suspenso')"><div class="status-dot" style="background:#f59e0b"></div>Suspenso</div>
+            <div class="status-option" onclick="app.changeStatus('Finalizado')"><div class="status-dot" style="background:#10b981"></div>Finalizado</div>
+            <div class="status-option" onclick="app.changeStatus('Arquivado')"><div class="status-dot" style="background:#64748b"></div>Arquivado</div>
+        </div>
+
+        <div id="modal-import" class="modal">
+            <div class="modal-content">
+                <div class="flex-between"><h3>Importar Publicação</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-import')">X</button></div>
+                <input type="hidden" id="import-id">
+                
+                <div id="step-1-import">
+                    <p style="font-size:0.9rem; color:var(--text-muted)">Cole o texto completo da publicação.</p>
+                    <textarea id="import-text" rows="8" placeholder="Ex: Processo 1001638-37.2024..."></textarea>
+                    <div style="text-align:right; margin-top:10px;">
+                        <button class="btn btn-primary" onclick="app.analyzeTextPreview()">🔍 Analisar com IA</button>
+                    </div>
+                </div>
+
+                <div id="step-2-import" style="display:none;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div><label>Tipo</label><input type="text" id="anl-type"></div>
+                        <div><label>Resultado</label><input type="text" id="anl-outcome"></div>
+                        <div><label>Processo Nº</label><input type="text" id="anl-caseNumber"></div>
+                        <div><label>Urgência</label><select id="anl-urgency"><option value="alta">Alta</option><option value="média">Média</option><option value="baixa">Baixa</option></select></div>
+                        <div><label>Autor</label><input type="text" id="anl-author"></div>
+                        <div><label>Réu</label><input type="text" id="anl-defendant"></div>
+                    </div>
+                    <label>Resumo IA</label><textarea id="anl-summary" rows="3"></textarea>
+                    
+                    <div id="match-info" style="margin:10px 0; font-weight:bold;"></div>
+
+                    <div style="text-align:right; margin-top:10px; display:flex; justify-content:space-between;">
+                        <button class="btn btn-outline" onclick="app.backToStep1()">← Voltar</button>
+                        <button class="btn btn-primary" onclick="app.saveImport()">💾 Salvar Publicação</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-publication-view" class="modal">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="flex-between" style="margin-bottom:20px"><h3>Análise Estratégica (IA)</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-publication-view')">X</button></div>
+                
+                <div class="pub-view-grid">
+                    <div id="pub-view-summary"></div>
+                    <div>
+                        <label>Texto Original:</label>
+                        <div class="pub-full-text" id="pub-view-text"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:20px; text-align:right; border-top:1px solid #eee; padding-top:15px;">
+                    <button class="btn btn-primary" id="pub-view-action-btn">📅 Agendar Prazo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-day-details" class="modal"><div class="modal-content" style="max-width:400px"><div class="flex-between" style="margin-bottom:15px"><h3 id="day-details-title">Detalhes</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-day-details')">X</button></div><div id="day-details-body"></div></div></div>
+        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-case')">X</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div><label>Cliente (Autor/Reclamante)</label><input type="text" name="client" required><label>Parte Contrária</label><input type="text" name="opponent"><div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area"><option>Cível</option><option>Trabalhista</option><option>Penal</option><option>Família</option><option>Previdenciário</option></select></div><div style="flex:1"><label>Data Dist.</label><input type="date" name="date_dist"></div></div><div class="flex-gap"><div style="flex:1"><label>Valor Causa (R$)</label><input type="number" name="value" step="0.01"></div><div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div></div><label>Advogado</label><input type="text" name="lawyer"><label>Obs</label><textarea name="obs"></textarea><button class="btn btn-primary" style="width:100%">Salvar</button></form></div></div>
+        <div id="modal-deadline" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Prazo</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-deadline')">X</button></div><form onsubmit="app.saveDeadline(event)"><input type="hidden" name="id"><input type="hidden" name="caseId" id="deadline-case-id"><div id="case-selector-container" style="margin-bottom:1rem"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div><label>Tipo de Prazo</label><select name="type" required><option value="">Selecione...</option><option>Apelação</option><option>Contestação</option><option>Réplica</option><option>Audiência</option><option>Manifestação</option><option>Pagamento de Custas</option><option>Outros</option></select><div class="flex-gap"><div style="flex:1"><label>Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Fatal</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%">Salvar</button></form></div></div>
+        <div id="modal-task" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Tarefa</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-task')">X</button></div><form onsubmit="app.saveTask(event)"><input type="hidden" name="id"><label>Vínculo</label><select id="task-case-select" name="caseId"><option value="">Geral</option></select><label>Descrição</label><input type="text" name="desc" required><div class="flex-gap"><div style="flex:1"><label>Prioridade</label><select name="priority"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div><div style="flex:1"><label>Prazo</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%">Salvar</button></form></div></div>
+        <div id="modal-payment" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Movimentação</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-payment')">X</button></div><form onsubmit="app.saveTransaction(event)"><input type="hidden" name="caseId" id="finance-case-id"><label>Tipo</label><select name="type"><option value="income">Recebimento (+)</option><option value="expense">Despesa (-)</option></select><label>Valor (R$)</label><input type="number" step="0.01" name="amount" required><label>Descrição</label><input type="text" name="desc"><button class="btn btn-success" style="width:100%">Registrar</button></form></div></div>
+        <div id="modal-client-detail" class="modal"><div class="modal-content"><div class="flex-between"><h3>Ficha do Cliente</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-client-detail')">X</button></div><div id="client-detail-body"></div></div></div>
+        <div id="modal-receipt" class="modal"><div class="modal-content" style="max-width:500px"><div class="receipt-paper" id="receipt-content"></div><div style="margin-top:20px; text-align:center;"><button class="btn btn-primary" onclick="window.print()">🖨 Imprimir</button><button class="btn btn-outline" onclick="app.closeModal('modal-receipt')">Fechar</button></div></div></div>
+
+    </main>
+
+    <script>
+        const app = {
+            data: { cases: [], deadlines: [], transactions: [], updates: [], tasks: [], settings: { theme: 'light', apiKey: 'AIzaSyAt-PhAbqYUk67SZ5yJ5s_1aIFgxsKCiJM' } },
+            currentStatusId: null,
+            tempAnalysis: null,
+
+            init() {
+                this.loadData();
+                if(localStorage.getItem('lexTheme') === 'dark') document.body.classList.add('dark-mode');
+                this.renderDashboard();
+                if(document.getElementById('api-key-input')) document.getElementById('api-key-input').value = this.data.settings.apiKey;
+                document.addEventListener('click', (e) => { if (!e.target.closest('.badge') && !e.target.closest('.status-dropdown')) document.getElementById('status-menu').classList.remove('show'); });
+            },
+
+            // --- API INTEGRATION (9 PONTOS - JSON) ---
+            async callGeminiAPI(text) {
+                const apiKey = this.data.settings.apiKey;
+                if (!apiKey) { alert('API Key inválida ou vazia.'); return null; }
+
+                const prompt = `
+                Atue como um advogado sênior. Analise o texto jurídico abaixo e retorne APENAS um objeto JSON válido (sem markdown, sem \`\`\`, apenas o objeto puro) com a seguinte estrutura exata:
+                {
+                    "caseNumber": "Número do processo (apenas números e pontuação)",
+                    "court": "Órgão julgador e Tribunal",
+                    "type": "Classificação do ato (Sentença, Despacho, etc)",
+                    "outcome": "Resultado (Procedente, Improcedente, etc - se houver)",
+                    "author": "Nome do Autor",
+                    "defendant": "Nome do Réu",
+                    "urgency": "alta, média ou baixa",
+                    "summary": "Resumo objetivo do que aconteceu",
+                    "determinations": ["Lista de ordens do juiz"],
+                    "requests": "Resumo dos pedidos/recursos envolvidos",
+                    "deadlineInfo": "Informação sobre prazo fatal e riscos",
+                    "nextStep": "Próximo passo processual sugerido",
+                    "clientSummary": "Explicação simples para o cliente (5 linhas)"
+                }
+
+                Texto da Publicação:
+                ${text}
+                `;
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await response.json();
+                    
+                    if(data.error) {
+                        console.error(data.error);
+                        alert(`Erro na API do Google: ${data.error.message}`);
+                        return null;
+                    }
+
+                    let rawJson = data.candidates[0].content.parts[0].text;
+                    // Limpeza agressiva para garantir JSON válido
+                    rawJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
+                    
+                    return JSON.parse(rawJson);
+
+                } catch (error) {
+                    console.error("Erro API/Parse:", error);
+                    alert("Erro ao processar a resposta da IA. Verifique o console.");
+                    return null;
+                }
+            },
+
+            async analyzeLegalText(text) {
+                const aiResult = await this.callGeminiAPI(text);
+                
+                if (aiResult) {
+                    // Match Local de Cliente
+                    const upperText = text.toUpperCase();
+                    let matchedCaseId = null;
+                    let caseNumber = aiResult.caseNumber;
+                    
+                    // Tenta achar vínculo pelo nome do cliente
+                    for(let c of this.data.cases) {
+                        if(upperText.includes(c.client.toUpperCase())) { 
+                            matchedCaseId = c.id; 
+                            if(!caseNumber) caseNumber = c.number; 
+                            break; 
+                        }
+                    }
+                    return { ...aiResult, matchedCaseId };
+                }
+                return null;
+            },
+            
+            async analyzeTextPreview() {
+                const text = document.getElementById('import-text').value; if(!text) return alert('Cole o texto.');
+                const btn = document.querySelector('#step-1-import button');
+                const originalText = btn.innerText;
+                btn.innerText = "⏳ Analisando..."; btn.disabled = true;
+
+                this.tempAnalysis = await this.analyzeLegalText(text);
+                
+                btn.innerText = originalText; btn.disabled = false;
+
+                if(!this.tempAnalysis) return; // Erro já tratado no callGeminiAPI
+
+                // Preenche Edição
+                document.getElementById('anl-type').value = this.tempAnalysis.type || '';
+                document.getElementById('anl-outcome').value = this.tempAnalysis.outcome || '';
+                document.getElementById('anl-caseNumber').value = this.tempAnalysis.caseNumber || '';
+                document.getElementById('anl-urgency').value = this.tempAnalysis.urgency || 'baixa';
+                document.getElementById('anl-author').value = this.tempAnalysis.author || '';
+                document.getElementById('anl-defendant').value = this.tempAnalysis.defendant || '';
+                document.getElementById('anl-summary').value = this.tempAnalysis.summary || '';
+
+                const matchDiv = document.getElementById('match-info');
+                if(this.tempAnalysis.matchedCaseId) matchDiv.innerHTML = `<span class="text-success">✅ Vinculado ao cliente!</span>`;
+                else matchDiv.innerHTML = `<span class="text-danger">⚠️ Novo processo será criado.</span>`;
+
+                document.getElementById('step-1-import').style.display = 'none';
+                document.getElementById('step-2-import').style.display = 'block';
+            },
+
+            backToStep1() {
+                document.getElementById('step-1-import').style.display = 'block';
+                document.getElementById('step-2-import').style.display = 'none';
+            },
+            
+            saveImport() {
+                // Recupera dados editados
+                const finalAnalysis = {
+                    type: document.getElementById('anl-type').value,
+                    outcome: document.getElementById('anl-outcome').value,
+                    caseNumber: document.getElementById('anl-caseNumber').value,
+                    urgency: document.getElementById('anl-urgency').value,
+                    author: document.getElementById('anl-author').value,
+                    defendant: document.getElementById('anl-defendant').value,
+                    summary: document.getElementById('anl-summary').value,
+                    // Campos da IA não editáveis
+                    determinations: this.tempAnalysis.determinations || [],
+                    requests: this.tempAnalysis.requests || '-',
+                    deadlineInfo: this.tempAnalysis.deadlineInfo || '-',
+                    nextStep: this.tempAnalysis.nextStep || '-',
+                    clientSummary: this.tempAnalysis.clientSummary || '-',
+                    court: this.tempAnalysis.court || '',
+                    matchedCaseId: this.tempAnalysis.matchedCaseId
+                };
+
+                const text = document.getElementById('import-text').value;
+                const importId = document.getElementById('import-id').value;
+                let cid = finalAnalysis.matchedCaseId;
+                
+                // AUTO-CADASTRO
+                if(!cid && finalAnalysis.caseNumber) {
+                    const existingCase = this.data.cases.find(c => c.number === finalAnalysis.caseNumber);
+                    if(existingCase) cid = existingCase.id;
+                    else {
+                        const newCase = { id: Date.now(), number: finalAnalysis.caseNumber, client: finalAnalysis.author || `Cliente Auto`, opponent: finalAnalysis.defendant || '', area: 'Cível', status: 'Em andamento', date_created: new Date().toISOString() };
+                        this.data.cases.push(newCase); cid = newCase.id;
+                    }
+                }
+
+                if (importId) {
+                    const idx = this.data.updates.findIndex(u => u.id == importId);
+                    if(idx > -1) { this.data.updates[idx].rawText = text; this.data.updates[idx].analysis = finalAnalysis; this.data.updates[idx].caseId = cid; }
+                } else {
+                    this.data.updates.unshift({ id: Date.now(), date: new Date().toISOString(), rawText: text, analysis: finalAnalysis, caseId: cid });
+                }
+                this.saveToStorage(); 
+                if(finalAnalysis.urgency === 'alta' && confirm('Urgente! Agendar prazo?')) this.openModal('modal-deadline', cid);
+                
+                this.closeModal('modal-import'); this.navigate('updates'); this.backToStep1();
+            },
+
+            viewPublication(id) {
+                const pub = this.data.updates.find(u => u.id === id); if(!pub) return;
+                const a = pub.analysis;
+                
+                const summaryHtml = `
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div class="analysis-grid">
+                            <div class="analysis-item"><span class="analysis-label">1. Identificação</span><span class="analysis-val">${a.caseNumber||'-'} | ${a.court||'-'}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">2. Natureza</span><span class="analysis-val">${a.type}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">3. Partes</span><span class="analysis-val">Autor: ${a.author||'-'} <br> Réu: ${a.defendant||'-'}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">4. Resultado</span><span class="analysis-val" style="color:var(--primary)">${a.outcome}</span></div>
+                        </div>
+                        <div><span class="analysis-label">5. Determinações</span><ul style="margin:5px 0 0 15px; font-size:0.9rem; color:var(--text-main)">${a.determinations && a.determinations.length ? a.determinations.map(d=>`<li>${d}</li>`).join('') : '<li>Verificar teor.</li>'}</ul></div>
+                        <div><span class="analysis-label">6. Resumo Técnico</span><p style="font-size:0.9rem; margin-top:5px; background:var(--bg-light); padding:10px; border-radius:6px;">${a.summary}</p></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div><span class="analysis-label" style="color:var(--danger)">7. Prazo Fatal</span><br><b>${a.deadlineInfo}</b></div><div><span class="analysis-label">8. Cenário</span><br>${a.nextStep}</div></div>
+                        <div class="client-summary-box"><b>9. Para o Cliente:</b><br>${a.clientSummary}</div>
+                    </div>
+                `;
+                document.getElementById('pub-view-summary').innerHTML = summaryHtml;
+                document.getElementById('pub-view-text').innerText = pub.rawText;
+                const btn = document.getElementById('pub-view-action-btn');
+                btn.onclick = () => { app.closeModal('modal-publication-view'); app.openModal('modal-deadline', pub.caseId); };
+                document.getElementById('modal-publication-view').classList.add('active');
+            },
+
+            editUpdate(id) {
+                const u = this.data.updates.find(x => x.id === id); if(!u) return;
+                document.getElementById('import-id').value = u.id; document.getElementById('import-text').value = u.rawText;
+                this.analyzeTextPreview(); 
+                document.getElementById('modal-import').classList.add('active');
+            },
+            deleteUpdate(id) { if(confirm('Excluir?')) { this.data.updates = this.data.updates.filter(u => u.id !== id); this.saveToStorage(); this.renderUpdatesFull(); } },
+            saveApiKey() { this.data.settings.apiKey = document.getElementById('api-key-input').value; this.saveToStorage(); alert('Salvo!'); },
+
+            // --- DATE HELPER ---
+            fixDate(dateStr) { if(!dateStr) return null; return new Date(dateStr + 'T12:00:00'); },
+            toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); },
+            navigate(view) {
+                document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+                const sec = document.getElementById(`view-${view}`); if(sec) sec.classList.remove('hidden');
+                const navBtn = document.getElementById(view === 'case-detail' ? 'nav-cases' : `nav-${view}`);
+                if(navBtn) navBtn.classList.add('active');
+                document.getElementById('sidebar').classList.remove('active');
+                if(view === 'dashboard') this.renderDashboard(); if(view === 'updates') this.renderUpdatesFull(); if(view === 'cases') this.renderCases(); if(view === 'deadlines') this.renderDeadlines(); if(view === 'finance') this.renderFinance(); if(view === 'tasks') this.renderTasks(); if(view === 'clients') this.renderClients(); if(view === 'settings') { if(document.getElementById('api-key-input')) document.getElementById('api-key-input').value = this.data.settings.apiKey; }
+            },
+            showDayDetails(day, month, year) {
+                const events = [];
+                this.data.deadlines.forEach(d => { const dDate = new Date(d.date); if(dDate.getDate() === day && dDate.getMonth() === month && dDate.getFullYear() === year) { const c = this.data.cases.find(x => x.id == d.caseId); events.push({ type: 'deadline', title: d.type, sub: c ? c.client : '-', done: d.done, id: d.id }); } });
+                this.data.tasks.forEach(t => { const tDate = new Date(t.date); if(tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year) { events.push({ type: 'task', title: t.desc, sub: t.priority, done: t.done, id: t.id }); } });
+                const body = document.getElementById('day-details-body'); document.getElementById('day-details-title').innerText = `Dia ${day}/${month+1}`;
+                if(events.length === 0) body.innerHTML = '<p style="color:#999; text-align:center">Vazio.</p>'; else body.innerHTML = events.map(e => `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:600; color:${e.type==='deadline'?'var(--danger)':'var(--info)'}">${e.type==='deadline'?'⏳':'📝'} ${e.title}</div><div style="font-size:0.8rem; color:#666">${e.sub}</div></div><div style="display:flex; gap:5px;"><button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">✓</button></div></div>`).join('');
+                document.getElementById('modal-day-details').classList.add('active');
+            },
+            renderDashboard() {
+                const active = this.data.cases.filter(c => c.status === 'Em andamento');
+                document.getElementById('dash-active').innerText = active.length;
+                let totalReceived = 0; this.data.transactions.forEach(t => { if (t.type === 'income') totalReceived += (parseFloat(t.amount) || 0); });
+                document.getElementById('dash-finance-received').innerText = this.formatCurrency(totalReceived);
+                const today = new Date(); today.setHours(0,0,0,0);
+                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                document.getElementById('calendar-month-label').innerText = monthNames[today.getMonth()];
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1); const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                const grid = document.getElementById('calendar-grid-content'); grid.innerHTML = '';
+                for(let i=0; i<firstDay.getDay(); i++) grid.innerHTML += `<div></div>`;
+                for(let i=1; i<=lastDay.getDate(); i++) {
+                    const deadlinesToday = this.data.deadlines.filter(d => { const dDate = new Date(d.date); return dDate.getDate() === i && dDate.getMonth() === today.getMonth() && !d.done; });
+                    const tasksToday = this.data.tasks.filter(t => { const tDate = new Date(t.date); return tDate.getDate() === i && tDate.getMonth() === today.getMonth() && !t.done; });
+                    let dotsHtml = '<div class="calendar-dots">';
+                    deadlinesToday.slice(0,4).forEach(() => dotsHtml += '<div class="calendar-dot dot-deadline"></div>');
+                    tasksToday.slice(0,4-deadlinesToday.length).forEach(() => dotsHtml += '<div class="calendar-dot dot-task"></div>');
+                    dotsHtml += '</div>';
+                    grid.innerHTML += `<div class="calendar-day ${i === today.getDate() ? 'today' : ''}" onclick="app.showDayDetails(${i}, ${today.getMonth()}, ${today.getFullYear()})">${i} ${dotsHtml}</div>`;
+                }
+                const list = document.getElementById('calendar-list-content'); list.innerHTML = '';
+                let agendaItems = [];
+                this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: 'Prazo', id:d.caseId}));
+                this.data.updates.slice(0,5).forEach(u => agendaItems.push({type:'update', date:u.date, title:u.analysis.type, sub: 'Publicação', id:u.id}));
+                agendaItems.sort((a,b)=>new Date(a.date)-new Date(b.date));
+                if(agendaItems.length === 0) list.innerHTML = '<div style="padding:10px;text-align:center;color:#999">Sem agenda próxima.</div>';
+                agendaItems.slice(0,6).forEach(item => {
+                    const icon = item.type==='deadline' ? '⏳' : '📜';
+                    const color = item.type==='deadline' ? 'var(--danger)' : 'var(--text-main)';
+                    const clickAction = item.type==='deadline' ? `app.openCaseDetail(${item.id})` : `app.viewPublication(${item.id})`;
+                    list.innerHTML += `<div style="padding:8px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="${clickAction}"><div style="font-weight:600; font-size:0.9rem; color:${color}">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-muted)">${new Date(item.date).toLocaleDateString().slice(0,5)} • ${item.sub}</div></div>`;
+                });
+                document.getElementById('dash-today').innerText = this.data.deadlines.filter(d => !d.done && new Date(d.date).toDateString() === today.toDateString()).length;
+            },
+            openStatusMenu(el, id) { this.currentStatusId = id; const m = document.getElementById('status-menu'); const r = el.getBoundingClientRect(); m.style.top = (r.bottom+window.scrollY+5)+'px'; m.style.left = r.left+'px'; m.classList.add('show'); },
+            changeStatus(st) { if(this.currentStatusId) { const i = this.data.cases.findIndex(c=>c.id===this.currentStatusId); if(i>-1) { this.data.cases[i].status=st; this.saveToStorage(); this.renderCases(); document.getElementById('status-menu').classList.remove('show'); } } },
+            openModal(id, dataId = null) {
+                document.getElementById(id).classList.add('active'); const form = document.querySelector(`#${id} form`); if(form) form.reset();
+                if(id==='modal-case' && dataId) { const c = this.data.cases.find(x=>x.id===dataId); if(c){document.querySelector('[name="id"]').value=c.id; document.querySelector('[name="number"]').value=c.number; document.querySelector('[name="client"]').value=c.client; document.querySelector('[name="status"]').value=c.status; document.querySelector('[name="opponent"]').value=c.opponent||'';} }
+                if(id==='modal-deadline' || id==='modal-task') {
+                    const sel = document.getElementById(id==='modal-deadline'?'case-select-dropdown':'task-case-select'); sel.innerHTML=id==='modal-deadline'?'<option value="">Selecione...</option>':'<option value="">Geral</option>';
+                    this.data.cases.forEach(x=>sel.add(new Option(x.client, x.id)));
+                    if(dataId && typeof dataId === 'number') { const item = id==='modal-deadline'?this.data.deadlines.find(x=>x.id===dataId):this.data.tasks.find(x=>x.id===dataId); if(item) { document.querySelector(`#${id} [name="id"]`).value=item.id; if(item.caseId) sel.value=item.caseId; } } 
+                    else if (dataId && id==='modal-deadline') { document.getElementById('deadline-case-id').value=dataId; document.getElementById('case-selector-container').style.display='none'; } 
+                    else { if(id==='modal-deadline') document.getElementById('case-selector-container').style.display='block'; }
+                }
+            },
+            closeModal(id) { document.getElementById(id).classList.remove('active'); },
+            saveCase(e) { e.preventDefault(); const f=new FormData(e.target); const id=f.get('id'); const d={number:f.get('number'), client:f.get('client'), opponent:f.get('opponent'), status:f.get('status'), area:f.get('area'), value:parseFloat(f.get('value')||0), fees:parseFloat(f.get('fees')||0), obs:f.get('obs'), lawyer:f.get('lawyer'), date_dist:this.fixDate(f.get('date_dist'))?.toISOString()}; if(id){const i=this.data.cases.findIndex(c=>c.id==id);this.data.cases[i]={...this.data.cases[i],...d};}else{this.data.cases.push({...d, id:Date.now(), date_created:new Date().toISOString()});} this.saveToStorage(); this.closeModal('modal-case'); this.navigate('cases'); },
+            saveDeadline(e) { e.preventDefault(); const f=new FormData(e.target); const cid=f.get('caseId')||f.get('caseSelect'); if(!cid)return; this.data.deadlines.push({id:Date.now(), caseId:parseInt(cid), type:f.get('type'), date:this.fixDate(f.get('date')).toISOString(), done:false}); this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
+            saveTask(e) { e.preventDefault(); const f=new FormData(e.target); this.data.tasks.push({id:Date.now(), desc:f.get('desc'), priority:f.get('priority'), date:this.fixDate(f.get('date')).toISOString(), caseId:document.getElementById('task-case-select').value, done:false}); this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
+            saveTransaction(e) { e.preventDefault(); const f=new FormData(e.target); this.data.transactions.push({id:Date.now(), caseId:parseInt(f.get('caseId')), type:f.get('type'), amount:parseFloat(f.get('amount'))}); this.saveToStorage(); this.closeModal('modal-payment'); this.renderFinance(); },
+            renderClients() { const t=document.getElementById('clients-table-body'); t.innerHTML=''; const cs={}; this.data.cases.forEach(c=>{ if(!cs[c.client])cs[c.client]={name:c.client,count:0,val:0}; if(c.status==='Em andamento')cs[c.client].count++; cs[c.client].val+=(parseFloat(c.value)||0); }); Object.values(cs).forEach(cl=>{ t.innerHTML+=`<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td>${cl.count} ativos</td><td>${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
+            openClientDetail(name) { const cl = this.data.cases.filter(c=>c.client===name); let h=`<div style="margin-bottom:15px"><b>Total:</b> ${cl.length} processos</div><table style="width:100%"><thead><tr><th>Ref</th><th>Status</th><th>Valor</th></tr></thead><tbody>`; cl.forEach(c=>h+=`<tr><td>${c.number}</td><td>${c.status}</td><td>${this.formatCurrency(c.value)}</td></tr>`); document.getElementById('client-detail-body').innerHTML=h+`</tbody></table>`; document.getElementById('modal-client-detail').classList.add('active'); },
+            deleteClient(n) { if(confirm('Excluir?')) { this.data.cases = this.data.cases.filter(c=>c.client!==n); this.saveToStorage(); this.renderClients(); } },
+            renderFinance() { const t=document.getElementById('finance-table-body'); t.innerHTML=''; let tr=0,tp=0; this.data.cases.forEach(c=>{ const p=this.data.transactions.filter(x=>x.caseId==c.id&&x.type=='income').reduce((a,b)=>a+(parseFloat(b.amount)||0),0); const b=(parseFloat(c.fees)||0)-p; tr+=p; tp+=b; t.innerHTML+=`<tr><td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span></td><td>${this.formatCurrency(c.fees||0)}</td><td><span class="clickable-link text-success" onclick="app.openReceipt(${c.id},${p})">${this.formatCurrency(p)}</span></td><td>${this.formatCurrency(b)}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">Registrar</button></td></tr>`; }); document.getElementById('fin-received').innerText=this.formatCurrency(tr); document.getElementById('fin-pending').innerText=this.formatCurrency(tp); },
+            openReceipt(cid, tot) { const c=this.data.cases.find(x=>x.id==cid); const tr=this.data.transactions.filter(x=>x.caseId==cid&&x.type=='income'); document.getElementById('receipt-content').innerHTML=`<div class="receipt-header"><h2>RECIBO</h2><p>LexManager</p></div><p><b>Pagador:</b> ${c.client}</p><div style="border-top:1px dashed #ccc; margin:15px 0;">${tr.map(t=>`<div class="receipt-row"><span>${new Date(t.date).toLocaleDateString()}</span><span>${this.formatCurrency(t.amount)}</span></div>`).join('')}</div><div class="receipt-row" style="font-weight:bold"><span>TOTAL</span><span>${this.formatCurrency(tot)}</span></div>`; document.getElementById('modal-receipt').classList.add('active'); },
+            renderCases() { const t=document.getElementById('cases-table-body'); t.innerHTML=''; const s=document.getElementById('search-case').value.toLowerCase(); const fl=document.getElementById('filter-lawyer').value; const fa=document.getElementById('filter-area').value; this.data.cases.filter(c=>(c.client.toLowerCase().includes(s)||c.number.includes(s))&&(fl===""||c.lawyer===fl)&&(fa===""||c.area===fa)).forEach(c=>{ let bg = c.status==='Em andamento'?'badge-blue':(c.status==='Finalizado'?'badge-green':'badge-gray'); t.innerHTML+=`<tr><td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td>${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
+            renderDeadlines() { const t=document.getElementById('deadlines-table-body'); t.innerHTML=''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d=>{ const c=this.data.cases.find(x=>x.id==d.caseId); t.innerHTML+=`<tr><td>${new Date(d.date).toLocaleDateString()}</td><td>${d.type}</td><td>${c?c.client:'-'}</td><td>${d.done?'✅':'⏳'}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
+            renderTasks() { const t=document.getElementById('tasks-table-body'); t.innerHTML=''; this.data.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk=>{ const c=this.data.cases.find(x=>x.id==tsk.caseId); t.innerHTML+=`<tr><td><span class="badge ${tsk.priority==='Alta'?'badge-red':'badge-blue'}">${tsk.priority}</span></td><td>${tsk.desc}</td><td>${c?c.client:'-'}</td><td>${new Date(tsk.date).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; }); },
+            renderUpdatesFull() { const c = document.getElementById('updates-list-full'); c.innerHTML = ''; this.data.updates.forEach(u => { c.innerHTML += `<div class="card" onclick="app.viewPublication(${u.id})" style="cursor:pointer"><div class="smart-summary"><div class="summary-header"><b>${u.analysis.type}</b> <span class="summary-tag tag-blue">${u.analysis.outcome}</span></div><div class="summary-points"><div>Aut: ${u.analysis.author||'-'}</div><div>Réu: ${u.analysis.defendant||'-'}</div><div style="grid-column:span 2"><i>"${u.analysis.summary}"</i></div></div></div><div class="raw-text-content">${u.rawText}</div><div style="margin-top:10px;text-align:right"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); app.editUpdate(${u.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); app.deleteUpdate(${u.id})">🗑</button></div></div>`; }); },
+            openCaseDetail(id) { const c=this.data.cases.find(x=>x.id===id); if(!c)return; const contracted=c.fees||0; const received=this.data.transactions.filter(t=>t.caseId===id&&t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived=contracted>0?Math.min((received/contracted)*100,100):0; let timeline=[]; timeline.push({date:c.date_created, type:'create', title:'Cadastro', desc:'Início', id:null}); this.data.deadlines.filter(d=>d.caseId===id).forEach(d=>timeline.push({date:d.date, type:'deadline', title:d.type, desc:d.done?'Concluído':'Pendente', id:null})); this.data.transactions.filter(t=>t.caseId===id).forEach(t=>timeline.push({date:t.date, type:'finance', title:t.type==='income'?'Pagamento':'Despesa', desc:this.formatCurrency(t.amount), id:null})); this.data.updates.filter(u=>u.caseId===id).forEach(u=>timeline.push({date:u.date, type:'update', title:'Publicação', desc:u.analysis.type, id:u.id})); timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); document.getElementById('case-detail-content').innerHTML=`<div class="card"><div class="flex-between"><h2>${c.number}</h2> <span class="badge badge-blue">${c.status}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0;background:var(--bg-light);padding:15px;border-radius:8px;"><div><span class="text-muted" style="font-size:0.8rem">Cliente</span><br><b>${c.client}</b></div><div><span class="text-muted" style="font-size:0.8rem">Réu</span><br><b>${c.opponent||'-'}</b></div></div><div class="finance-summary-bar"><div class="finance-values"><span>Honorários: <b>${this.formatCurrency(contracted)}</b></span><span class="text-success">Recebido: <b>${this.formatCurrency(received)}</b></span></div><div class="finance-progress"><div class="progress-received" style="width:${pctReceived}%"></div><div class="progress-pending" style="width:${100-pctReceived}%"></div></div></div><div style="margin-top:15px;text-align:right"><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case', ${c.id})">Editar</button> <button class="btn btn-primary btn-sm" onclick="app.openModal('modal-deadline', ${c.id})">Prazo</button></div></div><h3>Histórico</h3><div class="full-timeline">${timeline.map(t => `<div class="ft-item" ${t.type==='update'?`onclick="app.viewPublication(${t.id})"`:''}><div class="ft-icon ${t.type}">●</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString()}</div><b style="color:var(--primary)">${t.title}</b><div style="font-size:0.9rem">${t.desc}</div></div></div>`).join('')}</div>`; this.navigate('case-detail'); },
+            toggleDeadline(id) { const i = this.data.deadlines.findIndex(d=>d.id===id); if(i>-1) { this.data.deadlines[i].done = !this.data.deadlines[i].done; this.saveToStorage(); this.renderDeadlines(); } },
+            deleteDeadline(id) { if(confirm('Excluir?')) { this.data.deadlines = this.data.deadlines.filter(d=>d.id!==id); this.saveToStorage(); this.renderDeadlines(); } },
+            toggleTask(id) { const i = this.data.tasks.findIndex(t=>t.id===id); if(i>-1) { this.data.tasks[i].done = !this.data.tasks[i].done; this.saveToStorage(); this.renderTasks(); } },
+            saveToStorage() { localStorage.setItem('lexData', JSON.stringify(this.data)); },
+            loadData() { const d=localStorage.getItem('lexData'); if(d) this.data=JSON.parse(d); if(!this.data.tasks)this.data.tasks=[]; if(!this.data.updates)this.data.updates=[]; const l=[...new Set(this.data.cases.map(c=>c.lawyer).filter(Boolean))]; const ls=document.getElementById('filter-lawyer'); l.forEach(x=>ls.add(new Option(x,x))); const a=[...new Set(this.data.cases.map(c=>c.area).filter(Boolean))]; const as=document.getElementById('filter-area'); a.forEach(x=>as.add(new Option(x,x))); },
+            toggleDarkMode() { document.body.classList.toggle('dark-mode'); },
+            clearData() { if(confirm('Apagar tudo?')) { localStorage.removeItem('lexData'); location.reload(); } },
+            formatCurrency(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v); }
+        };
+        app.init();
+    </script>
+</body>
+</html>
