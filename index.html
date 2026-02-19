@@ -81,7 +81,7 @@
         .dash-header h2 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
-        .stat-card { background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; min-height: 140px; transition: var(--transition); }
+        .stat-card { background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; min-height: 140px; transition: var(--transition); user-select: none; -webkit-user-select: none; }
         .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
         .stat-icon-bg { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 1.5rem; }
         .stat-title { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -238,13 +238,13 @@
                 </div>
 
                 <div class="stats-grid" id="dashboard-stats-grid">
-                    <div class="stat-card card-blue" data-id="ativos" draggable="true" style="cursor: grab;">
+                    <div class="stat-card card-blue" data-id="ativos" draggable="true" style="cursor: grab;" onclick="if(!app.isDragging) app.navigate('cases')">
                         <div class="stat-icon-bg">⚖️</div><div class="stat-title">Ativos</div><div class="stat-value" id="dash-active">0</div>
                     </div>
-                    <div class="stat-card card-red" data-id="prazos" draggable="true" style="cursor: grab;">
+                    <div class="stat-card card-red" data-id="prazos" draggable="true" style="cursor: grab;" onclick="if(!app.isDragging) app.navigate('deadlines')">
                         <div class="stat-icon-bg">⏳</div><div class="stat-title">Prazos Hoje</div><div class="stat-value text-danger" id="dash-today">0</div>
                     </div>
-                    <div class="stat-card card-green" data-id="saldo" draggable="true" style="cursor: grab;">
+                    <div class="stat-card card-green" data-id="saldo" draggable="true" style="cursor: grab;" onclick="if(!app.isDragging) app.navigate('finance')">
                         <div class="stat-icon-bg">💰</div><div class="stat-title">Recebido (Total)</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div>
                     </div>
                 </div>
@@ -370,73 +370,36 @@
             </div>
         </div>
 
-        <div id="modal-case" class="modal">
-            <div class="modal-content">
-                <div class="flex-between" style="margin-bottom:20px">
-                    <h3>Processo</h3>
-                    <button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button>
-                </div>
-                <form onsubmit="app.saveCase(event)">
-                    <input type="hidden" name="id">
-                    
-                    <div class="flex-gap">
-                        <div style="flex:1"><label>Número</label><input type="text" name="number" required></div>
-                        <div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div>
-                    </div>
-                    
-                    <div class="flex-between" style="margin-bottom: 5px;">
-                        <label style="margin: 0;">Partes do Processo</label>
-                        <button type="button" class="btn-outline btn-sm" style="border:none; color:var(--primary); font-weight:700; padding:4px;" onclick="app.swapClientOpponent()">🔁 Inverter Partes</button>
-                    </div>
-                    
-                    <div class="flex-gap" style="margin-bottom: 0;">
-                        <div style="flex:2">
-                            <label style="font-size:0.75rem; font-weight:normal;">Meu Cliente</label>
-                            <input type="text" name="client" required>
-                        </div>
-                        <div style="flex:1">
-                            <label style="font-size:0.75rem; font-weight:normal;">Posição</label>
-                            <select name="client_role">
-                                <option value="autor">Autor / Reclamante</option>
-                                <option value="reu">Réu / Reclamado</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <label style="font-size:0.75rem; font-weight:normal;">Parte Adversa</label>
-                    <input type="text" name="opponent">
-                    
-                    <div class="flex-gap">
-                        <div style="flex:1"><label>Área</label>
-                            <select name="area">
-                                <option>Cível</option>
-                                <option>Trabalhista</option>
-                                <option>Família e Sucessões</option>
-                                <option>Penal</option>
-                                <option>Previdenciário</option>
-                                <option>Tributário</option>
-                                <option>Empresarial</option>
-                                <option>Consumidor</option>
-                                <option>Imobiliário</option>
-                                <option>Digital / Proteção de Dados</option>
-                                <option>Outros</option>
-                            </select>
-                        </div>
-                        <div style="flex:1"><label>Valor da Causa (R$)</label><input type="number" name="value" step="0.01"></div>
-                    </div>
-                    
-                    <div class="flex-gap">
-                        <div style="flex:1"><label>Data Início (Opcional)</label><input type="date" name="date_start"></div>
-                        <div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div>
-                    </div>
-                    
-                    <label>Advogado Responsável</label><input type="text" name="lawyer">
-                    <label>Observações</label><textarea name="obs"></textarea>
-                    
-                    <button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar</button>
-                </form>
-            </div>
+        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div>
+        
+        <div class="flex-between" style="margin-bottom: 5px;">
+            <label style="margin: 0;">Partes do Processo</label>
+            <button type="button" class="btn-outline btn-sm" style="border:none; color:var(--primary); font-weight:700; padding:4px;" onclick="app.swapClientOpponent()">🔁 Inverter Partes</button>
         </div>
+        
+        <div class="flex-gap" style="margin-bottom: 0;">
+            <div style="flex:2"><label style="font-size:0.75rem; font-weight:normal;">Meu Cliente</label><input type="text" name="client" required></div>
+            <div style="flex:1"><label style="font-size:0.75rem; font-weight:normal;">Posição</label><select name="client_role"><option value="autor">Autor / Reclamante</option><option value="reu">Réu / Reclamado</option></select></div>
+        </div>
+        <label style="font-size:0.75rem; font-weight:normal;">Parte Adversa</label><input type="text" name="opponent">
+        
+        <div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
+            <option>Cível</option>
+            <option>Trabalhista</option>
+            <option>Família e Sucessões</option>
+            <option>Penal</option>
+            <option>Previdenciário</option>
+            <option>Tributário</option>
+            <option>Empresarial</option>
+            <option>Consumidor</option>
+            <option>Imobiliário</option>
+            <option>Digital / Proteção de Dados</option>
+            <option>Outros</option>
+        </select></div><div style="flex:1"><label>Valor da Causa (R$)</label><input type="number" name="value" step="0.01"></div></div>
+        <div class="flex-gap"><div style="flex:1"><label>Data Início (Opcional)</label><input type="date" name="date_start"></div><div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div></div>
+        <label>Advogado Responsável</label><input type="text" name="lawyer">
+        <label>Observações</label><textarea name="obs"></textarea>
+        <button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar</button></form></div></div>
         
         <div id="modal-deadline" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Prazo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-deadline')">✕</button></div><form onsubmit="app.saveDeadline(event)"><input type="hidden" name="id"><input type="hidden" name="caseId" id="deadline-case-id"><div id="case-selector-container" style="margin-bottom:1rem"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div><label>Tipo</label><input type="text" name="type" required><div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar Prazo</button></form></div></div>
 
@@ -517,15 +480,16 @@
 
     <script>
         const app = {
-            data: { cases: [], deadlines: [], transactions: [], updates: [], tasks: [], settings: { theme: 'light' } },
+            data: { cases: [], deadlines: [], transactions: [], updates: [], tasks: [], settings: { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'] } },
             currentStatusId: null,
             tempParsedData: null,
+            isDragging: false,
 
             init() {
                 this.loadData();
                 if(localStorage.getItem('lexTheme') === 'dark') document.body.classList.add('dark-mode');
                 
-                // Configuração Drag and Drop dos Cards do Dashboard
+                // DRAG AND DROP CONFIGURATION FOR DASHBOARD CARDS
                 const dashOrder = this.data.settings.dashOrder || ['ativos', 'prazos', 'saldo'];
                 const dashGrid = document.getElementById('dashboard-stats-grid');
                 if(dashGrid) {
@@ -534,10 +498,11 @@
                         if(card) dashGrid.appendChild(card);
                     });
 
+                    // DESKTOP DRAG EVENTS
                     let dragged = null;
                     dashGrid.addEventListener('dragstart', e => {
                         const card = e.target.closest('.stat-card');
-                        if(card) { dragged = card; dragged.style.opacity = '0.5'; }
+                        if(card) { dragged = card; dragged.style.opacity = '0.5'; this.isDragging = true; }
                     });
                     dashGrid.addEventListener('dragend', e => {
                         if(dragged) {
@@ -545,6 +510,7 @@
                             const newOrder = Array.from(dashGrid.querySelectorAll('.stat-card')).map(c => c.dataset.id);
                             this.data.settings.dashOrder = newOrder;
                             this.saveToStorage();
+                            setTimeout(() => this.isDragging = false, 100);
                             dragged = null;
                         }
                     });
@@ -555,6 +521,48 @@
                             const rect = targetCard.getBoundingClientRect();
                             const next = (e.clientX - rect.left) / (rect.right - rect.left) > 0.5;
                             dashGrid.insertBefore(dragged, next ? targetCard.nextSibling : targetCard);
+                        }
+                    });
+
+                    // MOBILE TOUCH EVENTS
+                    let touchTarget = null;
+                    let touchMoved = false;
+                    dashGrid.addEventListener('touchstart', e => {
+                        const card = e.target.closest('.stat-card');
+                        if(card && e.touches.length === 1) { 
+                            touchTarget = card; 
+                            touchMoved = false;
+                            this.isDragging = false;
+                        }
+                    }, {passive: true});
+
+                    dashGrid.addEventListener('touchmove', e => {
+                        if(!touchTarget) return;
+                        touchMoved = true;
+                        this.isDragging = true;
+                        touchTarget.style.opacity = '0.5';
+                        const touch = e.touches[0];
+                        const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                        const targetCard = elem ? elem.closest('.stat-card') : null;
+                        
+                        if(targetCard && targetCard !== touchTarget && dashGrid.contains(targetCard)) {
+                            const rect = targetCard.getBoundingClientRect();
+                            const next = (touch.clientX - rect.left) / (rect.right - rect.left) > 0.5;
+                            dashGrid.insertBefore(touchTarget, next ? targetCard.nextSibling : targetCard);
+                        }
+                    }, {passive: false});
+
+                    dashGrid.addEventListener('touchend', e => {
+                        if(touchTarget) {
+                            touchTarget.style.opacity = '1';
+                            if(touchMoved) {
+                                const newOrder = Array.from(dashGrid.querySelectorAll('.stat-card')).map(c => c.dataset.id);
+                                this.data.settings.dashOrder = newOrder;
+                                this.saveToStorage();
+                                e.preventDefault();
+                            }
+                            setTimeout(() => this.isDragging = false, 100);
+                            touchTarget = null;
                         }
                     });
                 }
@@ -725,7 +733,6 @@ ${textToAnalyze}`;
                 let cid = this.tempParsedData.matchedCaseId;
                 
                 if(!cid && this.tempParsedData.caseNumber) {
-                    // Lógica para definir corretamente quem é o cliente baseado na seleção
                     let defClient = this.tempParsedData.extractedAutor || "Cliente Não Identificado";
                     let defOpponent = this.tempParsedData.extractedReu || "-";
                     
@@ -997,7 +1004,7 @@ ${textToAnalyze}`;
                 }); 
                 const netBalance = totalIncome - totalExpense;
                 const balanceEl = document.getElementById('dash-finance-received');
-                balanceEl.innerText = this.formatCurrency(totalIncome); // Dashboard agora mostra o Total Recebido (Entradas puras)
+                balanceEl.innerText = this.formatCurrency(totalIncome); 
                 balanceEl.className = `stat-value text-success`;
                 
                 const today = new Date(); 
@@ -1034,7 +1041,7 @@ ${textToAnalyze}`;
                 
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => {
                     const c = this.data.cases.find(x => x.id == d.caseId);
-                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id}); // id do deadline modificado
+                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id});
                 });
                 
                 this.data.tasks.filter(t => !t.done && new Date(t.date) >= today).forEach(t => {
@@ -1380,7 +1387,7 @@ ${textToAnalyze}`;
             toggleTask(id) { const i = this.data.tasks.findIndex(t=>t.id===id); if(i>-1) { this.data.tasks[i].done = !this.data.tasks[i].done; this.saveToStorage(); this.renderTasks(); } },
             
             saveToStorage() { localStorage.setItem('lexData', JSON.stringify(this.data)); },
-            loadData() { const d = localStorage.getItem('lexData'); if(d) this.data = JSON.parse(d); if(!this.data.tasks) this.data.tasks = []; if(!this.data.updates) this.data.updates = []; const l = [...new Set(this.data.cases.map(c=>c.lawyer).filter(Boolean))]; const ls = document.getElementById('filter-lawyer'); if(ls) l.forEach(x => ls.add(new Option(x,x))); const a = [...new Set(this.data.cases.map(c=>c.area).filter(Boolean))]; const as = document.getElementById('filter-area'); if(as) a.forEach(x => as.add(new Option(x,x))); },
+            loadData() { const d = localStorage.getItem('lexData'); if(d) this.data = JSON.parse(d); if(!this.data.tasks) this.data.tasks = []; if(!this.data.updates) this.data.updates = []; if(!this.data.settings) this.data.settings = { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'] }; const l = [...new Set(this.data.cases.map(c=>c.lawyer).filter(Boolean))]; const ls = document.getElementById('filter-lawyer'); if(ls) l.forEach(x => ls.add(new Option(x,x))); const a = [...new Set(this.data.cases.map(c=>c.area).filter(Boolean))]; const as = document.getElementById('filter-area'); if(as) a.forEach(x => as.add(new Option(x,x))); },
             toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('lexTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); },
             clearData() { if(confirm('ATENÇÃO: Isso irá apagar TODOS os processos, clientes e financeiro do seu navegador. Não há como desfazer. Confirmar?')) { localStorage.removeItem('lexData'); location.reload(); } },
             formatCurrency(v) { return new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(v); }
