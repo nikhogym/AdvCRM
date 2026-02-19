@@ -186,14 +186,6 @@
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* RESPONSIVIDADE & MOBILE APP TWEAKS */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .app-topbar { padding-top: env(safe-area-inset-top); height: calc(60px + env(safe-area-inset-top)); }
-            aside { padding-top: calc(24px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom); }
-            .content-scroll { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
-            .menu-toggle { bottom: calc(20px + env(safe-area-inset-bottom)) !important; }
-            .modal-content { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
-        }
-
         @media (max-width: 768px) { 
             aside { position: fixed; height: 100%; left: calc(var(--sidebar-width) * -1); box-shadow: var(--shadow-lg); } 
             aside.active { left: 0; } 
@@ -222,6 +214,31 @@
             .calendar-legend { margin-top: 10px; padding-top: 10px; font-size: 0.75rem; }
             
             .analysis-grid { grid-template-columns: 1fr; }
+        }
+
+        /* SAFE AREA (iOS NOTCH / DYNAMIC ISLAND FIXES) */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .app-topbar { 
+                padding-top: env(safe-area-inset-top, 0px) !important; 
+                height: calc(70px + env(safe-area-inset-top, 0px)) !important; 
+            }
+            @media (max-width: 768px) {
+                .app-topbar { height: calc(60px + env(safe-area-inset-top, 0px)) !important; }
+            }
+            aside { 
+                padding-top: calc(24px + env(safe-area-inset-top, 0px)); 
+                padding-bottom: env(safe-area-inset-bottom, 0px); 
+            }
+            .content-scroll { 
+                padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); 
+            }
+            .menu-toggle { 
+                bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; 
+            }
+            .modal { 
+                padding-top: env(safe-area-inset-top, 0px); 
+                padding-bottom: env(safe-area-inset-bottom, 0px); 
+            }
         }
     </style>
 </head>
@@ -515,6 +532,7 @@
                 this.loadData();
                 if(localStorage.getItem('lexTheme') === 'dark') document.body.classList.add('dark-mode');
                 
+                // DRAG AND DROP CONFIGURATION FOR DASHBOARD CARDS
                 const dashOrder = this.data.settings.dashOrder || ['ativos', 'prazos', 'saldo'];
                 const dashGrid = document.getElementById('dashboard-stats-grid');
                 if(dashGrid) {
@@ -549,7 +567,7 @@
                         }
                     });
 
-                    // MOBILE TOUCH EVENTS (Long Press para não impedir o scroll nativo e evitar cliques acidentais)
+                    // MOBILE TOUCH EVENTS (ROBUST iOS/ANDROID)
                     let touchTimer;
                     dashGrid.addEventListener('touchstart', e => {
                         const card = e.target.closest('.stat-card');
@@ -559,10 +577,11 @@
                                 this.isDragging = true;
                                 dragged.style.opacity = '0.7';
                                 dragged.style.transform = 'scale(0.95)';
+                                dragged.style.pointerEvents = 'none'; 
                                 if(navigator.vibrate) navigator.vibrate(50);
-                            }, 400); // 400ms para reconhecer como segurar/arrastar
+                            }, 400); 
                         }
-                    }, {passive: true});
+                    }, {passive: false});
 
                     dashGrid.addEventListener('touchmove', e => {
                         if(dragged && this.isDragging) {
@@ -587,6 +606,7 @@
                         if(dragged && this.isDragging) {
                             dragged.style.opacity = '1';
                             dragged.style.transform = 'none';
+                            dragged.style.pointerEvents = 'auto';
                             const newOrder = Array.from(dashGrid.querySelectorAll('.stat-card')).map(c => c.dataset.id);
                             this.data.settings.dashOrder = newOrder;
                             this.saveToStorage();
@@ -1351,160 +1371,6 @@ ${textToAnalyze}`;
             renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; [...this.data.tasks].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; }); },
             renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0, roles:new Set()}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); cs[c.client].roles.add(c.client_role === 'reu' ? 'Réu' : 'Autor'); }); Object.values(cs).forEach(cl => { const rolesStr = Array.from(cl.roles).join(' / '); t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
             
-            renderFinance() { 
-                const t = document.getElementById('finance-table-body'); 
-                const ledger = document.getElementById('finance-ledger-body');
-                if(!t || !ledger) return;
-
-                t.innerHTML = ''; 
-                ledger.innerHTML = '';
-
-                let totalIn = 0, totalOut = 0, totalPending = 0; 
-
-                this.data.cases.forEach(c => { 
-                    const p = this.data.transactions.filter(x=>x.caseId==c.id && x.type=='income').reduce((a,b)=>a+(parseFloat(b.amount)||0),0); 
-                    const b = (parseFloat(c.fees)||0) - p; 
-                    totalPending += (b > 0 ? b : 0);
-                    
-                    t.innerHTML += `<tr>
-                        <td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td>
-                        <td>${this.formatCurrency(c.fees||0)}</td>
-                        <td><span class="clickable-link text-success" onclick="app.openReceiptConfig(null, ${c.id})" style="font-weight:700;">${this.formatCurrency(p)}</span></td>
-                        <td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td>
-                        <td style="display:flex; gap:8px;">
-                            <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">➕ Lançar</button>
-                            <button class="btn btn-primary btn-sm" onclick="app.openReceiptConfig(null, ${c.id})">📄 Recibo</button>
-                        </td>
-                    </tr>`; 
-                }); 
-
-                this.data.transactions.forEach(tx => {
-                    if (tx.type === 'income') totalIn += parseFloat(tx.amount) || 0;
-                    if (tx.type === 'expense') totalOut += parseFloat(tx.amount) || 0;
-                });
-                const balance = totalIn - totalOut;
-
-                if(document.getElementById('fin-received')) document.getElementById('fin-received').innerText = this.formatCurrency(totalIn); 
-                if(document.getElementById('fin-pending')) document.getElementById('fin-pending').innerText = this.formatCurrency(totalPending); 
-                if(document.getElementById('fin-expenses')) document.getElementById('fin-expenses').innerText = this.formatCurrency(totalOut);
-                if(document.getElementById('fin-balance')) {
-                    const balEl = document.getElementById('fin-balance');
-                    balEl.innerText = this.formatCurrency(balance);
-                    balEl.className = `stat-value ${balance >= 0 ? 'text-success' : 'text-danger'}`;
-                }
-
-                [...this.data.transactions].sort((a,b)=>b.id-a.id).forEach(tx => {
-                    const c = this.data.cases.find(x => x.id == tx.caseId);
-                    const isIncome = tx.type === 'income';
-                    
-                    let actionBtns = `<button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${tx.id})">🗑</button>`;
-                    if(isIncome) {
-                        actionBtns = `<button class="btn btn-outline btn-sm" onclick="app.openReceiptConfig(${tx.id})">📄 Recibo</button> ` + actionBtns;
-                    }
-
-                    ledger.innerHTML += `<tr>
-                        <td>${new Date(tx.id).toLocaleDateString('pt-BR')}</td>
-                        <td><span class="badge ${isIncome?'badge-green':'badge-red'}">${isIncome?'Entrada':'Saída'}</span></td>
-                        <td>${tx.desc || '-'}</td>
-                        <td>${c ? c.client : '-'}</td>
-                        <td style="font-weight:bold; color:${isIncome?'var(--success)':'var(--danger)'}">${isIncome?'+':'-'} ${this.formatCurrency(tx.amount)}</td>
-                        <td style="display:flex; gap:8px;">${actionBtns}</td>
-                    </tr>`;
-                });
-            },
-
-            openReceiptConfig(txId = null, caseId = null) {
-                let pagador = '';
-                let valor = 0;
-                let desc = 'Serviços jurídicos prestados.';
-                let data = new Date().toISOString().split('T')[0];
-
-                const dl = document.getElementById('rcpt-client-list');
-                dl.innerHTML = '';
-                const clients = [...new Set(this.data.cases.map(c => c.client).filter(Boolean))];
-                clients.forEach(c => dl.innerHTML += `<option value="${c}">`);
-
-                if (txId) {
-                    const tx = this.data.transactions.find(t => t.id === txId);
-                    if (tx) {
-                        valor = tx.amount;
-                        desc = tx.desc || 'Pagamento de honorários';
-                        data = new Date(tx.id).toISOString().split('T')[0];
-                        const c = this.data.cases.find(x => x.id == tx.caseId);
-                        if (c) {
-                            pagador = c.client;
-                            desc += ` (Processo nº ${c.number})`;
-                        }
-                    }
-                } else if (caseId) {
-                    const c = this.data.cases.find(x => x.id === caseId);
-                    if (c) {
-                        pagador = c.client;
-                        valor = this.data.transactions.filter(t => t.caseId === caseId && t.type === 'income').reduce((a,b) => a + (parseFloat(b.amount) || 0), 0);
-                        desc = `Honorários advocatícios referente ao processo ${c.number}`;
-                    }
-                }
-
-                document.getElementById('rcpt-client').value = pagador;
-                document.getElementById('rcpt-amount').value = valor;
-                document.getElementById('rcpt-desc').value = desc;
-                document.getElementById('rcpt-date').value = data;
-
-                document.getElementById('modal-receipt-config').classList.add('active');
-            },
-
-            generateReceipt() {
-                const pagador = document.getElementById('rcpt-client').value || '_______________________';
-                const valor = parseFloat(document.getElementById('rcpt-amount').value) || 0;
-                const desc = document.getElementById('rcpt-desc').value || '_______________________';
-                
-                const dateInput = document.getElementById('rcpt-date').value;
-                const dateStr = dateInput ? new Date(dateInput + 'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
-
-                document.getElementById('receipt-content').innerHTML = `
-                    <div style="border: 2px solid #000; padding: 40px; background: #fff; color: #000; font-family: 'Times New Roman', serif; position: relative; border-radius: 8px;">
-                        <div style="display:flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px;">
-                            <div>
-                                <h1 style="margin:0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px;">RECIBO</h1>
-                                <p style="margin: 5px 0 0 0; color: #555;">Via LexManager CRM</p>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="background: #f4f4f4; border: 1px solid #000; padding: 10px 20px; font-size: 1.5rem; font-weight: bold;">
-                                    ${this.formatCurrency(valor)}
-                                </div>
-                                <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Nº ${Date.now().toString().slice(-6)}</p>
-                            </div>
-                        </div>
-
-                        <div style="font-size: 1.15rem; line-height: 1.8; text-align: justify; margin-bottom: 30px;">
-                            Recebi(emos) de <b>${pagador}</b>, portador(a) do CPF/CNPJ nº ________________________, a importância supra de <b>${this.formatCurrency(valor)}</b>, em pagamento referente a <b>${desc}</b>.
-                            <br><br>
-                            Para maior clareza e validade, firmo o presente recibo dando plena, rasa e irrevogável quitação referente ao valor acima especificado.
-                        </div>
-
-                        <div style="display:flex; justify-content: flex-end; margin-bottom: 50px;">
-                            <div style="text-align: center; width: 60%;">
-                                <p style="font-size: 1.1rem; margin: 0;">__________________________, ${dateStr}</p>
-                            </div>
-                        </div>
-
-                        <div style="display:flex; justify-content: space-between; gap: 30px;">
-                            <div style="flex:1; border-top: 1px solid #000; text-align: center; padding-top: 10px;">
-                                <b style="display:block;">Assinatura do Pagador</b>
-                                <span style="font-size:0.9rem; color:#555;">(Opcional)</span>
-                            </div>
-                            <div style="flex:1; border-top: 1px solid #000; text-align: center; padding-top: 10px;">
-                                <b style="display:block;">Assinatura do Recebedor</b>
-                                <span style="font-size:0.9rem; color:#555;">Advogado / Escritório</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                this.closeModal('modal-receipt-config');
-                document.getElementById('modal-receipt').classList.add('active');
-            },
-
             openClientDetail(name) { 
                 const cl = this.data.cases.filter(c=>c.client===name); 
                 let h = `<div style="margin-bottom:20px; font-size:1.1rem;">Total consolidado: <b>${cl.length} processo(s)</b></div><table style="width:100%"><thead><tr><th>Nº CNJ</th><th>Posição</th><th>Status</th><th>Valor Causa</th></tr></thead><tbody>`; 
