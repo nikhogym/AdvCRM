@@ -185,17 +185,44 @@
 
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* RESPONSIVIDADE */
+        /* RESPONSIVIDADE & MOBILE APP TWEAKS */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .app-topbar { padding-top: env(safe-area-inset-top); height: calc(60px + env(safe-area-inset-top)); }
+            aside { padding-top: calc(24px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom); }
+            .content-scroll { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+            .menu-toggle { bottom: calc(20px + env(safe-area-inset-bottom)) !important; }
+            .modal-content { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+        }
+
         @media (max-width: 768px) { 
-            aside { position: fixed; height: 100%; left: -280px; box-shadow: var(--shadow-lg); } 
+            aside { position: fixed; height: 100%; left: calc(var(--sidebar-width) * -1); box-shadow: var(--shadow-lg); } 
             aside.active { left: 0; } 
             .menu-toggle { display: flex; } 
-            .calendar-widget { grid-template-columns: 1fr; } 
-            .app-topbar { padding: 0 16px; } 
-            .stats-grid { grid-template-columns: 1fr; }
-            .dash-header { flex-direction: column; gap: 15px;}
-            .dash-header .quick-actions { width: 100%; display: flex; gap: 10px;}
-            .dash-header .quick-actions button { flex: 1; font-size: 0.85rem; padding: 10px 5px;}
+            .app-topbar { padding: 0 16px; height: 60px; } 
+            .content-scroll { padding: 16px; }
+            
+            /* Dash Header Compacto */
+            .dash-header { flex-direction: column; gap: 12px; margin-bottom: 16px; }
+            .dash-header h2 { font-size: 1.4rem; }
+            .dash-header .quick-actions { width: 100%; display: flex; gap: 8px;}
+            .dash-header .quick-actions button { flex: 1; font-size: 0.75rem; padding: 8px 4px;}
+            
+            /* Stats 3 Colunas no Mobile para caber tudo */
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+            .stat-card { padding: 12px 6px; min-height: auto; align-items: center; text-align: center; border-radius: var(--radius-md); }
+            .stat-icon-bg { width: 32px; height: 32px; font-size: 1rem; margin-bottom: 6px; border-radius: 8px; }
+            .stat-title { font-size: 0.6rem; letter-spacing: 0; }
+            .stat-value { font-size: 1rem; margin: 4px 0 0 0; }
+            
+            /* Calendário Mobile */
+            .card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
+            .calendar-widget { display: flex; flex-direction: column-reverse; gap: 16px; }
+            .calendar-list { border-right: none; padding-right: 0; border-top: 1px solid var(--border-color); padding-top: 16px; max-height: 150px; }
+            .calendar-day-header { font-size: 0.65rem; padding-bottom: 4px; }
+            .calendar-day { font-size: 0.8rem; border-radius: 6px; }
+            .calendar-dot { width: 4px; height: 4px; }
+            .calendar-legend { margin-top: 10px; padding-top: 10px; font-size: 0.75rem; }
+            
             .analysis-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -1051,7 +1078,7 @@ ${textToAnalyze}`;
                 
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => {
                     const c = this.data.cases.find(x => x.id == d.caseId);
-                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id});
+                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.caseId});
                 });
                 
                 this.data.tasks.filter(t => !t.done && new Date(t.date) >= today).forEach(t => {
