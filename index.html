@@ -299,7 +299,8 @@
                 <div class="flex-between" style="margin-bottom:20px"><h3>Análise Estratégica (IA)</h3><button class="btn-outline btn-sm" onclick="app.closeModal('modal-publication-view')">X</button></div>
                 
                 <div class="pub-view-grid">
-                    <div id="pub-view-summary"></div>
+                    <div id="pub-view-summary">
+                        </div>
                     <div>
                         <label>Texto Original:</label>
                         <div class="pub-full-text" id="pub-view-text"></div>
@@ -342,25 +343,36 @@
                 if (!apiKey) { alert('API Key inválida ou vazia.'); return null; }
 
                 const prompt = `
-                Atue como um advogado sênior. Analise o texto jurídico abaixo e retorne APENAS um objeto JSON válido (sem markdown, sem \`\`\`, apenas o objeto puro) com a seguinte estrutura exata:
-                {
-                    "caseNumber": "Número do processo (apenas números e pontuação)",
-                    "court": "Órgão julgador e Tribunal",
-                    "type": "Classificação do ato (Sentença, Despacho, etc)",
-                    "outcome": "Resultado (Procedente, Improcedente, etc - se houver)",
-                    "author": "Nome do Autor",
-                    "defendant": "Nome do Réu",
-                    "urgency": "alta, média ou baixa",
-                    "summary": "Resumo objetivo do que aconteceu",
-                    "determinations": ["Lista de ordens do juiz"],
-                    "requests": "Resumo dos pedidos/recursos envolvidos",
-                    "deadlineInfo": "Informação sobre prazo fatal e riscos",
-                    "nextStep": "Próximo passo processual sugerido",
-                    "clientSummary": "Explicação simples para o cliente (5 linhas)"
-                }
+                Atue como um advogado sênior especialista. Analise o texto jurídico abaixo e extraia um JSON estrito com os seguintes 9 pontos:
+                
+                1. Identificação (Número, Órgão, Tribunal, Justiça, Comunicação, Data Disp)
+                2. Partes (Autor, Réu, Advogados)
+                3. Natureza do Ato (Tipo e Explicação)
+                4. Resumo Objetivo (O que aconteceu, Decisão, Recurso)
+                5. Determinações (O que fazer, Quem, Prazo)
+                6. Pedidos/Recursos (Qual pedido analisado, fase)
+                7. Prazo Fatal (Próximo ato, prazo legal, se é fatal, data provável, risco)
+                8. Próximo Cenário (O que acontece depois)
+                9. Resumo Cliente (5 linhas simples para leigo)
 
-                Texto da Publicação:
-                ${text}
+                Texto: """${text}"""
+
+                Retorne APENAS um JSON com esta estrutura (sem markdown, sem \`\`\`):
+                {
+                    "caseNumber": "string",
+                    "court": "string",
+                    "type": "string",
+                    "outcome": "string (Procedente/Improcedente/Neutro)",
+                    "author": "string",
+                    "defendant": "string",
+                    "urgency": "alta/média/baixa",
+                    "summary": "Resumo do ponto 4",
+                    "determinations": ["lista strings"],
+                    "requests": "Resumo do ponto 6",
+                    "deadlineInfo": "Resumo do ponto 7 (Prazo Fatal e Risco)",
+                    "nextStep": "Resumo do ponto 8",
+                    "clientSummary": "Texto do ponto 9"
+                }
                 `;
 
                 try {
@@ -378,9 +390,7 @@
                     }
 
                     let rawJson = data.candidates[0].content.parts[0].text;
-                    // Limpeza agressiva para garantir JSON válido
                     rawJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
-                    
                     return JSON.parse(rawJson);
 
                 } catch (error) {
@@ -394,12 +404,10 @@
                 const aiResult = await this.callGeminiAPI(text);
                 
                 if (aiResult) {
-                    // Match Local de Cliente
                     const upperText = text.toUpperCase();
                     let matchedCaseId = null;
                     let caseNumber = aiResult.caseNumber;
                     
-                    // Tenta achar vínculo pelo nome do cliente
                     for(let c of this.data.cases) {
                         if(upperText.includes(c.client.toUpperCase())) { 
                             matchedCaseId = c.id; 
@@ -409,7 +417,18 @@
                     }
                     return { ...aiResult, matchedCaseId };
                 }
-                return null;
+
+                // Fallback Local
+                const lower = text.toLowerCase();
+                let result = { 
+                    type: 'Outros', outcome: 'Neutro', summary: 'IA indisponível. Análise básica.', determinations: [], 
+                    requests: '-', deadlineInfo: 'Verificar.', nextStep: '-', clientSummary: '-',
+                    author: null, defendant: null, caseNumber: null, urgency: 'baixa', matchedCaseId: null
+                };
+                const caseMatch = text.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+                if(caseMatch) result.caseNumber = caseMatch[0];
+                if (lower.includes('sentença')) { result.type = 'Sentença'; result.urgency = 'alta'; }
+                return result;
             },
             
             async analyzeTextPreview() {
@@ -422,7 +441,7 @@
                 
                 btn.innerText = originalText; btn.disabled = false;
 
-                if(!this.tempAnalysis) return; // Erro já tratado no callGeminiAPI
+                if(!this.tempAnalysis) return;
 
                 // Preenche Edição
                 document.getElementById('anl-type').value = this.tempAnalysis.type || '';
@@ -447,7 +466,6 @@
             },
             
             saveImport() {
-                // Recupera dados editados
                 const finalAnalysis = {
                     type: document.getElementById('anl-type').value,
                     outcome: document.getElementById('anl-outcome').value,
@@ -456,7 +474,6 @@
                     author: document.getElementById('anl-author').value,
                     defendant: document.getElementById('anl-defendant').value,
                     summary: document.getElementById('anl-summary').value,
-                    // Campos da IA não editáveis
                     determinations: this.tempAnalysis.determinations || [],
                     requests: this.tempAnalysis.requests || '-',
                     deadlineInfo: this.tempAnalysis.deadlineInfo || '-',
@@ -470,7 +487,6 @@
                 const importId = document.getElementById('import-id').value;
                 let cid = finalAnalysis.matchedCaseId;
                 
-                // AUTO-CADASTRO
                 if(!cid && finalAnalysis.caseNumber) {
                     const existingCase = this.data.cases.find(c => c.number === finalAnalysis.caseNumber);
                     if(existingCase) cid = existingCase.id;
