@@ -315,6 +315,13 @@
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Cole o texto bruto retirado do Diário Oficial.</p>
                     <textarea id="import-text" rows="5" placeholder="Cole o texto aqui..."></textarea>
                     
+                    <label style="margin-top:10px;">Meu cliente neste processo atua como:</label>
+                    <select id="import-client-role" style="margin-bottom:10px;">
+                        <option value="autor">Autor / Reclamante</option>
+                        <option value="reu">Réu / Reclamado</option>
+                        <option value="desconhecido" selected>Análise Neutra (Não sei ainda)</option>
+                    </select>
+
                     <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
                         <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white;" onclick="app.analyzeWithAI('gemini')">✨ Gemini</button>
                         <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white;" onclick="app.analyzeWithAI('chatgpt')">🤖 ChatGPT</button>
@@ -357,7 +364,15 @@
             </div>
         </div>
 
-        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div><label>Cliente</label><input type="text" name="client" required><label>Adverso</label><input type="text" name="opponent"><div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
+        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div>
+        
+        <div class="flex-gap">
+            <div style="flex:2"><label>Cliente</label><input type="text" name="client" required></div>
+            <div style="flex:1"><label>Posição do Cliente</label><select name="client_role"><option value="autor">Autor / Reclamante</option><option value="reu">Réu / Reclamado</option></select></div>
+        </div>
+        <label>Parte Adversa</label><input type="text" name="opponent">
+        
+        <div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
             <option>Cível</option>
             <option>Trabalhista</option>
             <option>Família e Sucessões</option>
@@ -476,7 +491,12 @@
                     return;
                 }
 
-                const geminiPrompt = `Analise a publicação judicial abaixo e extraia as informações de forma ESTRUTURADA, EXTREMAMENTE CONCISA e DIRETA.
+                const roleFromImport = document.getElementById('import-client-role').value;
+                let roleInstruction = "";
+                if(roleFromImport === 'autor') roleInstruction = "\n\n🚨 ATENÇÃO: Meu cliente é o AUTOR/RECLAMANTE. Indique claramente se a decisão foi POSITIVA ou NEGATIVA para ele no Resumo (Bloco 9).";
+                if(roleFromImport === 'reu') roleInstruction = "\n\n🚨 ATENÇÃO: Meu cliente é o RÉU/RECLAMADO. Indique claramente se a decisão foi POSITIVA ou NEGATIVA para ele no Resumo (Bloco 9).";
+
+                const geminiPrompt = `Analise a publicação judicial abaixo e extraia as informações de forma ESTRUTURADA, EXTREMAMENTE CONCISA e DIRETA.${roleInstruction}
 
 ⚠️ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 - NÃO USE formatação Markdown (PROIBIDO usar asteriscos **, PROIBIDO usar bullet points como * ou -).
@@ -589,10 +609,7 @@ ${textToAnalyze}`;
                     if(found) matchedId = found.id;
                 }
 
-                let outcomeLabel = "Movimentação";
-                if(/deferi/i.test(b4) || /procedente/i.test(b4)) outcomeLabel = "Deferido / Procedente";
-                if(/indeferi/i.test(b4) || /improcedente/i.test(b4)) outcomeLabel = "Indeferido / Improcedente";
-
+                const roleFromImport = document.getElementById('import-client-role').value;
                 this.tempParsedData = {
                     rawText: rawImport,
                     caseNumber: caseNum,
@@ -601,8 +618,9 @@ ${textToAnalyze}`;
                     extractedReu: extractedReu,
                     dispDate: dispDate,
                     type: b3.split('\n')[0].replace('Classificação:', '').trim().substring(0, 40) || 'Ato Judicial', 
-                    outcome: outcomeLabel,
-                    blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 }
+                    outcome: "Movimentação", // será calculado dinamicamente no render
+                    blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 },
+                    importRole: roleFromImport
                 };
 
                 const matchDiv = document.getElementById('match-info');
@@ -628,6 +646,7 @@ ${textToAnalyze}`;
                         id: Date.now(), 
                         number: this.tempParsedData.caseNumber, 
                         client: this.tempParsedData.extractedAutor || "Cliente Não Identificado", 
+                        client_role: this.tempParsedData.importRole === 'desconhecido' ? 'autor' : this.tempParsedData.importRole,
                         opponent: this.tempParsedData.extractedReu || "-", 
                         area: 'Cível', 
                         status: 'Em andamento', 
@@ -666,6 +685,7 @@ ${textToAnalyze}`;
                 document.getElementById('import-text').value = '';
                 document.getElementById('ai-result-text').value = '';
                 document.getElementById('import-id').value = '';
+                document.getElementById('import-client-role').value = 'desconhecido';
                 this.tempParsedData = null;
                 
                 this.closeModal('modal-import'); 
@@ -680,6 +700,22 @@ ${textToAnalyze}`;
             backToStep1() {
                 document.getElementById('step-1-import').style.display = 'block';
                 document.getElementById('step-2-import').style.display = 'none';
+            },
+
+            getOutcomeColor(text, clientRole) {
+                text = (text || '').toLowerCase();
+                let isPositive = null;
+
+                if (text.includes('positivo')) return 'style="background:var(--success); color:white;" class="summary-tag"';
+                if (text.includes('negativo')) return 'style="background:var(--danger); color:white;" class="summary-tag"';
+
+                if (/deferi|procedent|provid|acolhid/i.test(text)) isPositive = true;
+                else if (/indeferi|improcedent|improvid|rejeitad/i.test(text)) isPositive = false;
+
+                if (isPositive === null) return 'class="summary-tag tag-blue"';
+
+                let goodForClient = clientRole === 'reu' ? !isPositive : isPositive;
+                return goodForClient ? 'style="background:var(--success); color:white;" class="summary-tag"' : 'style="background:var(--danger); color:white;" class="summary-tag"';
             },
 
             viewPublication(id) {
@@ -768,16 +804,21 @@ ${textToAnalyze}`;
                 
                 this.data.updates.sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(u => { 
                     const a = u.analysis || {};
-                    let outcomeColor = (a.outcome||'').toLowerCase().includes('deferido') ? 'style="background:var(--success); color:white;"' : ((a.outcome||'').toLowerCase().includes('indeferido') ? 'style="background:var(--danger); color:white;"' : 'class="tag-blue"');
-                    
                     const caseRef = this.data.cases.find(caseItem => caseItem.id === u.caseId);
+                    const clientRole = caseRef ? (caseRef.client_role || 'autor') : 'autor';
                     const clientName = caseRef ? caseRef.client : "Cliente Não Vinculado";
+                    
+                    let outcomeColor = this.getOutcomeColor(a.blocks?.b4 || a.outcome, clientRole);
+
+                    let displayLabel = 'Movimentação';
+                    if (outcomeColor.includes('success')) displayLabel = "Positivo";
+                    if (outcomeColor.includes('danger')) displayLabel = "Negativo";
 
                     c.innerHTML += `
                         <div class="smart-summary" onclick="app.viewPublication(${u.id})">
                             <div class="summary-header">
                                 <span style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${a.type || 'Ato Judicial'}</span> 
-                                <span class="summary-tag" ${outcomeColor}>${a.outcome || 'Movimentação'}</span>
+                                <span ${outcomeColor}>${displayLabel}</span>
                             </div>
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;">
                                 <div><b style="color:var(--text-secondary)">Processo:</b> ${a.caseNumber || 'N/A'}</div>
@@ -995,6 +1036,7 @@ ${textToAnalyze}`;
                         document.querySelector('[name="id"]').value=c.id; 
                         document.querySelector('[name="number"]').value=c.number; 
                         document.querySelector('[name="client"]').value=c.client; 
+                        document.querySelector('[name="client_role"]').value=c.client_role || 'autor'; 
                         document.querySelector('[name="status"]').value=c.status; 
                         document.querySelector('[name="opponent"]').value=c.opponent||''; 
                         document.querySelector('[name="area"]').value=c.area||'Cível'; 
@@ -1046,6 +1088,7 @@ ${textToAnalyze}`;
                 const d = { 
                     number: f.get('number'), 
                     client: f.get('client'), 
+                    client_role: f.get('client_role') || 'autor',
                     opponent: f.get('opponent'), 
                     status: f.get('status'), 
                     area: f.get('area'), 
@@ -1078,8 +1121,8 @@ ${textToAnalyze}`;
                     id: Date.now(), 
                     caseId: parseInt(f.get('caseId')), 
                     type: f.get('type'), 
-                    amount: parseFloat(f.get('amount')),
-                    desc: f.get('desc')
+                    amount: parseFloat(f.get('amount')), 
+                    desc: f.get('desc') 
                 }); 
                 this.saveToStorage(); 
                 this.closeModal('modal-payment'); 
@@ -1159,9 +1202,6 @@ ${textToAnalyze}`;
                 });
             },
 
-            // ==========================================
-            // RECEIPT GENERATOR (DYNAMIC)
-            // ==========================================
             openReceiptConfig(txId = null, caseId = null) {
                 let pagador = '';
                 let valor = 0;
