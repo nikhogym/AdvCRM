@@ -3,13 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LexManager">
-    <meta name="theme-color" content="#4F46E5">
-    
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%234F46E5%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2245%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>LM</text></svg>">
-    
     <title>LexManager | CRM Jurídico Profissional</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,22 +58,9 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
-        /* =========================================
-           2. RESET & LAYOUT BASE
-        ========================================= */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
-        body { 
-            font-family: var(--font-main); 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            height: 100vh; 
-            display: flex; 
-            overflow: hidden; 
-            transition: background-color 0.3s, color 0.3s; 
-            font-size: 14px; 
-            -webkit-font-smoothing: antialiased;
-        }
+        body { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; transition: background-color 0.3s, color 0.3s; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
         aside { width: var(--sidebar-width); background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 24px 16px; transition: var(--transition); z-index: 50; flex-shrink: 0; box-shadow: var(--shadow-md); }
         .logo { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; padding: 0 12px; display: flex; align-items: center; gap: 12px; color: var(--text-on-dark); letter-spacing: -0.5px; }
@@ -88,25 +68,12 @@
         nav button { background: transparent; border: none; color: #94A3B8; width: 100%; padding: 12px 16px; text-align: left; cursor: pointer; border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 0.95rem; transition: var(--transition); position: relative; margin-bottom: 8px; }
         nav button:hover { background-color: rgba(255,255,255,0.05); color: var(--text-on-dark); }
         nav button.active { background-color: var(--primary); color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-        nav button svg { width: 20px; height: 20px; fill: currentColor; opacity: 0.8; }
 
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .app-topbar { height: 70px; background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; flex-shrink: 0; transition: background-color 0.3s, border-color 0.3s; }
         .content-scroll { flex: 1; overflow-y: auto; padding: 32px; scroll-behavior: smooth; }
         .hidden { display: none !important; }
 
-        /* Integração Visual com as Margens do iPhone/Android (Notch) */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .app-topbar { padding-top: env(safe-area-inset-top); height: calc(70px + env(safe-area-inset-top)); }
-            aside { padding-top: calc(24px + env(safe-area-inset-top)); padding-bottom: env(safe-area-inset-bottom); }
-            .content-scroll { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
-            .menu-toggle { bottom: calc(20px + env(safe-area-inset-bottom)) !important; }
-            .modal-content { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
-        }
-
-        /* =========================================
-           3. COMPONENTES VISUAIS
-        ========================================= */
         .card { background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 24px; margin-bottom: 24px; transition: var(--transition); }
         .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: var(--primary); }
 
@@ -158,7 +125,7 @@
         .clickable-link { color: var(--primary); font-weight: 600; cursor: pointer; transition: 0.2s; }
         .clickable-link:hover { text-decoration: underline; color: var(--primary-hover); }
 
-        /* WIDGETS */
+        /* WIDGETS CALENDARIO */
         .calendar-widget { display: grid; grid-template-columns: 1fr 320px; gap: 32px; }
         .calendar-list { border-right: 1px solid var(--border-color); padding-right: 24px; max-height: 350px; overflow-y: auto; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
@@ -171,6 +138,9 @@
         .dot-deadline { background-color: var(--danger); }
         .dot-task { background-color: var(--info); }
         
+        .calendar-legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; padding-top:15px; border-top: 1px solid var(--border-color); }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+
         .smart-summary { background: var(--bg-body); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; cursor: pointer; transition: 0.2s; }
         .smart-summary:hover { box-shadow: var(--shadow-md); border-color: var(--primary); }
         .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
@@ -202,29 +172,28 @@
         .status-option:hover { background: var(--bg-body); }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-        /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 200; backdrop-filter: blur(4px); align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: var(--bg-surface); padding: 32px; border-radius: var(--radius-xl); width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .pub-view-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .pub-full-text { background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border-color); }
-
-        .menu-toggle { display: none; position: fixed; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); color: white; box-shadow: var(--shadow-lg); z-index: 100; font-size: 24px; align-items: center; justify-content: center; border: none; transition: transform 0.2s; }
-        .menu-toggle:active { transform: scale(0.9); }
+        
+        .menu-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; box-shadow: var(--shadow-lg); z-index: 100; font-size: 24px; align-items: center; justify-content: center; border: none; }
 
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+        /* RESPONSIVIDADE */
         @media (max-width: 768px) { 
-            aside { position: fixed; height: 100%; left: calc(var(--sidebar-width) * -1); box-shadow: var(--shadow-lg); } 
+            aside { position: fixed; height: 100%; left: -280px; box-shadow: var(--shadow-lg); } 
             aside.active { left: 0; } 
-            .menu-toggle { display: flex; bottom: 20px; } 
+            .menu-toggle { display: flex; } 
             .calendar-widget { grid-template-columns: 1fr; } 
             .app-topbar { padding: 0 16px; } 
             .stats-grid { grid-template-columns: 1fr; }
-            .dash-header { flex-direction: column; gap: 15px; }
-            .quick-actions { width: 100%; display: flex; gap: 8px; justify-content: space-between; }
-            .quick-actions button { flex: 1; font-size: 0.8rem; padding: 10px; }
+            .dash-header { flex-direction: column; gap: 15px;}
+            .dash-header .quick-actions { width: 100%; display: flex; gap: 10px;}
+            .dash-header .quick-actions button { flex: 1; font-size: 0.85rem; padding: 10px 5px;}
             .analysis-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -251,6 +220,7 @@
         <div class="app-topbar">
             <div style="font-weight:700; font-size:1.2rem; color:var(--text-main);">Painel Executivo</div>
             <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-outline" style="min-width:auto; padding:8px 12px; border-radius: 8px;" onclick="app.toggleDarkMode()">🌓 Tema</button>
                 <div style="width:38px; height:38px; border-radius:50%; background:var(--primary-gradient); color:white; display:flex; align-items:center; justify-content:center; font-weight: 700;">Dr</div>
             </div>
         </div>
@@ -279,6 +249,11 @@
                         <div>
                             <div class="calendar-grid" style="margin-bottom:5px;"><div class="calendar-day-header">D</div><div class="calendar-day-header">S</div><div class="calendar-day-header">T</div><div class="calendar-day-header">Q</div><div class="calendar-day-header">Q</div><div class="calendar-day-header">S</div><div class="calendar-day-header">S</div></div>
                             <div class="calendar-grid" id="calendar-grid-content"></div>
+                            
+                            <div class="calendar-legend">
+                                <div class="legend-item"><div class="calendar-dot dot-deadline"></div> Prazo</div>
+                                <div class="legend-item"><div class="calendar-dot dot-task"></div> Tarefa</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -299,24 +274,22 @@
 
             <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
             <section id="view-finance" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Financeiro</h2></div><div class="stats-grid"><div class="stat-card" style="border-top: 4px solid var(--warning)"><div class="stat-title">Pendente</div><div class="stat-value" id="fin-pending">R$ 0,00</div></div><div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Recebido</div><div class="stat-value text-success" id="fin-received">R$ 0,00</div></div></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Registrar</th></tr></thead><tbody id="finance-table-body"></tbody></table></div></section>
-            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0; overflow:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
-            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0; overflow:auto;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
+            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
+            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
             
             <section id="view-settings" class="hidden">
                 <h2>Configurações</h2>
                 <div class="card" style="max-width: 400px; margin-top:20px;">
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema (Claro/Escuro)</button>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema</button>
                     
-                    <hr style="border:0; border-top:1px solid var(--border-color); margin: 20px 0;">
-                    
+                    <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
                     <h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Dados e Backup</h4>
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Fazer Backup (Baixar JSON)</button>
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup (Ler JSON)</button>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Salvar Backup (JSON)</button>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup</button>
                     <input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)">
                     
-                    <hr style="border:0; border-top:1px solid var(--border-color); margin: 20px 0;">
-                    
-                    <button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Apagar Sistema (Reset Geral)</button>
+                    <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
+                    <button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button>
                 </div>
             </section>
             
@@ -360,7 +333,7 @@
                     </div>
                     <div style="text-align:right; margin-top:20px; display:flex; justify-content:space-between;">
                         <button class="btn btn-outline" onclick="app.backToStep1()">← Corrigir</button>
-                        <button class="btn btn-primary" onclick="app.saveParsedImport()">💾 Finalizar e Agendar Prazo</button>
+                        <button class="btn btn-primary" onclick="app.saveParsedImport()">💾 Finalizar Registro</button>
                     </div>
                 </div>
             </div>
@@ -411,9 +384,6 @@
                 });
             },
 
-            // ==========================================
-            // IA INTEGRATION - PROMPT & PARSER
-            // ==========================================
             analyzeWithAI(platform) {
                 const textToAnalyze = document.getElementById('import-text').value;
                 if (!textToAnalyze || !textToAnalyze.trim()) {
@@ -498,7 +468,6 @@ ${textToAnalyze}`;
                     const match = aiResult.match(new RegExp(regexStr));
                     if(match) {
                         let block = match[1].trim();
-                        // Limpeza de segurança: remove quebras de linha iniciais e asteriscos teimosos da IA
                         block = block.replace(/^[^\n]*\n/, '').replace(/\*\*/g, '').replace(/^\s*[\*\-]\s/gm, '').trim(); 
                         return block;
                     }
@@ -513,10 +482,15 @@ ${textToAnalyze}`;
                 const b6 = extract('6️⃣', '7️⃣');
                 const b7 = extract('7️⃣', '8️⃣');
                 const b8 = extract('8️⃣', '9️⃣');
-                const b9 = extract('9️⃣', '⚖️'); 
+                const b9 = extract('9️⃣', '⚖️');
 
                 const caseMatch = (b1 + rawImport).match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
                 const caseNum = caseMatch ? caseMatch[0] : '';
+                
+                const autorMatch = b2.match(/Autor:\s*([^\n]+)/i);
+                const reuMatch = b2.match(/Réu:\s*([^\n]+)/i);
+                const extractedAutor = autorMatch ? autorMatch[1].trim() : '';
+                const extractedReu = reuMatch ? reuMatch[1].trim() : '';
 
                 let matchedId = null;
                 if(caseNum) {
@@ -532,6 +506,8 @@ ${textToAnalyze}`;
                     rawText: rawImport,
                     caseNumber: caseNum,
                     matchedCaseId: matchedId,
+                    extractedAutor: extractedAutor,
+                    extractedReu: extractedReu,
                     type: b3.split('\n')[0].replace('Classificação:', '').trim().substring(0, 40) || 'Ato Judicial', 
                     outcome: outcomeLabel,
                     blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 }
@@ -541,7 +517,7 @@ ${textToAnalyze}`;
                 if(matchedId) {
                     matchDiv.innerHTML = `Processo identificado automaticamente na base: <b style="color:var(--text-main)">${caseNum}</b>. Será vinculado ao dossiê.`;
                 } else if(caseNum) {
-                    matchDiv.innerHTML = `Processo <b style="color:var(--text-main)">${caseNum}</b> não encontrado na base. Um novo caso será gerado automaticamente.`;
+                    matchDiv.innerHTML = `Processo <b style="color:var(--text-main)">${caseNum}</b> não encontrado na base. Um novo caso será criado com Autor(a): <b style="color:var(--text-main)">${extractedAutor || 'Desconhecido'}</b> e Réu: <b style="color:var(--text-main)">${extractedReu || 'Desconhecido'}</b>.`;
                 } else {
                     matchDiv.innerHTML = `Processo não identificado. Ficará registrado como análise avulsa.`;
                 }
@@ -559,8 +535,8 @@ ${textToAnalyze}`;
                     const newCase = { 
                         id: Date.now(), 
                         number: this.tempParsedData.caseNumber, 
-                        client: "Cliente Automático", 
-                        opponent: "Parte Contrária", 
+                        client: this.tempParsedData.extractedAutor || "Cliente Não Identificado", 
+                        opponent: this.tempParsedData.extractedReu || "-", 
                         area: 'Cível', 
                         status: 'Em andamento', 
                         date_created: new Date().toISOString() 
@@ -611,13 +587,11 @@ ${textToAnalyze}`;
                 document.getElementById('step-2-import').style.display = 'none';
             },
 
-            // --- A função visual que formata as chaves e valores automaticamente ---
             viewPublication(id) {
                 const pub = this.data.updates.find(u => u.id === id); 
                 if(!pub) return;
                 const b = pub.analysis.blocks || {};
                 
-                // Formata os campos antes dos dois-pontos para ficarem em negrito
                 const formatBlock = (text) => {
                     if(!text) return '-';
                     return text.replace(/^([^:\n]+):/gm, '<span style="color:var(--primary); font-weight:700;">$1:</span>');
@@ -625,24 +599,20 @@ ${textToAnalyze}`;
                 
                 const summaryHtml = `
                     <div style="display:flex; flex-direction:column; gap:15px;">
-                        
                         <div class="analysis-grid">
                             <div class="analysis-item"><span class="analysis-label">1️⃣ Identificação</span><span class="analysis-val">${formatBlock(b.b1) || pub.analysis.caseNumber || '-'}</span></div>
                             <div class="analysis-item"><span class="analysis-label">2️⃣ Partes</span><span class="analysis-val">${formatBlock(b.b2) || '-'}</span></div>
                             <div class="analysis-item"><span class="analysis-label">3️⃣ Natureza</span><span class="analysis-val">${formatBlock(b.b3) || pub.analysis.type}</span></div>
                             <div class="analysis-item"><span class="analysis-label">4️⃣ Resumo</span><span class="analysis-val">${formatBlock(b.b4) || '-'}</span></div>
                         </div>
-                        
                         <div style="background: var(--bg-body); padding: 15px; border-radius: var(--radius-md);">
                             <span class="analysis-label">5️⃣ Determinações do Juiz</span>
                             <div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b5)}</div>
                         </div>
-
                         <div style="background: var(--bg-body); padding: 15px; border-radius: var(--radius-md);">
                             <span class="analysis-label">6️⃣ Pedidos e Recursos</span>
                             <div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b6)}</div>
                         </div>
-                        
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
                             <div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-top: 4px solid var(--danger);">
                                 <span class="analysis-label" style="color:var(--danger)">7️⃣ Prazo Fatal</span>
@@ -653,7 +623,6 @@ ${textToAnalyze}`;
                                 <div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b8)}</div>
                             </div>
                         </div>
-                        
                         <div class="client-summary-box">
                             <b>9️⃣ Resumo para o Cliente (Copie e envie no WhatsApp):</b><br><br>
                             <span style="white-space:pre-wrap; font-style: normal; font-size:1rem; color:var(--text-main);">${(b.b9 || '').replace(/^Resumo:/i, '').trim() || '-'}</span>
@@ -706,6 +675,9 @@ ${textToAnalyze}`;
                     const a = u.analysis || {};
                     let outcomeColor = (a.outcome||'').toLowerCase().includes('deferido') ? 'style="background:var(--success); color:white;"' : ((a.outcome||'').toLowerCase().includes('indeferido') ? 'style="background:var(--danger); color:white;"' : 'class="tag-blue"');
                     
+                    const caseRef = this.data.cases.find(caseItem => caseItem.id === u.caseId);
+                    const clientName = caseRef ? caseRef.client : "Cliente Não Vinculado";
+
                     c.innerHTML += `
                         <div class="smart-summary" onclick="app.viewPublication(${u.id})">
                             <div class="summary-header">
@@ -713,7 +685,8 @@ ${textToAnalyze}`;
                                 <span class="summary-tag" ${outcomeColor}>${a.outcome || 'Movimentação'}</span>
                             </div>
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;">
-                                <div><b style="color:var(--text-secondary)">Processo Vinculado:</b> ${a.caseNumber || 'N/A'}</div>
+                                <div><b style="color:var(--text-secondary)">Processo:</b> ${a.caseNumber || 'N/A'}</div>
+                                <div><b style="color:var(--text-secondary)">Cliente:</b> <span style="color:var(--primary); font-weight:600;">${clientName}</span></div>
                             </div>
                             <div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-left:4px solid var(--primary); font-size:0.95rem; line-height:1.5;">
                                 <b>Resumo Técnico:</b><br> ${(a.blocks && a.blocks.b4) ? a.blocks.b4.substring(0, 200) + '...' : 'Sem resumo.'}
@@ -726,9 +699,6 @@ ${textToAnalyze}`;
                 }); 
             },
 
-            // ==========================================
-            // BACKUP E RESTAURAÇÃO (JSON)
-            // ==========================================
             exportBackup() {
                 const dataStr = JSON.stringify(this.data, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
@@ -765,10 +735,9 @@ ${textToAnalyze}`;
                     }
                 };
                 reader.readAsText(file);
-                event.target.value = ''; // Reseta o input para permitir selecionar o mesmo arquivo novamente
+                event.target.value = '';
             },
 
-            // --- UNIVERSAL FUNCTIONS ---
             fixDate(dateStr) { if(!dateStr) return null; return new Date(dateStr + 'T12:00:00'); },
             toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); },
             navigate(view) {
@@ -778,39 +747,100 @@ ${textToAnalyze}`;
                 const navBtn = document.getElementById(view === 'case-detail' ? 'nav-cases' : `nav-${view}`);
                 if(navBtn) navBtn.classList.add('active');
                 document.getElementById('sidebar').classList.remove('active');
-                if(view === 'dashboard') this.renderDashboard(); if(view === 'updates') this.renderUpdatesFull(); if(view === 'cases') this.renderCases(); if(view === 'deadlines') this.renderDeadlines(); if(view === 'finance') this.renderFinance(); if(view === 'tasks') this.renderTasks(); if(view === 'clients') this.renderClients();
+                
+                if(view === 'dashboard') this.renderDashboard(); 
+                if(view === 'updates') this.renderUpdatesFull(); 
+                if(view === 'cases') this.renderCases(); 
+                if(view === 'deadlines') this.renderDeadlines(); 
+                if(view === 'finance') this.renderFinance(); 
+                if(view === 'tasks') this.renderTasks(); 
+                if(view === 'clients') this.renderClients();
             },
             
             renderDashboard() {
-                const active = this.data.cases.filter(c => c.status === 'Em andamento'); document.getElementById('dash-active').innerText = active.length;
-                let totalReceived = 0; this.data.transactions.forEach(t => { if (t.type === 'income') totalReceived += (parseFloat(t.amount) || 0); }); document.getElementById('dash-finance-received').innerText = this.formatCurrency(totalReceived);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]; document.getElementById('calendar-month-label').innerText = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
-                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1); const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                const grid = document.getElementById('calendar-grid-content'); grid.innerHTML = '';
+                const active = this.data.cases.filter(c => c.status === 'Em andamento'); 
+                document.getElementById('dash-active').innerText = active.length;
+                
+                let totalReceived = 0; 
+                this.data.transactions.forEach(t => { if (t.type === 'income') totalReceived += (parseFloat(t.amount) || 0); }); 
+                document.getElementById('dash-finance-received').innerText = this.formatCurrency(totalReceived);
+                
+                const today = new Date(); 
+                today.setHours(0,0,0,0);
+                
+                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]; 
+                document.getElementById('calendar-month-label').innerText = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+                
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1); 
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                
+                const grid = document.getElementById('calendar-grid-content'); 
+                grid.innerHTML = '';
                 for(let i=0; i<firstDay.getDay(); i++) grid.innerHTML += `<div></div>`;
+                
                 for(let i=1; i<=lastDay.getDate(); i++) {
-                    const deadlinesToday = this.data.deadlines.filter(d => { const dDate = new Date(d.date); return dDate.getDate() === i && dDate.getMonth() === today.getMonth() && !d.done; });
-                    const tasksToday = this.data.tasks.filter(t => { const tDate = new Date(t.date); return tDate.getDate() === i && tDate.getMonth() === today.getMonth() && !t.done; });
-                    let dotsHtml = '<div class="calendar-dots">'; deadlinesToday.slice(0,4).forEach(() => dotsHtml += '<div class="calendar-dot dot-deadline"></div>'); tasksToday.slice(0,4-deadlinesToday.length).forEach(() => dotsHtml += '<div class="calendar-dot dot-task"></div>'); dotsHtml += '</div>';
+                    const deadlinesToday = this.data.deadlines.filter(d => { 
+                        const dDate = new Date(d.date); 
+                        return dDate.getDate() === i && dDate.getMonth() === today.getMonth() && dDate.getFullYear() === today.getFullYear() && !d.done; 
+                    });
+                    const tasksToday = this.data.tasks.filter(t => { 
+                        const tDate = new Date(t.date); 
+                        return tDate.getDate() === i && tDate.getMonth() === today.getMonth() && tDate.getFullYear() === today.getFullYear() && !t.done; 
+                    });
+                    
+                    let dotsHtml = '<div class="calendar-dots">'; 
+                    deadlinesToday.slice(0,4).forEach(() => dotsHtml += '<div class="calendar-dot dot-deadline"></div>'); 
+                    tasksToday.slice(0,4-deadlinesToday.length).forEach(() => dotsHtml += '<div class="calendar-dot dot-task"></div>'); 
+                    dotsHtml += '</div>';
+                    
                     grid.innerHTML += `<div class="calendar-day ${i === today.getDate() ? 'today' : ''}" onclick="app.showDayDetails(${i}, ${today.getMonth()}, ${today.getFullYear()})"><span>${i}</span> ${dotsHtml}</div>`;
                 }
-                const list = document.getElementById('calendar-list-content'); list.innerHTML = ''; let agendaItems = [];
+                
+                const list = document.getElementById('calendar-list-content'); 
+                list.innerHTML = ''; let agendaItems = [];
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: 'Prazo Fatal', id:d.caseId}));
                 this.data.updates.slice(0,5).forEach(u => agendaItems.push({type:'update', date:u.date, title:u.analysis.type || 'Decisão', sub: 'Nova Publicação', id:u.id}));
                 agendaItems.sort((a,b)=>new Date(a.date)-new Date(b.date));
-                if(agendaItems.length === 0) { list.innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted)">A agenda está livre no momento.</div>'; } 
-                else { agendaItems.slice(0,6).forEach(item => { const icon = item.type==='deadline' ? '⏳' : '📜'; const color = item.type==='deadline' ? 'var(--danger)' : 'var(--text-main)'; const clickAction = item.type==='deadline' ? `app.openCaseDetail(${item.id})` : `app.viewPublication(${item.id})`; list.innerHTML += `<div style="padding:12px; border-radius:var(--radius-md); background:var(--bg-body); margin-bottom:10px; cursor:pointer; transition:0.2s;" onclick="${clickAction}"><div style="font-weight:700; font-size:0.9rem; color:${color}; margin-bottom:4px;">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">${new Date(item.date).toLocaleDateString('pt-BR').slice(0,5)} • ${item.sub}</div></div>`; }); }
-                document.getElementById('dash-today').innerText = this.data.deadlines.filter(d => !d.done && new Date(d.date).toDateString() === today.toDateString()).length;
+                
+                if(agendaItems.length === 0) { 
+                    list.innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted)">A agenda está livre no momento.</div>'; 
+                } else { 
+                    agendaItems.slice(0,6).forEach(item => { 
+                        const icon = item.type==='deadline' ? '⏳' : '📜'; 
+                        const color = item.type==='deadline' ? 'var(--danger)' : 'var(--text-main)'; 
+                        const clickAction = item.type==='deadline' ? `app.openCaseDetail(${item.id})` : `app.viewPublication(${item.id})`; 
+                        list.innerHTML += `<div style="padding:12px; border-radius:var(--radius-md); background:var(--bg-body); margin-bottom:10px; cursor:pointer; transition:0.2s;" onclick="${clickAction}"><div style="font-weight:700; font-size:0.9rem; color:${color}; margin-bottom:4px;">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">${new Date(item.date).toLocaleDateString('pt-BR').slice(0,5)} • ${item.sub}</div></div>`; 
+                    }); 
+                }
+                
+                document.getElementById('dash-today').innerText = this.data.deadlines.filter(d => {
+                    const dDate = new Date(d.date);
+                    return !d.done && dDate.getDate() === today.getDate() && dDate.getMonth() === today.getMonth() && dDate.getFullYear() === today.getFullYear();
+                }).length;
             },
             
             showDayDetails(day, month, year) {
                 const events = [];
-                this.data.deadlines.forEach(d => { const dDate = new Date(d.date); if(dDate.getDate() === day && dDate.getMonth() === month && dDate.getFullYear() === year) { const c = this.data.cases.find(x => x.id == d.caseId); events.push({ type: 'deadline', title: d.type, sub: c ? c.client : 'Sem vínculo', done: d.done, id: d.id }); } });
-                this.data.tasks.forEach(t => { const tDate = new Date(t.date); if(tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year) { events.push({ type: 'task', title: t.desc, sub: `Prioridade: ${t.priority}`, done: t.done, id: t.id }); } });
-                const body = document.getElementById('day-details-body'); document.getElementById('day-details-title').innerText = `Agenda do dia ${String(day).padStart(2,'0')}/${String(month+1).padStart(2,'0')}`;
-                if(events.length === 0) { body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum compromisso agendado.</p>'; } 
-                else { body.innerHTML = events.map(e => `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${e.type==='deadline'?'var(--danger)':'var(--info)'}; text-decoration:${e.done?'line-through':'none'}">${e.type==='deadline'?'⏳':'📝'} ${e.title}</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;"><button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button></div></div>`).join(''); }
+                this.data.deadlines.forEach(d => { 
+                    const dDate = new Date(d.date); 
+                    if(dDate.getDate() === day && dDate.getMonth() === month && dDate.getFullYear() === year) { 
+                        const c = this.data.cases.find(x => x.id == d.caseId); 
+                        events.push({ type: 'deadline', title: d.type, sub: c ? c.client : 'Sem vínculo', done: d.done, id: d.id }); 
+                    } 
+                });
+                this.data.tasks.forEach(t => { 
+                    const tDate = new Date(t.date); 
+                    if(tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year) { 
+                        events.push({ type: 'task', title: t.desc, sub: `Prioridade: ${t.priority}`, done: t.done, id: t.id }); 
+                    } 
+                });
+                const body = document.getElementById('day-details-body'); 
+                document.getElementById('day-details-title').innerText = `Agenda do dia ${String(day).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
+                if(events.length === 0) { 
+                    body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum compromisso agendado.</p>'; 
+                } else { 
+                    body.innerHTML = events.map(e => `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${e.type==='deadline'?'var(--danger)':'var(--info)'}; text-decoration:${e.done?'line-through':'none'}">${e.type==='deadline'?'⏳':'📝'} ${e.title}</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;"><button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button></div></div>`).join(''); 
+                }
                 document.getElementById('modal-day-details').classList.add('active');
             },
 
@@ -822,7 +852,7 @@ ${textToAnalyze}`;
             saveCase(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const d = { number: f.get('number'), client: f.get('client'), opponent: f.get('opponent'), status: f.get('status'), area: f.get('area'), value: parseFloat(f.get('value')||0), fees: parseFloat(f.get('fees')||0), obs: f.get('obs'), lawyer: f.get('lawyer'), date_dist: this.fixDate(f.get('date_dist'))?.toISOString() }; if(id){ const i = this.data.cases.findIndex(c=>c.id==id); this.data.cases[i]={...this.data.cases[i],...d}; } else { this.data.cases.push({...d, id:Date.now(), date_created:new Date().toISOString()}); } this.saveToStorage(); this.closeModal('modal-case'); this.navigate('cases'); },
             saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); this.data.deadlines.push({ id: Date.now(), caseId: parseInt(cid), type: f.get('type'), date: this.fixDate(f.get('date')).toISOString(), done: false }); this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); this.data.tasks.push({ id: Date.now(), desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }); this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
-            saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')) }); this.saveToStorage(); this.closeModal('modal-payment'); this.renderFinance(); },
+            saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')) }); this.saveToStorage(); this.closeModal('modal-payment'); this.renderFinance(); this.renderDashboard(); },
             
             renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
             renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
