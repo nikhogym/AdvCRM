@@ -237,10 +237,16 @@
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card card-blue"><div class="stat-icon-bg">⚖️</div><div class="stat-title">Ativos</div><div class="stat-value" id="dash-active">0</div></div>
-                    <div class="stat-card card-red"><div class="stat-icon-bg">⏳</div><div class="stat-title">Prazos Hoje</div><div class="stat-value text-danger" id="dash-today">0</div></div>
-                    <div class="stat-card card-green"><div class="stat-icon-bg">💰</div><div class="stat-title">Saldo Global</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div></div>
+                <div class="stats-grid" id="dashboard-stats-grid">
+                    <div class="stat-card card-blue" data-id="ativos" draggable="true" style="cursor: grab;">
+                        <div class="stat-icon-bg">⚖️</div><div class="stat-title">Ativos</div><div class="stat-value" id="dash-active">0</div>
+                    </div>
+                    <div class="stat-card card-red" data-id="prazos" draggable="true" style="cursor: grab;">
+                        <div class="stat-icon-bg">⏳</div><div class="stat-title">Prazos Hoje</div><div class="stat-value text-danger" id="dash-today">0</div>
+                    </div>
+                    <div class="stat-card card-green" data-id="saldo" draggable="true" style="cursor: grab;">
+                        <div class="stat-icon-bg">💰</div><div class="stat-title">Recebido (Total)</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -518,6 +524,41 @@
             init() {
                 this.loadData();
                 if(localStorage.getItem('lexTheme') === 'dark') document.body.classList.add('dark-mode');
+                
+                // Configuração Drag and Drop dos Cards do Dashboard
+                const dashOrder = this.data.settings.dashOrder || ['ativos', 'prazos', 'saldo'];
+                const dashGrid = document.getElementById('dashboard-stats-grid');
+                if(dashGrid) {
+                    dashOrder.forEach(id => {
+                        const card = dashGrid.querySelector(`[data-id="${id}"]`);
+                        if(card) dashGrid.appendChild(card);
+                    });
+
+                    let dragged = null;
+                    dashGrid.addEventListener('dragstart', e => {
+                        const card = e.target.closest('.stat-card');
+                        if(card) { dragged = card; dragged.style.opacity = '0.5'; }
+                    });
+                    dashGrid.addEventListener('dragend', e => {
+                        if(dragged) {
+                            dragged.style.opacity = '1';
+                            const newOrder = Array.from(dashGrid.querySelectorAll('.stat-card')).map(c => c.dataset.id);
+                            this.data.settings.dashOrder = newOrder;
+                            this.saveToStorage();
+                            dragged = null;
+                        }
+                    });
+                    dashGrid.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        const targetCard = e.target.closest('.stat-card');
+                        if(targetCard && targetCard !== dragged && dragged) {
+                            const rect = targetCard.getBoundingClientRect();
+                            const next = (e.clientX - rect.left) / (rect.right - rect.left) > 0.5;
+                            dashGrid.insertBefore(dragged, next ? targetCard.nextSibling : targetCard);
+                        }
+                    });
+                }
+
                 this.renderDashboard();
                 document.addEventListener('click', (e) => { 
                     if (!e.target.closest('.badge') && !e.target.closest('.status-dropdown')) {
@@ -684,12 +725,21 @@ ${textToAnalyze}`;
                 let cid = this.tempParsedData.matchedCaseId;
                 
                 if(!cid && this.tempParsedData.caseNumber) {
+                    // Lógica para definir corretamente quem é o cliente baseado na seleção
+                    let defClient = this.tempParsedData.extractedAutor || "Cliente Não Identificado";
+                    let defOpponent = this.tempParsedData.extractedReu || "-";
+                    
+                    if (this.tempParsedData.importRole === 'reu') {
+                        defClient = this.tempParsedData.extractedReu || "Cliente Não Identificado";
+                        defOpponent = this.tempParsedData.extractedAutor || "-";
+                    }
+
                     const newCase = { 
                         id: Date.now(), 
                         number: this.tempParsedData.caseNumber, 
-                        client: this.tempParsedData.importRole === 'reu' ? (this.tempParsedData.extractedReu || "Cliente Não Identificado") : (this.tempParsedData.extractedAutor || "Cliente Não Identificado"), 
+                        client: defClient, 
                         client_role: this.tempParsedData.importRole === 'desconhecido' ? 'autor' : this.tempParsedData.importRole,
-                        opponent: this.tempParsedData.importRole === 'reu' ? (this.tempParsedData.extractedAutor || "-") : (this.tempParsedData.extractedReu || "-"), 
+                        opponent: defOpponent, 
                         area: 'Cível', 
                         status: 'Em andamento', 
                         date_created: new Date().toISOString() 
@@ -947,8 +997,8 @@ ${textToAnalyze}`;
                 }); 
                 const netBalance = totalIncome - totalExpense;
                 const balanceEl = document.getElementById('dash-finance-received');
-                balanceEl.innerText = this.formatCurrency(netBalance);
-                balanceEl.className = `stat-value ${netBalance >= 0 ? 'text-success' : 'text-danger'}`;
+                balanceEl.innerText = this.formatCurrency(totalIncome); // Dashboard agora mostra o Total Recebido (Entradas puras)
+                balanceEl.className = `stat-value text-success`;
                 
                 const today = new Date(); 
                 today.setHours(0,0,0,0);
@@ -984,7 +1034,7 @@ ${textToAnalyze}`;
                 
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => {
                     const c = this.data.cases.find(x => x.id == d.caseId);
-                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.caseId});
+                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id}); // id do deadline modificado
                 });
                 
                 this.data.tasks.filter(t => !t.done && new Date(t.date) >= today).forEach(t => {
@@ -1005,7 +1055,7 @@ ${textToAnalyze}`;
                     agendaItems.slice(0,6).forEach(item => { 
                         const icon = item.type==='deadline' ? '⏳' : (item.type==='task' ? '📝' : '📜'); 
                         const color = item.type==='deadline' ? 'var(--danger)' : (item.type==='task' ? 'var(--info)' : 'var(--warning)'); 
-                        const clickAction = item.type==='update' ? `app.viewPublication(${item.id})` : `app.navigate('${item.type==='deadline'?'deadlines':'tasks'}')`; 
+                        const clickAction = item.type==='update' ? `app.viewPublication(${item.id})` : `app.openModal('modal-${item.type}', ${item.id})`; 
                         
                         list.innerHTML += `<div style="padding:12px; border-radius:var(--radius-md); background:var(--bg-body); margin-bottom:10px; cursor:pointer; transition:0.2s;" onclick="${clickAction}"><div style="font-weight:700; font-size:0.9rem; color:${color}; margin-bottom:4px;">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">${new Date(item.date).toLocaleDateString('pt-BR').slice(0,5)} • ${item.sub}</div></div>`; 
                     }); 
@@ -1123,6 +1173,15 @@ ${textToAnalyze}`;
                             if(item) { 
                                 document.querySelector(`#${id} [name="id"]`).value=item.id; 
                                 if(item.caseId) sel.value=item.caseId; 
+                                if(id==='modal-deadline') {
+                                    document.querySelector(`#${id} [name="type"]`).value = item.type || '';
+                                    if(item.date_start) document.querySelector(`#${id} [name="date_start"]`).value = item.date_start.split('T')[0];
+                                    if(item.date) document.querySelector(`#${id} [name="date"]`).value = item.date.split('T')[0];
+                                } else if(id==='modal-task') {
+                                    document.querySelector(`#${id} [name="desc"]`).value = item.desc || '';
+                                    document.querySelector(`#${id} [name="priority"]`).value = item.priority || 'Média';
+                                    if(item.date) document.querySelector(`#${id} [name="date"]`).value = item.date.split('T')[0];
+                                }
                             }
                         }
                     } else if (dataId && id==='modal-deadline') { 
@@ -1167,8 +1226,63 @@ ${textToAnalyze}`;
                 this.navigate('cases'); 
             },
             
-            saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); this.data.deadlines.push({ id: Date.now(), caseId: parseInt(cid), type: f.get('type'), date: this.fixDate(f.get('date')).toISOString(), done: false }); this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
-            saveTask(e) { e.preventDefault(); const f = new FormData(e.target); this.data.tasks.push({ id: Date.now(), desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }); this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
+            saveDeadline(e) { 
+                e.preventDefault(); 
+                const f = new FormData(e.target); 
+                const id = f.get('id');
+                const cid = f.get('caseId')||f.get('caseSelect'); 
+                if(!cid) return alert('Selecione um processo.'); 
+                
+                const payload = { 
+                    caseId: parseInt(cid), 
+                    type: f.get('type'), 
+                    date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null,
+                    date: this.fixDate(f.get('date')).toISOString(), 
+                    done: false 
+                };
+
+                if(id) {
+                    const idx = this.data.deadlines.findIndex(d => d.id == id);
+                    if(idx > -1) {
+                        payload.done = this.data.deadlines[idx].done;
+                        this.data.deadlines[idx] = { ...this.data.deadlines[idx], ...payload };
+                    }
+                } else {
+                    this.data.deadlines.push({ id: Date.now(), ...payload }); 
+                }
+                
+                this.saveToStorage(); 
+                this.closeModal('modal-deadline'); 
+                this.navigate('deadlines'); 
+            },
+
+            saveTask(e) { 
+                e.preventDefault(); 
+                const f = new FormData(e.target); 
+                const id = f.get('id');
+                
+                const payload = { 
+                    desc: f.get('desc'), 
+                    priority: f.get('priority'), 
+                    date: this.fixDate(f.get('date')).toISOString(), 
+                    caseId: document.getElementById('task-case-select').value, 
+                    done: false 
+                };
+                
+                if(id) {
+                    const idx = this.data.tasks.findIndex(t => t.id == id);
+                    if(idx > -1) {
+                        payload.done = this.data.tasks[idx].done;
+                        this.data.tasks[idx] = { ...this.data.tasks[idx], ...payload };
+                    }
+                } else {
+                    this.data.tasks.push({ id: Date.now(), ...payload }); 
+                }
+
+                this.saveToStorage(); 
+                this.closeModal('modal-task'); 
+                this.navigate('tasks'); 
+            },
             
             saveTransaction(e) { 
                 e.preventDefault(); 
@@ -1194,8 +1308,8 @@ ${textToAnalyze}`;
             },
 
             renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
-            renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
-            renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; this.data.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button></td></tr>`; }); },
+            renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
+            renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; this.data.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; }); },
             renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0, roles:new Set()}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); cs[c.client].roles.add(c.client_role === 'reu' ? 'Réu' : 'Autor'); }); Object.values(cs).forEach(cl => { const rolesStr = Array.from(cl.roles).join(' / '); t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
             
             openClientDetail(name) { 
@@ -1220,7 +1334,7 @@ ${textToAnalyze}`;
                 const initialDate = c.date_start || c.date_created;
                 timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 
-                this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:null}) ); 
+                this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); 
                 this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); 
                 this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
                 
@@ -1249,7 +1363,12 @@ ${textToAnalyze}`;
                     </div>
                     <h3 style="margin-bottom: 20px;">Linha do Tempo (Histórico)</h3>
                     <div class="full-timeline">
-                        ${timeline.map(t => `<div class="ft-item" ${t.type==='update'?`onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`:''}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1.1rem; display:block; margin-bottom:5px;">${t.title}</b><div style="font-size:0.95rem; color:var(--text-secondary);">${t.desc}</div></div></div>`).join('')}
+                        ${timeline.map(t => {
+                            let clickAct = '';
+                            if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`;
+                            if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`;
+                            return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1.1rem; display:block; margin-bottom:5px;">${t.title}</b><div style="font-size:0.95rem; color:var(--text-secondary);">${t.desc}</div></div></div>`;
+                        }).join('')}
                     </div>`; 
                 this.navigate('case-detail'); 
             },
