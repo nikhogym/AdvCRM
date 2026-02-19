@@ -364,31 +364,73 @@
             </div>
         </div>
 
-        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div>
-        
-        <div class="flex-gap">
-            <div style="flex:2"><label>Cliente</label><input type="text" name="client" required></div>
-            <div style="flex:1"><label>Posição do Cliente</label><select name="client_role"><option value="autor">Autor / Reclamante</option><option value="reu">Réu / Reclamado</option></select></div>
+        <div id="modal-case" class="modal">
+            <div class="modal-content">
+                <div class="flex-between" style="margin-bottom:20px">
+                    <h3>Processo</h3>
+                    <button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button>
+                </div>
+                <form onsubmit="app.saveCase(event)">
+                    <input type="hidden" name="id">
+                    
+                    <div class="flex-gap">
+                        <div style="flex:1"><label>Número</label><input type="text" name="number" required></div>
+                        <div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div>
+                    </div>
+                    
+                    <div class="flex-between" style="margin-bottom: 5px;">
+                        <label style="margin: 0;">Partes do Processo</label>
+                        <button type="button" class="btn-outline btn-sm" style="border:none; color:var(--primary); font-weight:700; padding:4px;" onclick="app.swapClientOpponent()">🔁 Inverter Partes</button>
+                    </div>
+                    
+                    <div class="flex-gap" style="margin-bottom: 0;">
+                        <div style="flex:2">
+                            <label style="font-size:0.75rem; font-weight:normal;">Meu Cliente</label>
+                            <input type="text" name="client" required>
+                        </div>
+                        <div style="flex:1">
+                            <label style="font-size:0.75rem; font-weight:normal;">Posição</label>
+                            <select name="client_role">
+                                <option value="autor">Autor / Reclamante</option>
+                                <option value="reu">Réu / Reclamado</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <label style="font-size:0.75rem; font-weight:normal;">Parte Adversa</label>
+                    <input type="text" name="opponent">
+                    
+                    <div class="flex-gap">
+                        <div style="flex:1"><label>Área</label>
+                            <select name="area">
+                                <option>Cível</option>
+                                <option>Trabalhista</option>
+                                <option>Família e Sucessões</option>
+                                <option>Penal</option>
+                                <option>Previdenciário</option>
+                                <option>Tributário</option>
+                                <option>Empresarial</option>
+                                <option>Consumidor</option>
+                                <option>Imobiliário</option>
+                                <option>Digital / Proteção de Dados</option>
+                                <option>Outros</option>
+                            </select>
+                        </div>
+                        <div style="flex:1"><label>Valor da Causa (R$)</label><input type="number" name="value" step="0.01"></div>
+                    </div>
+                    
+                    <div class="flex-gap">
+                        <div style="flex:1"><label>Data Início (Opcional)</label><input type="date" name="date_start"></div>
+                        <div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div>
+                    </div>
+                    
+                    <label>Advogado Responsável</label><input type="text" name="lawyer">
+                    <label>Observações</label><textarea name="obs"></textarea>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar</button>
+                </form>
+            </div>
         </div>
-        <label>Parte Adversa</label><input type="text" name="opponent">
-        
-        <div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
-            <option>Cível</option>
-            <option>Trabalhista</option>
-            <option>Família e Sucessões</option>
-            <option>Penal</option>
-            <option>Previdenciário</option>
-            <option>Tributário</option>
-            <option>Empresarial</option>
-            <option>Consumidor</option>
-            <option>Imobiliário</option>
-            <option>Digital / Proteção de Dados</option>
-            <option>Outros</option>
-        </select></div><div style="flex:1"><label>Valor da Causa (R$)</label><input type="number" name="value" step="0.01"></div></div>
-        <div class="flex-gap"><div style="flex:1"><label>Data Início (Opcional)</label><input type="date" name="date_start"></div><div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div></div>
-        <label>Advogado Responsável</label><input type="text" name="lawyer">
-        <label>Observações</label><textarea name="obs"></textarea>
-        <button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar</button></form></div></div>
         
         <div id="modal-deadline" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Prazo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-deadline')">✕</button></div><form onsubmit="app.saveDeadline(event)"><input type="hidden" name="id"><input type="hidden" name="caseId" id="deadline-case-id"><div id="case-selector-container" style="margin-bottom:1rem"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div><label>Tipo</label><input type="text" name="type" required><div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar Prazo</button></form></div></div>
 
@@ -618,7 +660,7 @@ ${textToAnalyze}`;
                     extractedReu: extractedReu,
                     dispDate: dispDate,
                     type: b3.split('\n')[0].replace('Classificação:', '').trim().substring(0, 40) || 'Ato Judicial', 
-                    outcome: "Movimentação", // será calculado dinamicamente no render
+                    outcome: "Movimentação",
                     blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 },
                     importRole: roleFromImport
                 };
@@ -645,9 +687,9 @@ ${textToAnalyze}`;
                     const newCase = { 
                         id: Date.now(), 
                         number: this.tempParsedData.caseNumber, 
-                        client: this.tempParsedData.extractedAutor || "Cliente Não Identificado", 
+                        client: this.tempParsedData.importRole === 'reu' ? (this.tempParsedData.extractedReu || "Cliente Não Identificado") : (this.tempParsedData.extractedAutor || "Cliente Não Identificado"), 
                         client_role: this.tempParsedData.importRole === 'desconhecido' ? 'autor' : this.tempParsedData.importRole,
-                        opponent: this.tempParsedData.extractedReu || "-", 
+                        opponent: this.tempParsedData.importRole === 'reu' ? (this.tempParsedData.extractedAutor || "-") : (this.tempParsedData.extractedReu || "-"), 
                         area: 'Cível', 
                         status: 'Em andamento', 
                         date_created: new Date().toISOString() 
@@ -1020,6 +1062,20 @@ ${textToAnalyze}`;
                     }).join(''); 
                 }
                 document.getElementById('modal-day-details').classList.add('active');
+            },
+
+            swapClientOpponent() {
+                const clientInput = document.querySelector('#modal-case [name="client"]');
+                const opponentInput = document.querySelector('#modal-case [name="opponent"]');
+                const roleInput = document.querySelector('#modal-case [name="client_role"]');
+                
+                if(clientInput && opponentInput && roleInput) {
+                    const temp = clientInput.value;
+                    clientInput.value = opponentInput.value;
+                    opponentInput.value = temp;
+                    
+                    roleInput.value = roleInput.value === 'autor' ? 'reu' : 'autor';
+                }
             },
 
             openStatusMenu(el, id) { this.currentStatusId = id; const m = document.getElementById('status-menu'); const r = el.getBoundingClientRect(); m.style.top = (r.bottom + window.scrollY + 8) + 'px'; m.style.left = r.left + 'px'; m.classList.add('show'); },
