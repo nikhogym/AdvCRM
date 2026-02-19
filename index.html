@@ -274,7 +274,7 @@
                 <div id="updates-list-full"></div>
             </section>
 
-            <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
+            <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Posição</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
             
             <section id="view-finance" class="hidden">
                 <div class="flex-between" style="margin-bottom:1.5rem;"><h2>Financeiro</h2><button class="btn btn-primary" onclick="app.openModal('modal-payment')">+ Novo Lançamento</button></div>
@@ -1140,158 +1140,17 @@ ${textToAnalyze}`;
             renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
             renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
             renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; this.data.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button></td></tr>`; }); },
-            renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); }); Object.values(cs).forEach(cl => { t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
+            renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0, roles:new Set()}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); cs[c.client].roles.add(c.client_role === 'reu' ? 'Réu' : 'Autor'); }); Object.values(cs).forEach(cl => { const rolesStr = Array.from(cl.roles).join(' / '); t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
             
-            renderFinance() { 
-                const t = document.getElementById('finance-table-body'); 
-                const ledger = document.getElementById('finance-ledger-body');
-                t.innerHTML = ''; 
-                ledger.innerHTML = '';
-
-                let totalIn = 0, totalOut = 0, totalPending = 0; 
-
-                this.data.cases.forEach(c => { 
-                    const p = this.data.transactions.filter(x=>x.caseId==c.id && x.type=='income').reduce((a,b)=>a+(parseFloat(b.amount)||0),0); 
-                    const b = (parseFloat(c.fees)||0) - p; 
-                    totalPending += (b > 0 ? b : 0);
-                    
-                    t.innerHTML += `<tr>
-                        <td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td>
-                        <td>${this.formatCurrency(c.fees||0)}</td>
-                        <td><span class="clickable-link text-success" onclick="app.openReceiptConfig(null, ${c.id})" style="font-weight:700;">${this.formatCurrency(p)}</span></td>
-                        <td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td>
-                        <td style="display:flex; gap:8px;">
-                            <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">➕ Lançar</button>
-                            <button class="btn btn-primary btn-sm" onclick="app.openReceiptConfig(null, ${c.id})">📄 Recibo</button>
-                        </td>
-                    </tr>`; 
+            openClientDetail(name) { 
+                const cl = this.data.cases.filter(c=>c.client===name); 
+                let h = `<div style="margin-bottom:20px; font-size:1.1rem;">Total consolidado: <b>${cl.length} processo(s)</b></div><table style="width:100%"><thead><tr><th>Nº CNJ</th><th>Posição</th><th>Status</th><th>Valor Causa</th></tr></thead><tbody>`; 
+                cl.forEach(c => {
+                    const roleLabel = c.client_role === 'reu' ? '<span class="badge badge-yellow">Réu</span>' : '<span class="badge badge-blue">Autor</span>';
+                    h += `<tr><td style="font-weight:600;"><span class="clickable-link" onclick="app.closeModal('modal-client-detail'); app.openCaseDetail(${c.id})">${c.number}</span></td><td>${roleLabel}</td><td><span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></td><td>${this.formatCurrency(c.value)}</td></tr>`;
                 }); 
-
-                this.data.transactions.forEach(tx => {
-                    if (tx.type === 'income') totalIn += parseFloat(tx.amount) || 0;
-                    if (tx.type === 'expense') totalOut += parseFloat(tx.amount) || 0;
-                });
-                const balance = totalIn - totalOut;
-
-                if(document.getElementById('fin-received')) document.getElementById('fin-received').innerText = this.formatCurrency(totalIn); 
-                if(document.getElementById('fin-pending')) document.getElementById('fin-pending').innerText = this.formatCurrency(totalPending); 
-                if(document.getElementById('fin-expenses')) document.getElementById('fin-expenses').innerText = this.formatCurrency(totalOut);
-                if(document.getElementById('fin-balance')) {
-                    const balEl = document.getElementById('fin-balance');
-                    balEl.innerText = this.formatCurrency(balance);
-                    balEl.className = `stat-value ${balance >= 0 ? 'text-success' : 'text-danger'}`;
-                }
-
-                this.data.transactions.sort((a,b)=>b.id-a.id).forEach(tx => {
-                    const c = this.data.cases.find(x => x.id == tx.caseId);
-                    const isIncome = tx.type === 'income';
-                    
-                    let actionBtns = `<button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${tx.id})">🗑</button>`;
-                    if(isIncome) {
-                        actionBtns = `<button class="btn btn-outline btn-sm" onclick="app.openReceiptConfig(${tx.id})">📄 Recibo</button> ` + actionBtns;
-                    }
-
-                    ledger.innerHTML += `<tr>
-                        <td>${new Date(tx.id).toLocaleDateString('pt-BR')}</td>
-                        <td><span class="badge ${isIncome?'badge-green':'badge-red'}">${isIncome?'Entrada':'Saída'}</span></td>
-                        <td>${tx.desc || '-'}</td>
-                        <td>${c ? c.client : '-'}</td>
-                        <td style="font-weight:bold; color:${isIncome?'var(--success)':'var(--danger)'}">${isIncome?'+':'-'} ${this.formatCurrency(tx.amount)}</td>
-                        <td style="display:flex; gap:8px;">${actionBtns}</td>
-                    </tr>`;
-                });
-            },
-
-            openReceiptConfig(txId = null, caseId = null) {
-                let pagador = '';
-                let valor = 0;
-                let desc = 'Serviços jurídicos prestados.';
-                let data = new Date().toISOString().split('T')[0];
-
-                const dl = document.getElementById('rcpt-client-list');
-                dl.innerHTML = '';
-                const clients = [...new Set(this.data.cases.map(c => c.client).filter(Boolean))];
-                clients.forEach(c => dl.innerHTML += `<option value="${c}">`);
-
-                if (txId) {
-                    const tx = this.data.transactions.find(t => t.id === txId);
-                    if (tx) {
-                        valor = tx.amount;
-                        desc = tx.desc || 'Pagamento de honorários';
-                        data = new Date(tx.id).toISOString().split('T')[0];
-                        const c = this.data.cases.find(x => x.id == tx.caseId);
-                        if (c) {
-                            pagador = c.client;
-                            desc += ` (Processo nº ${c.number})`;
-                        }
-                    }
-                } else if (caseId) {
-                    const c = this.data.cases.find(x => x.id === caseId);
-                    if (c) {
-                        pagador = c.client;
-                        valor = this.data.transactions.filter(t => t.caseId === caseId && t.type === 'income').reduce((a,b) => a + (parseFloat(b.amount) || 0), 0);
-                        desc = `Honorários advocatícios referente ao processo ${c.number}`;
-                    }
-                }
-
-                document.getElementById('rcpt-client').value = pagador;
-                document.getElementById('rcpt-amount').value = valor;
-                document.getElementById('rcpt-desc').value = desc;
-                document.getElementById('rcpt-date').value = data;
-
-                document.getElementById('modal-receipt-config').classList.add('active');
-            },
-
-            generateReceipt() {
-                const pagador = document.getElementById('rcpt-client').value || '_______________________';
-                const valor = parseFloat(document.getElementById('rcpt-amount').value) || 0;
-                const desc = document.getElementById('rcpt-desc').value || '_______________________';
-                
-                const dateInput = document.getElementById('rcpt-date').value;
-                const dateStr = dateInput ? new Date(dateInput + 'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
-
-                document.getElementById('receipt-content').innerHTML = `
-                    <div style="border: 2px solid #000; padding: 40px; background: #fff; color: #000; font-family: 'Times New Roman', serif; position: relative; border-radius: 8px;">
-                        <div style="display:flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px;">
-                            <div>
-                                <h1 style="margin:0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px;">RECIBO</h1>
-                                <p style="margin: 5px 0 0 0; color: #555;">Via LexManager CRM</p>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="background: #f4f4f4; border: 1px solid #000; padding: 10px 20px; font-size: 1.5rem; font-weight: bold;">
-                                    ${this.formatCurrency(valor)}
-                                </div>
-                                <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Nº ${Date.now().toString().slice(-6)}</p>
-                            </div>
-                        </div>
-
-                        <div style="font-size: 1.15rem; line-height: 1.8; text-align: justify; margin-bottom: 30px;">
-                            Recebi(emos) de <b>${pagador}</b>, portador(a) do CPF/CNPJ nº ________________________, a importância supra de <b>${this.formatCurrency(valor)}</b>, em pagamento referente a <b>${desc}</b>.
-                            <br><br>
-                            Para maior clareza e validade, firmo o presente recibo dando plena, rasa e irrevogável quitação referente ao valor acima especificado.
-                        </div>
-
-                        <div style="display:flex; justify-content: flex-end; margin-bottom: 50px;">
-                            <div style="text-align: center; width: 60%;">
-                                <p style="font-size: 1.1rem; margin: 0;">__________________________, ${dateStr}</p>
-                            </div>
-                        </div>
-
-                        <div style="display:flex; justify-content: space-between; gap: 30px;">
-                            <div style="flex:1; border-top: 1px solid #000; text-align: center; padding-top: 10px;">
-                                <b style="display:block;">Assinatura do Pagador</b>
-                                <span style="font-size:0.9rem; color:#555;">(Opcional)</span>
-                            </div>
-                            <div style="flex:1; border-top: 1px solid #000; text-align: center; padding-top: 10px;">
-                                <b style="display:block;">Assinatura do Recebedor</b>
-                                <span style="font-size:0.9rem; color:#555;">Advogado / Escritório</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                this.closeModal('modal-receipt-config');
-                document.getElementById('modal-receipt').classList.add('active');
+                document.getElementById('client-detail-body').innerHTML = h + `</tbody></table>`; 
+                document.getElementById('modal-client-detail').classList.add('active'); 
             },
 
             openCaseDetail(id) { 
@@ -1310,13 +1169,16 @@ ${textToAnalyze}`;
                 this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
                 
                 timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
+
+                const clientLabel = c.client_role === 'reu' ? 'Réu / Cliente' : 'Autor / Cliente';
+                const opponentLabel = c.client_role === 'reu' ? 'Autor / Adverso' : 'Réu / Adverso';
                 
                 document.getElementById('case-detail-content').innerHTML = `
                     <div class="card" style="margin-bottom: 30px;">
                         <div class="flex-between"><h2 style="font-size:1.8rem; font-family:monospace; letter-spacing:-1px;">${c.number}</h2> <span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></div>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin:25px 0; background:var(--bg-body); padding:20px; border-radius:var(--radius-lg); border: 1px solid var(--border-color);">
-                            <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Autor / Cliente</span><br><b style="font-size:1.1rem;">${c.client}</b></div>
-                            <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Réu / Adverso</span><br><b style="font-size:1.1rem;">${c.opponent||'-'}</b></div>
+                            <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">${clientLabel}</span><br><b style="font-size:1.1rem;">${c.client}</b></div>
+                            <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">${opponentLabel}</span><br><b style="font-size:1.1rem;">${c.opponent||'-'}</b></div>
                             <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Área</span><br><b>${c.area}</b></div>
                             <div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Valor da Causa</span><br><b>${this.formatCurrency(c.value)}</b></div>
                         </div>
@@ -1336,7 +1198,6 @@ ${textToAnalyze}`;
                 this.navigate('case-detail'); 
             },
 
-            openClientDetail(name) { const cl = this.data.cases.filter(c=>c.client===name); let h = `<div style="margin-bottom:20px; font-size:1.1rem;">Total consolidado: <b>${cl.length} processo(s)</b></div><table style="width:100%"><thead><tr><th>Nº CNJ</th><th>Status</th><th>Valor Causa</th></tr></thead><tbody>`; cl.forEach(c => h += `<tr><td style="font-weight:600;">${c.number}</td><td><span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></td><td>${this.formatCurrency(c.value)}</td></tr>`); document.getElementById('client-detail-body').innerHTML = h + `</tbody></table>`; document.getElementById('modal-client-detail').classList.add('active'); },
             deleteClient(n) { if(confirm('Aviso: Isso apagará TODOS os processos vinculados a este cliente. Deseja prosseguir?')) { this.data.cases = this.data.cases.filter(c=>c.client!==n); this.saveToStorage(); this.renderClients(); } },
             
             toggleDeadline(id) { const i = this.data.deadlines.findIndex(d=>d.id===id); if(i>-1) { this.data.deadlines[i].done = !this.data.deadlines[i].done; this.saveToStorage(); this.renderDeadlines(); } },
