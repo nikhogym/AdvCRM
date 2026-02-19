@@ -137,7 +137,7 @@
         .calendar-dot { width: 6px; height: 6px; border-radius: 50%; }
         .dot-deadline { background-color: var(--danger); }
         .dot-task { background-color: var(--info); }
-        .dot-publication { background-color: var(--warning); } /* NOVA BOLINHA IA */
+        .dot-publication { background-color: var(--warning); }
         
         .calendar-legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; padding-top:15px; border-top: 1px solid var(--border-color); }
         .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -286,14 +286,14 @@
                 </div>
                 
                 <h3 style="margin-bottom: 1rem; margin-top:2rem;">Balanço por Processo</h3>
-                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Recibo</th></tr></thead><tbody id="finance-table-body"></tbody></table></div>
+                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Ações</th></tr></thead><tbody id="finance-table-body"></tbody></table></div>
 
                 <h3 style="margin-bottom: 1rem; margin-top:2rem;">Histórico Geral de Caixa</h3>
                 <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Processo/Cliente</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="finance-ledger-body"></tbody></table></div>
             </section>
 
-            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
-            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
+            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
+            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
             <section id="view-settings" class="hidden"><h2>Configurações</h2><div class="card" style="max-width: 400px; margin-top:20px;"><button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema</button><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Dados e Backup</h4><button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Salvar Backup (JSON)</button><button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup</button><input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)"><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button></div></section>
             <section id="view-case-detail" class="hidden"><button class="btn btn-outline" onclick="app.navigate('cases')" style="margin-bottom:1rem;">← Voltar</button><div id="case-detail-content"></div></section>
         </div>
@@ -357,8 +357,6 @@
             </div>
         </div>
 
-        <div id="modal-day-details" class="modal"><div class="modal-content" style="max-width:500px"><div class="flex-between" style="margin-bottom:20px"><h3 id="day-details-title">Detalhes</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-day-details')">✕</button></div><div id="day-details-body"></div></div></div>
-
         <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div><label>Cliente</label><input type="text" name="client" required><label>Adverso</label><input type="text" name="opponent"><div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
             <option>Cível</option>
             <option>Trabalhista</option>
@@ -385,6 +383,31 @@
 
         <div id="modal-client-detail" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px;"><h3>Ficha</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-client-detail')">✕</button></div><div id="client-detail-body"></div></div></div>
         
+        <div id="modal-day-details" class="modal"><div class="modal-content" style="max-width:500px"><div class="flex-between" style="margin-bottom:20px"><h3 id="day-details-title">Detalhes</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-day-details')">✕</button></div><div id="day-details-body"></div></div></div>
+        
+        <div id="modal-receipt-config" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="flex-between" style="margin-bottom:20px">
+                    <h3>Configurar Recibo</h3>
+                    <button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-receipt-config')">✕</button>
+                </div>
+                <label>Pagador (Nome do Cliente)</label>
+                <input type="text" id="rcpt-client" list="rcpt-client-list" placeholder="Nome do pagador">
+                <datalist id="rcpt-client-list"></datalist>
+                
+                <div class="flex-gap">
+                    <div style="flex:1"><label>Valor (R$)</label><input type="number" id="rcpt-amount" step="0.01"></div>
+                    <div style="flex:1"><label>Data</label><input type="date" id="rcpt-date"></div>
+                </div>
+                
+                <label>Referente a</label>
+                <textarea id="rcpt-desc" rows="3" placeholder="Ex: Honorários advocatícios referentes ao processo..."></textarea>
+                
+                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="app.generateReceipt()">Visualizar Recibo Pronto</button>
+            </div>
+        </div>
+
+        <div id="modal-receipt" class="modal"><div class="modal-content" style="max-width:600px"><div class="receipt-paper" id="receipt-content"></div><div style="margin-top:20px; text-align:center;"><button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Recibo</button><button class="btn btn-outline" style="margin-left:10px;" onclick="app.closeModal('modal-receipt')">Fechar</button></div></div></div>
     </main>
 
     <script>
@@ -836,7 +859,7 @@ ${textToAnalyze}`;
                 
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => {
                     const c = this.data.cases.find(x => x.id == d.caseId);
-                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id});
+                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.caseId});
                 });
                 
                 this.data.tasks.filter(t => !t.done && new Date(t.date) >= today).forEach(t => {
@@ -856,7 +879,7 @@ ${textToAnalyze}`;
                 } else { 
                     agendaItems.slice(0,6).forEach(item => { 
                         const icon = item.type==='deadline' ? '⏳' : (item.type==='task' ? '📝' : '📜'); 
-                        const color = item.type==='deadline' ? 'var(--danger)' : (item.type==='task' ? 'var(--info)' : 'var(--text-main)'); 
+                        const color = item.type==='deadline' ? 'var(--danger)' : (item.type==='task' ? 'var(--info)' : 'var(--warning)'); 
                         const clickAction = item.type==='update' ? `app.viewPublication(${item.id})` : `app.navigate('${item.type==='deadline'?'deadlines':'tasks'}')`; 
                         
                         list.innerHTML += `<div style="padding:12px; border-radius:var(--radius-md); background:var(--bg-body); margin-bottom:10px; cursor:pointer; transition:0.2s;" onclick="${clickAction}"><div style="font-weight:700; font-size:0.9rem; color:${color}; margin-bottom:4px;">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">${new Date(item.date).toLocaleDateString('pt-BR').slice(0,5)} • ${item.sub}</div></div>`; 
@@ -994,8 +1017,29 @@ ${textToAnalyze}`;
             
             saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); this.data.deadlines.push({ id: Date.now(), caseId: parseInt(cid), type: f.get('type'), date: this.fixDate(f.get('date')).toISOString(), done: false }); this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); this.data.tasks.push({ id: Date.now(), desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }); this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
-            saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')), desc: f.get('desc') }); this.saveToStorage(); this.closeModal('modal-payment'); this.navigate('finance'); },
-            deleteTransaction(id) { if(confirm('Excluir este lançamento financeiro permanentemente?')) { this.data.transactions = this.data.transactions.filter(t => t.id !== id); this.saveToStorage(); this.navigate('finance'); } },
+            
+            saveTransaction(e) { 
+                e.preventDefault(); 
+                const f = new FormData(e.target); 
+                this.data.transactions.push({ 
+                    id: Date.now(), 
+                    caseId: parseInt(f.get('caseId')), 
+                    type: f.get('type'), 
+                    amount: parseFloat(f.get('amount')), 
+                    desc: f.get('desc') 
+                }); 
+                this.saveToStorage(); 
+                this.closeModal('modal-payment'); 
+                this.navigate('finance'); 
+            },
+            
+            deleteTransaction(id) { 
+                if(confirm('Excluir este lançamento financeiro permanentemente?')) { 
+                    this.data.transactions = this.data.transactions.filter(t => t.id !== id); 
+                    this.saveToStorage(); 
+                    this.navigate('finance'); 
+                } 
+            },
 
             renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
             renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
@@ -1015,7 +1059,16 @@ ${textToAnalyze}`;
                     const b = (parseFloat(c.fees)||0) - p; 
                     totalPending += (b > 0 ? b : 0);
                     
-                    t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td><td>${this.formatCurrency(c.fees||0)}</td><td><span class="clickable-link text-success" onclick="app.openReceipt(${c.id},${p})" style="font-weight:700;">${this.formatCurrency(p)}</span></td><td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">Recibo</button></td></tr>`; 
+                    t.innerHTML += `<tr>
+                        <td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td>
+                        <td>${this.formatCurrency(c.fees||0)}</td>
+                        <td><span class="clickable-link text-success" onclick="app.openReceiptConfig(null, ${c.id})" style="font-weight:700;">${this.formatCurrency(p)}</span></td>
+                        <td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td>
+                        <td style="display:flex; gap:8px;">
+                            <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">➕ Lançar</button>
+                            <button class="btn btn-primary btn-sm" onclick="app.openReceiptConfig(null, ${c.id})">📄 Recibo</button>
+                        </td>
+                    </tr>`; 
                 }); 
 
                 this.data.transactions.forEach(tx => {
@@ -1036,15 +1089,100 @@ ${textToAnalyze}`;
                 this.data.transactions.sort((a,b)=>b.id-a.id).forEach(tx => {
                     const c = this.data.cases.find(x => x.id == tx.caseId);
                     const isIncome = tx.type === 'income';
+                    
+                    let actionBtns = `<button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${tx.id})">🗑</button>`;
+                    if(isIncome) {
+                        actionBtns = `<button class="btn btn-outline btn-sm" onclick="app.openReceiptConfig(${tx.id})">📄 Recibo</button> ` + actionBtns;
+                    }
+
                     ledger.innerHTML += `<tr>
                         <td>${new Date(tx.id).toLocaleDateString('pt-BR')}</td>
                         <td><span class="badge ${isIncome?'badge-green':'badge-red'}">${isIncome?'Entrada':'Saída'}</span></td>
                         <td>${tx.desc || '-'}</td>
                         <td>${c ? c.client : '-'}</td>
                         <td style="font-weight:bold; color:${isIncome?'var(--success)':'var(--danger)'}">${isIncome?'+':'-'} ${this.formatCurrency(tx.amount)}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${tx.id})">🗑</button></td>
+                        <td style="display:flex; gap:8px;">${actionBtns}</td>
                     </tr>`;
                 });
+            },
+
+            // ==========================================
+            // RECEIPT GENERATOR (DYNAMIC)
+            // ==========================================
+            openReceiptConfig(txId = null, caseId = null) {
+                let pagador = '';
+                let valor = 0;
+                let desc = 'Serviços jurídicos prestados.';
+                let data = new Date().toISOString().split('T')[0];
+
+                const dl = document.getElementById('rcpt-client-list');
+                dl.innerHTML = '';
+                const clients = [...new Set(this.data.cases.map(c => c.client).filter(Boolean))];
+                clients.forEach(c => dl.innerHTML += `<option value="${c}">`);
+
+                if (txId) {
+                    const tx = this.data.transactions.find(t => t.id === txId);
+                    if (tx) {
+                        valor = tx.amount;
+                        desc = tx.desc || 'Pagamento de honorários';
+                        data = new Date(tx.id).toISOString().split('T')[0];
+                        const c = this.data.cases.find(x => x.id == tx.caseId);
+                        if (c) {
+                            pagador = c.client;
+                            desc += ` (Processo nº ${c.number})`;
+                        }
+                    }
+                } else if (caseId) {
+                    const c = this.data.cases.find(x => x.id === caseId);
+                    if (c) {
+                        pagador = c.client;
+                        valor = this.data.transactions.filter(t => t.caseId === caseId && t.type === 'income').reduce((a,b) => a + (parseFloat(b.amount) || 0), 0);
+                        desc = `Honorários advocatícios referente ao processo ${c.number}`;
+                    }
+                }
+
+                document.getElementById('rcpt-client').value = pagador;
+                document.getElementById('rcpt-amount').value = valor;
+                document.getElementById('rcpt-desc').value = desc;
+                document.getElementById('rcpt-date').value = data;
+
+                document.getElementById('modal-receipt-config').classList.add('active');
+            },
+
+            generateReceipt() {
+                const pagador = document.getElementById('rcpt-client').value || '_______________________';
+                const valor = parseFloat(document.getElementById('rcpt-amount').value) || 0;
+                const desc = document.getElementById('rcpt-desc').value || '_______________________';
+                
+                const dateInput = document.getElementById('rcpt-date').value;
+                const dateStr = dateInput ? new Date(dateInput + 'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+
+                document.getElementById('receipt-content').innerHTML = `
+                    <div class="receipt-header">
+                        <h2>RECIBO DE HONORÁRIOS</h2>
+                        <p>Documento gerado via LexManager</p>
+                    </div>
+                    <p style="margin-bottom:15px; font-size:1.1rem; line-height: 1.6;">
+                        Recebemos de <b>${pagador}</b>, a importância de <b>${this.formatCurrency(valor)}</b>, 
+                        referente a ${desc}.
+                    </p>
+                    <p style="margin-bottom:15px; font-size:1.1rem;">
+                        Para maior clareza, firmamos o presente recibo para que produza os seus efeitos legais.
+                    </p>
+                    <div class="receipt-row" style="font-weight:bold; font-size:1.2rem; border-top:2px solid #333; padding-top:10px; margin-top:20px; text-align:right;">
+                        <span>VALOR PAGO: ${this.formatCurrency(valor)}</span>
+                    </div>
+                    <br><br>
+                    <div style="text-align:center;">
+                        <p>Data de emissão: ${dateStr}</p>
+                        <br><br>
+                        <p>_____________________________________</p>
+                        <p style="margin-top:5px;">Assinatura do Advogado / Escritório</p>
+                    </div>
+                `;
+                
+                this.closeModal('modal-receipt-config');
+                document.getElementById('modal-receipt').classList.add('active');
             },
 
             openCaseDetail(id) { 
@@ -1091,7 +1229,6 @@ ${textToAnalyze}`;
 
             openClientDetail(name) { const cl = this.data.cases.filter(c=>c.client===name); let h = `<div style="margin-bottom:20px; font-size:1.1rem;">Total consolidado: <b>${cl.length} processo(s)</b></div><table style="width:100%"><thead><tr><th>Nº CNJ</th><th>Status</th><th>Valor Causa</th></tr></thead><tbody>`; cl.forEach(c => h += `<tr><td style="font-weight:600;">${c.number}</td><td><span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></td><td>${this.formatCurrency(c.value)}</td></tr>`); document.getElementById('client-detail-body').innerHTML = h + `</tbody></table>`; document.getElementById('modal-client-detail').classList.add('active'); },
             deleteClient(n) { if(confirm('Aviso: Isso apagará TODOS os processos vinculados a este cliente. Deseja prosseguir?')) { this.data.cases = this.data.cases.filter(c=>c.client!==n); this.saveToStorage(); this.renderClients(); } },
-            openReceipt(cid, tot) { const c = this.data.cases.find(x=>x.id==cid); const tr = this.data.transactions.filter(x=>x.caseId==cid && x.type=='income'); document.getElementById('receipt-content').innerHTML = `<div class="receipt-header"><h2>RECIBO DE HONORÁRIOS</h2><p>Documento gerado via LexManager</p></div><p style="margin-bottom:15px; font-size:1.1rem;">Recebemos de <b>${c.client}</b>, referente ao processo judicial <b>${c.number}</b>.</p><div style="border-top:1px dashed #ccc; margin:15px 0; padding-top:15px;"><b style="display:block; margin-bottom:10px;">HISTÓRICO DE PAGAMENTOS:</b>${tr.map(t=>`<div class="receipt-row"><span>${new Date(t.date).toLocaleDateString('pt-BR')}</span><span>${this.formatCurrency(t.amount)}</span></div>`).join('')}</div><div class="receipt-row" style="font-weight:bold; font-size:1.2rem; border-top:2px solid #333; padding-top:10px; margin-top:10px;"><span>TOTAL PAGO</span><span>${this.formatCurrency(tot)}</span></div><br><br><br><div style="text-align:center;"><p>_____________________________________</p><p style="margin-top:5px;">Assinatura do Advogado / Escritório</p></div>`; document.getElementById('modal-receipt').classList.add('active'); },
             
             toggleDeadline(id) { const i = this.data.deadlines.findIndex(d=>d.id===id); if(i>-1) { this.data.deadlines[i].done = !this.data.deadlines[i].done; this.saveToStorage(); this.renderDeadlines(); } },
             deleteDeadline(id) { if(confirm('Tem certeza que deseja apagar este prazo?')) { this.data.deadlines = this.data.deadlines.filter(d=>d.id!==id); this.saveToStorage(); this.renderDeadlines(); } },
