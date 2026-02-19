@@ -137,6 +137,7 @@
         .calendar-dot { width: 6px; height: 6px; border-radius: 50%; }
         .dot-deadline { background-color: var(--danger); }
         .dot-task { background-color: var(--info); }
+        .dot-publication { background-color: var(--warning); } /* NOVA BOLINHA IA */
         
         .calendar-legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; padding-top:15px; border-top: 1px solid var(--border-color); }
         .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -239,7 +240,7 @@
                 <div class="stats-grid">
                     <div class="stat-card card-blue"><div class="stat-icon-bg">⚖️</div><div class="stat-title">Ativos</div><div class="stat-value" id="dash-active">0</div></div>
                     <div class="stat-card card-red"><div class="stat-icon-bg">⏳</div><div class="stat-title">Prazos Hoje</div><div class="stat-value text-danger" id="dash-today">0</div></div>
-                    <div class="stat-card card-green"><div class="stat-icon-bg">💰</div><div class="stat-title">Recebido (Total)</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div></div>
+                    <div class="stat-card card-green"><div class="stat-icon-bg">💰</div><div class="stat-title">Saldo Global</div><div class="stat-value text-success" id="dash-finance-received">R$ 0,00</div></div>
                 </div>
 
                 <div class="card">
@@ -253,6 +254,7 @@
                             <div class="calendar-legend">
                                 <div class="legend-item"><div class="calendar-dot dot-deadline"></div> Prazo</div>
                                 <div class="legend-item"><div class="calendar-dot dot-task"></div> Tarefa</div>
+                                <div class="legend-item"><div class="calendar-dot dot-publication"></div> Pub.</div>
                             </div>
                         </div>
                     </div>
@@ -273,26 +275,26 @@
             </section>
 
             <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
-            <section id="view-finance" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Financeiro</h2></div><div class="stats-grid"><div class="stat-card" style="border-top: 4px solid var(--warning)"><div class="stat-title">Pendente</div><div class="stat-value" id="fin-pending">R$ 0,00</div></div><div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Recebido</div><div class="stat-value text-success" id="fin-received">R$ 0,00</div></div></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Registrar</th></tr></thead><tbody id="finance-table-body"></tbody></table></div></section>
-            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
-            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
             
-            <section id="view-settings" class="hidden">
-                <h2>Configurações</h2>
-                <div class="card" style="max-width: 400px; margin-top:20px;">
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema</button>
-                    
-                    <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
-                    <h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Dados e Backup</h4>
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Salvar Backup (JSON)</button>
-                    <button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup</button>
-                    <input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)">
-                    
-                    <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
-                    <button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button>
+            <section id="view-finance" class="hidden">
+                <div class="flex-between" style="margin-bottom:1.5rem;"><h2>Financeiro</h2><button class="btn btn-primary" onclick="app.openModal('modal-payment')">+ Novo Lançamento</button></div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-top: 4px solid var(--info)"><div class="stat-title">A Receber</div><div class="stat-value" id="fin-pending">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Entradas</div><div class="stat-value text-success" id="fin-received">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--danger)"><div class="stat-title">Saídas</div><div class="stat-value text-danger" id="fin-expenses">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--primary)"><div class="stat-title">Saldo Líquido</div><div class="stat-value" id="fin-balance">R$ 0,00</div></div>
                 </div>
+                
+                <h3 style="margin-bottom: 1rem; margin-top:2rem;">Balanço por Processo</h3>
+                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Recibo</th></tr></thead><tbody id="finance-table-body"></tbody></table></div>
+
+                <h3 style="margin-bottom: 1rem; margin-top:2rem;">Histórico Geral de Caixa</h3>
+                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Processo/Cliente</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="finance-ledger-body"></tbody></table></div>
             </section>
-            
+
+            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
+            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
+            <section id="view-settings" class="hidden"><h2>Configurações</h2><div class="card" style="max-width: 400px; margin-top:20px;"><button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema</button><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Dados e Backup</h4><button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Salvar Backup (JSON)</button><button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup</button><input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)"><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button></div></section>
             <section id="view-case-detail" class="hidden"><button class="btn btn-outline" onclick="app.navigate('cases')" style="margin-bottom:1rem;">← Voltar</button><div id="case-detail-content"></div></section>
         </div>
 
@@ -354,6 +356,8 @@
                 </div>
             </div>
         </div>
+
+        <div id="modal-day-details" class="modal"><div class="modal-content" style="max-width:500px"><div class="flex-between" style="margin-bottom:20px"><h3 id="day-details-title">Detalhes</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-day-details')">✕</button></div><div id="day-details-body"></div></div></div>
 
         <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div><label>Cliente</label><input type="text" name="client" required><label>Adverso</label><input type="text" name="opponent"><div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
             <option>Cível</option>
@@ -508,7 +512,6 @@ ${textToAnalyze}`;
                 const extractedAutor = autorMatch ? autorMatch[1].trim() : '';
                 const extractedReu = reuMatch ? reuMatch[1].trim() : '';
 
-                // Extração da data de disponibilização para ordenação
                 const dateMatch = b1.match(/Data de disponibilização:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
                 let dispDate = null;
                 if(dateMatch) {
@@ -586,7 +589,6 @@ ${textToAnalyze}`;
                 if(isEditId) {
                     const idx = this.data.updates.findIndex(u => u.id == isEditId);
                     if(idx > -1) {
-                        // Preserva a data original se for edição e não encontrar uma nova
                         updatePayload.date = this.tempParsedData.dispDate || this.data.updates[idx].date;
                         this.data.updates[idx] = updatePayload;
                     }
@@ -664,7 +666,7 @@ ${textToAnalyze}`;
                 const btn = document.getElementById('pub-view-action-btn');
                 btn.onclick = () => { 
                     this.closeModal('modal-publication-view'); 
-                    this.openModal('modal-deadline', pub.caseId); 
+                    this.navigate('deadlines');
                 };
                 
                 document.getElementById('modal-publication-view').classList.add('active');
@@ -699,7 +701,6 @@ ${textToAnalyze}`;
                     return;
                 }
                 
-                // Ordenação por data (da mais recente para a mais antiga)
                 this.data.updates.sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(u => { 
                     const a = u.analysis || {};
                     let outcomeColor = (a.outcome||'').toLowerCase().includes('deferido') ? 'style="background:var(--success); color:white;"' : ((a.outcome||'').toLowerCase().includes('indeferido') ? 'style="background:var(--danger); color:white;"' : 'class="tag-blue"');
@@ -716,6 +717,7 @@ ${textToAnalyze}`;
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;">
                                 <div><b style="color:var(--text-secondary)">Processo:</b> ${a.caseNumber || 'N/A'}</div>
                                 <div><b style="color:var(--text-secondary)">Cliente:</b> <span style="color:var(--primary); font-weight:600;">${clientName}</span></div>
+                                <div><b style="color:var(--text-secondary)">Publicado em:</b> ${new Date(u.date).toLocaleDateString('pt-BR')}</div>
                             </div>
                             <div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-left:4px solid var(--primary); font-size:0.95rem; line-height:1.5;">
                                 <b>Resumo Técnico:</b><br> ${(a.blocks && a.blocks.b4) ? a.blocks.b4.substring(0, 200) + '...' : 'Sem resumo.'}
@@ -790,9 +792,15 @@ ${textToAnalyze}`;
                 const active = this.data.cases.filter(c => c.status === 'Em andamento'); 
                 document.getElementById('dash-active').innerText = active.length;
                 
-                let totalReceived = 0; 
-                this.data.transactions.forEach(t => { if (t.type === 'income') totalReceived += (parseFloat(t.amount) || 0); }); 
-                document.getElementById('dash-finance-received').innerText = this.formatCurrency(totalReceived);
+                let totalIncome = 0; let totalExpense = 0;
+                this.data.transactions.forEach(t => { 
+                    if (t.type === 'income') totalIncome += (parseFloat(t.amount) || 0); 
+                    if (t.type === 'expense') totalExpense += (parseFloat(t.amount) || 0); 
+                }); 
+                const netBalance = totalIncome - totalExpense;
+                const balanceEl = document.getElementById('dash-finance-received');
+                balanceEl.innerText = this.formatCurrency(netBalance);
+                balanceEl.className = `stat-value ${netBalance >= 0 ? 'text-success' : 'text-danger'}`;
                 
                 const today = new Date(); 
                 today.setHours(0,0,0,0);
@@ -808,18 +816,16 @@ ${textToAnalyze}`;
                 for(let i=0; i<firstDay.getDay(); i++) grid.innerHTML += `<div></div>`;
                 
                 for(let i=1; i<=lastDay.getDate(); i++) {
-                    const deadlinesToday = this.data.deadlines.filter(d => { 
-                        const dDate = new Date(d.date); 
-                        return dDate.getDate() === i && dDate.getMonth() === today.getMonth() && dDate.getFullYear() === today.getFullYear() && !d.done; 
-                    });
-                    const tasksToday = this.data.tasks.filter(t => { 
-                        const tDate = new Date(t.date); 
-                        return tDate.getDate() === i && tDate.getMonth() === today.getMonth() && tDate.getFullYear() === today.getFullYear() && !t.done; 
-                    });
+                    const currentDateStr = new Date(today.getFullYear(), today.getMonth(), i).toDateString();
+                    
+                    const deadlinesToday = this.data.deadlines.filter(d => new Date(d.date).toDateString() === currentDateStr && !d.done);
+                    const tasksToday = this.data.tasks.filter(t => new Date(t.date).toDateString() === currentDateStr && !t.done);
+                    const updatesToday = this.data.updates.filter(u => new Date(u.date).toDateString() === currentDateStr);
                     
                     let dotsHtml = '<div class="calendar-dots">'; 
-                    deadlinesToday.slice(0,4).forEach(() => dotsHtml += '<div class="calendar-dot dot-deadline"></div>'); 
-                    tasksToday.slice(0,4-deadlinesToday.length).forEach(() => dotsHtml += '<div class="calendar-dot dot-task"></div>'); 
+                    deadlinesToday.slice(0,3).forEach(() => dotsHtml += '<div class="calendar-dot dot-deadline"></div>'); 
+                    tasksToday.slice(0,3).forEach(() => dotsHtml += '<div class="calendar-dot dot-task"></div>'); 
+                    updatesToday.slice(0,3).forEach(() => dotsHtml += '<div class="calendar-dot dot-publication"></div>'); 
                     dotsHtml += '</div>';
                     
                     grid.innerHTML += `<div class="calendar-day ${i === today.getDate() ? 'today' : ''}" onclick="app.showDayDetails(${i}, ${today.getMonth()}, ${today.getFullYear()})"><span>${i}</span> ${dotsHtml}</div>`;
@@ -830,12 +836,17 @@ ${textToAnalyze}`;
                 
                 this.data.deadlines.filter(d => !d.done && new Date(d.date) >= today).forEach(d => {
                     const c = this.data.cases.find(x => x.id == d.caseId);
-                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.caseId});
+                    agendaItems.push({type:'deadline', date:d.date, title:d.type, sub: c ? c.client : 'Sem vínculo', id:d.id});
                 });
                 
-                this.data.updates.slice(0,5).forEach(u => {
+                this.data.tasks.filter(t => !t.done && new Date(t.date) >= today).forEach(t => {
+                    const c = this.data.cases.find(x => x.id == t.caseId);
+                    agendaItems.push({type:'task', date:t.date, title:t.desc, sub: c ? c.client : 'Geral', id:t.id});
+                });
+
+                this.data.updates.filter(u => new Date(u.date) >= today).slice(0,5).forEach(u => {
                     const c = this.data.cases.find(x => x.id == u.caseId);
-                    agendaItems.push({type:'update', date:u.date, title:u.analysis.type || 'Decisão', sub: c ? c.client : 'Nova Publicação', id:u.id});
+                    agendaItems.push({type:'update', date:u.date, title:u.analysis.type || 'Decisão', sub: c ? c.client : 'S/ Vínculo', id:u.id});
                 });
                 
                 agendaItems.sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -844,9 +855,10 @@ ${textToAnalyze}`;
                     list.innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted)">A agenda está livre no momento.</div>'; 
                 } else { 
                     agendaItems.slice(0,6).forEach(item => { 
-                        const icon = item.type==='deadline' ? '⏳' : '📜'; 
-                        const color = item.type==='deadline' ? 'var(--danger)' : 'var(--text-main)'; 
-                        const clickAction = item.type==='deadline' ? `app.openCaseDetail(${item.id})` : `app.viewPublication(${item.id})`; 
+                        const icon = item.type==='deadline' ? '⏳' : (item.type==='task' ? '📝' : '📜'); 
+                        const color = item.type==='deadline' ? 'var(--danger)' : (item.type==='task' ? 'var(--info)' : 'var(--text-main)'); 
+                        const clickAction = item.type==='update' ? `app.viewPublication(${item.id})` : `app.navigate('${item.type==='deadline'?'deadlines':'tasks'}')`; 
+                        
                         list.innerHTML += `<div style="padding:12px; border-radius:var(--radius-md); background:var(--bg-body); margin-bottom:10px; cursor:pointer; transition:0.2s;" onclick="${clickAction}"><div style="font-weight:700; font-size:0.9rem; color:${color}; margin-bottom:4px;">${icon} ${item.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">${new Date(item.date).toLocaleDateString('pt-BR').slice(0,5)} • ${item.sub}</div></div>`; 
                     }); 
                 }
@@ -859,26 +871,47 @@ ${textToAnalyze}`;
             
             showDayDetails(day, month, year) {
                 const events = [];
+                const targetDateStr = new Date(year, month, day).toDateString();
+                
                 this.data.deadlines.forEach(d => { 
-                    const dDate = new Date(d.date); 
-                    if(dDate.getDate() === day && dDate.getMonth() === month && dDate.getFullYear() === year) { 
+                    if(new Date(d.date).toDateString() === targetDateStr) { 
                         const c = this.data.cases.find(x => x.id == d.caseId); 
                         events.push({ type: 'deadline', title: d.type, sub: c ? c.client : 'Sem vínculo', done: d.done, id: d.id }); 
                     } 
                 });
                 this.data.tasks.forEach(t => { 
-                    const tDate = new Date(t.date); 
-                    if(tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year) { 
+                    if(new Date(t.date).toDateString() === targetDateStr) { 
                         const c = this.data.cases.find(x => x.id == t.caseId);
-                        events.push({ type: 'task', title: t.desc, sub: c ? c.client : `Prioridade: ${t.priority}`, done: t.done, id: t.id }); 
+                        events.push({ type: 'task', title: t.desc, sub: c ? c.client : `Tarefa Geral - ${t.priority}`, done: t.done, id: t.id }); 
                     } 
                 });
+                this.data.updates.forEach(u => {
+                    if(new Date(u.date).toDateString() === targetDateStr) {
+                        const c = this.data.cases.find(x => x.id == u.caseId);
+                        events.push({ type: 'update', title: u.analysis?.type || 'Publicação', sub: c ? c.client : 'Sem vínculo', done: true, id: u.id });
+                    }
+                });
+                
                 const body = document.getElementById('day-details-body'); 
-                document.getElementById('day-details-title').innerText = `Agenda do dia ${String(day).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
+                document.getElementById('day-details-title').innerText = `Agenda: ${String(day).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
+                
                 if(events.length === 0) { 
-                    body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum compromisso agendado.</p>'; 
+                    body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum evento registrado.</p>'; 
                 } else { 
-                    body.innerHTML = events.map(e => `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${e.type==='deadline'?'var(--danger)':'var(--info)'}; text-decoration:${e.done?'line-through':'none'}">${e.type==='deadline'?'⏳':'📝'} ${e.title}</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;"><button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button></div></div>`).join(''); 
+                    body.innerHTML = events.map(e => {
+                        let icon = '📝'; let color = 'var(--info)';
+                        if(e.type === 'deadline') { icon = '⏳'; color = 'var(--danger)'; }
+                        if(e.type === 'update') { icon = '📜'; color = 'var(--warning)'; }
+                        
+                        let actionBtn = '';
+                        if(e.type !== 'update') {
+                            actionBtn = `<button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button>`;
+                        } else {
+                            actionBtn = `<button class="btn btn-sm btn-outline" onclick="app.closeModal('modal-day-details'); app.viewPublication(${e.id})">Visualizar</button>`;
+                        }
+
+                        return `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${color}; text-decoration:${(e.done && e.type !== 'update')?'line-through':'none'}">${icon} ${e.title}</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;">${actionBtn}</div></div>`;
+                    }).join(''); 
                 }
                 document.getElementById('modal-day-details').classList.add('active');
             },
@@ -961,13 +994,58 @@ ${textToAnalyze}`;
             
             saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); this.data.deadlines.push({ id: Date.now(), caseId: parseInt(cid), type: f.get('type'), date: this.fixDate(f.get('date')).toISOString(), done: false }); this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); this.data.tasks.push({ id: Date.now(), desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }); this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
-            saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')) }); this.saveToStorage(); this.closeModal('modal-payment'); this.renderFinance(); },
-            
+            saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')), desc: f.get('desc') }); this.saveToStorage(); this.closeModal('modal-payment'); this.navigate('finance'); },
+            deleteTransaction(id) { if(confirm('Excluir este lançamento financeiro permanentemente?')) { this.data.transactions = this.data.transactions.filter(t => t.id !== id); this.saveToStorage(); this.navigate('finance'); } },
+
             renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
             renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; this.data.deadlines.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
             renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; this.data.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button></td></tr>`; }); },
             renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); }); Object.values(cs).forEach(cl => { t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
-            renderFinance() { const t = document.getElementById('finance-table-body'); t.innerHTML = ''; let tr = 0, tp = 0; this.data.cases.forEach(c => { const p = this.data.transactions.filter(x=>x.caseId==c.id && x.type=='income').reduce((a,b)=>a+(parseFloat(b.amount)||0),0); const b = (parseFloat(c.fees)||0) - p; tr += p; tp += b; t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td><td>${this.formatCurrency(c.fees||0)}</td><td><span class="clickable-link text-success" onclick="app.openReceipt(${c.id},${p})" style="font-weight:700;">${this.formatCurrency(p)}</span></td><td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">Baixar Recibo</button></td></tr>`; }); document.getElementById('fin-received').innerText = this.formatCurrency(tr); document.getElementById('fin-pending').innerText = this.formatCurrency(tp); },
+            
+            renderFinance() { 
+                const t = document.getElementById('finance-table-body'); 
+                const ledger = document.getElementById('finance-ledger-body');
+                t.innerHTML = ''; 
+                ledger.innerHTML = '';
+
+                let totalIn = 0, totalOut = 0, totalPending = 0; 
+
+                this.data.cases.forEach(c => { 
+                    const p = this.data.transactions.filter(x=>x.caseId==c.id && x.type=='income').reduce((a,b)=>a+(parseFloat(b.amount)||0),0); 
+                    const b = (parseFloat(c.fees)||0) - p; 
+                    totalPending += (b > 0 ? b : 0);
+                    
+                    t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted)">${c.number}</small></td><td>${this.formatCurrency(c.fees||0)}</td><td><span class="clickable-link text-success" onclick="app.openReceipt(${c.id},${p})" style="font-weight:700;">${this.formatCurrency(p)}</span></td><td style="color:${b > 0 ? 'var(--warning)' : 'inherit'}; font-weight:${b > 0 ? '700' : 'normal'}">${this.formatCurrency(b)}</td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment',${c.id})">Recibo</button></td></tr>`; 
+                }); 
+
+                this.data.transactions.forEach(tx => {
+                    if (tx.type === 'income') totalIn += parseFloat(tx.amount) || 0;
+                    if (tx.type === 'expense') totalOut += parseFloat(tx.amount) || 0;
+                });
+                const balance = totalIn - totalOut;
+
+                if(document.getElementById('fin-received')) document.getElementById('fin-received').innerText = this.formatCurrency(totalIn); 
+                if(document.getElementById('fin-pending')) document.getElementById('fin-pending').innerText = this.formatCurrency(totalPending); 
+                if(document.getElementById('fin-expenses')) document.getElementById('fin-expenses').innerText = this.formatCurrency(totalOut);
+                if(document.getElementById('fin-balance')) {
+                    const balEl = document.getElementById('fin-balance');
+                    balEl.innerText = this.formatCurrency(balance);
+                    balEl.className = `stat-value ${balance >= 0 ? 'text-success' : 'text-danger'}`;
+                }
+
+                this.data.transactions.sort((a,b)=>b.id-a.id).forEach(tx => {
+                    const c = this.data.cases.find(x => x.id == tx.caseId);
+                    const isIncome = tx.type === 'income';
+                    ledger.innerHTML += `<tr>
+                        <td>${new Date(tx.id).toLocaleDateString('pt-BR')}</td>
+                        <td><span class="badge ${isIncome?'badge-green':'badge-red'}">${isIncome?'Entrada':'Saída'}</span></td>
+                        <td>${tx.desc || '-'}</td>
+                        <td>${c ? c.client : '-'}</td>
+                        <td style="font-weight:bold; color:${isIncome?'var(--success)':'var(--danger)'}">${isIncome?'+':'-'} ${this.formatCurrency(tx.amount)}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${tx.id})">🗑</button></td>
+                    </tr>`;
+                });
+            },
 
             openCaseDetail(id) { 
                 const c = this.data.cases.find(x=>x.id===id); 
@@ -978,10 +1056,10 @@ ${textToAnalyze}`;
                 
                 let timeline = []; 
                 const initialDate = c.date_start || c.date_created;
-                timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro inicial no sistema', id:null}); 
+                timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:null}) ); 
-                this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.date, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); 
+                this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); 
                 this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
                 
                 timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
