@@ -72,23 +72,20 @@
 
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        /* =========================================
-           TOPBAR LIMPA (SEM STATUS BAR FAKE)
-        ========================================= */
+        /* TOPBAR LIMPA */
         .app-topbar { 
             background-color: var(--bg-surface); 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
-            align-items: center; /* Centraliza verticalmente */
+            align-items: center; 
             justify-content: center;
             padding: 10px 24px; 
             flex-shrink: 0; 
             transition: background-color 0.3s, border-color 0.3s;
-            height: 70px; /* Altura padrão desktop */
+            height: 70px; 
             z-index: 40;
         }
 
-        /* Container do Header Principal */
         .topbar-main-row {
             display: flex;
             justify-content: space-between;
@@ -230,9 +227,8 @@
                 padding: 10px 16px; 
                 height: auto;
                 min-height: 70px;
-                /* Espaço extra para o sistema nativo (notch) */
                 padding-top: calc(10px + env(safe-area-inset-top)); 
-                justify-content: flex-end; /* Alinha o header na parte de baixo */
+                justify-content: flex-end; 
             }
             
             .content-scroll { padding: 16px; }
@@ -340,22 +336,122 @@
             #modal-case .flex-gap { display: contents !important; }
             #modal-case input[name="client"], #modal-case input[name="opponent"], #modal-case input[name="lawyer"], #modal-case textarea[name="obs"], #modal-case button { grid-column: span 2; }
 
-            /* ESTILOS DA PÁGINA DE DETALHES DO PROCESSO (SINGLE PAGE FEEL) */
-            .case-detail-card { padding: 0; background: transparent; box-shadow: none; border: none; margin-bottom: 20px; }
-            .case-header-mobile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-            .case-header-mobile h2 { font-size: 1.4rem; letter-spacing: -0.5px; }
+            /* =======================================================
+               ESTILOS ESPECÍFICOS PARA DETALHES DO PROCESSO (MOBILE)
+               Correção solicitada: Limpeza, alinhamento e tipografia
+            ======================================================= */
+            .case-detail-card { 
+                padding: 0; 
+                background: transparent; 
+                box-shadow: none; 
+                border: none; 
+                margin-bottom: 24px; 
+                margin-top: 10px; /* Respiro superior */
+            }
             
-            .case-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
-            .info-item label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; letter-spacing: 0.5px; }
-            .info-item div { font-size: 0.95rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            /* Novo Cabeçalho do Processo Otimizado */
+            .case-header-optimized {
+                display: flex;
+                justify-content: space-between;
+                align-items: center; /* Alinha verticalmente no centro */
+                padding-bottom: 16px;
+                border-bottom: 1px solid var(--border-color);
+                margin-bottom: 20px;
+                gap: 12px;
+            }
+
+            .case-number-box {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                flex: 1; /* Ocupa o espaço disponível */
+                min-width: 0; /* Permite ellipsis */
+            }
+
+            .case-number-label {
+                font-size: 0.65rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                font-weight: 700;
+                margin-bottom: 4px;
+                letter-spacing: 0.5px;
+            }
+
+            .case-number-main {
+                font-family: 'Courier New', Courier, monospace; /* Tipografia jurídica */
+                font-size: 1rem; /* Tamanho controlado */
+                font-weight: 600; /* Peso médio/leve */
+                color: var(--text-main);
+                letter-spacing: -0.5px;
+                line-height: 1.2;
+                white-space: normal; /* Permite quebra se necessário */
+                word-break: break-all; /* Quebra em telas muito pequenas */
+            }
             
-            .finance-compact { background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
-            .finance-compact .finance-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-secondary); }
+            /* Grid de Informações 2x2 */
+            .case-info-grid { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 16px; 
+                background: var(--bg-surface); 
+                padding: 20px; 
+                border-radius: 16px; 
+                border: 1px solid var(--border-color); 
+                margin-bottom: 16px; 
+                box-shadow: var(--shadow-sm); 
+            }
+            
+            .info-item label { 
+                font-size: 0.65rem; 
+                color: var(--text-muted); 
+                text-transform: uppercase; 
+                font-weight: 800; 
+                margin-bottom: 4px; 
+                display: block; 
+                letter-spacing: 0.5px; 
+            }
+            
+            .info-item div { 
+                font-size: 0.95rem; 
+                font-weight: 500; 
+                color: var(--text-main); 
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
+            }
+            
+            .finance-compact { 
+                background: var(--bg-surface); 
+                padding: 16px; 
+                border-radius: 12px; 
+                border: 1px solid var(--border-color); 
+                margin-bottom: 20px; 
+                box-shadow: var(--shadow-sm); 
+            }
+            
+            .finance-compact .finance-row { 
+                display: flex; 
+                justify-content: space-between; 
+                font-size: 0.85rem; 
+                margin-bottom: 8px; 
+                color: var(--text-secondary); 
+            }
+            
             .finance-compact b { color: var(--text-main); }
             .finance-compact .finance-progress { height: 6px; border-radius: 4px; }
             
-            .btn-group-mobile { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 20px; }
-            .btn-group-mobile button { width: 100%; margin: 0; }
+            .btn-group-mobile { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 12px; 
+                padding-top: 10px; 
+            }
+            
+            .btn-group-mobile button { 
+                width: 100%; 
+                margin: 0; 
+                height: 48px; /* Botão mais alto para toque */
+            }
         }
 
         /* SAFE AREA */
@@ -950,8 +1046,12 @@
                 // MOBILE OPTIMIZED LAYOUT STRUCTURE
                 document.getElementById('case-detail-content').innerHTML = `
                     <div class="case-detail-card">
-                        <div class="case-header-mobile">
-                            <h2 style="font-family:monospace; margin:0; color:var(--text-main);">${c.number}</h2>
+                        
+                        <div class="case-header-optimized">
+                            <div class="case-number-box">
+                                <span class="case-number-label">Processo Unificado</span>
+                                <span class="case-number-main">${c.number}</span>
+                            </div>
                             <span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span>
                         </div>
                         
