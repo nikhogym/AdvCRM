@@ -108,6 +108,10 @@
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: var(--bg-surface); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
         label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 
+        /* NOVO: Estilo para o seletor de classificação (Ordenação) */
+        .sort-select { width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; margin-bottom: 0; border: 1px solid var(--border-color); background-color: var(--bg-surface); color: var(--text-main); cursor: pointer; font-weight: 500; }
+        .sort-select:hover { border-color: var(--primary); }
+
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th { text-align: left; padding: 16px 20px; color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); position: sticky; top: 0; }
         td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; vertical-align: middle; }
@@ -196,7 +200,7 @@
             
             .dash-header { flex-direction: column; gap: 12px; margin-bottom: 16px; }
             .dash-header h2 { font-size: 1.4rem; }
-            .dash-header .quick-actions { width: 100%; display: flex; gap: 8px;}
+            .dash-header .quick-actions { width: 100%; display: flex; gap: 8px; justify-content: space-between;}
             .dash-header .quick-actions button { flex: 1; font-size: 0.75rem; padding: 8px 4px;}
             
             .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -214,31 +218,25 @@
             .calendar-legend { margin-top: 10px; padding-top: 10px; font-size: 0.75rem; }
             
             .analysis-grid { grid-template-columns: 1fr; }
+
+            /* OTIMIZAÇÃO DE ALTA DENSIDADE PARA TABELAS NO MOBILE */
+            #view-cases .card, #view-clients .card, #view-deadlines .card, #view-tasks .card, #view-finance .card { padding: 0; border-radius: var(--radius-md); }
+            #view-cases td, #view-cases th, #view-clients td, #view-clients th, #view-deadlines td, #view-deadlines th, #view-tasks td, #view-tasks th, #view-finance td, #view-finance th { padding: 10px 6px; font-size: 0.75rem; }
+            #view-cases th, #view-clients th, #view-deadlines th, #view-tasks th, #view-finance th { font-size: 0.65rem; letter-spacing: -0.5px; }
+            .badge { padding: 4px 6px; font-size: 0.65rem; }
+            td .btn-sm { padding: 6px 8px; font-size: 0.7rem; }
+            
+            .sort-select { padding: 6px; font-size: 0.75rem; border-radius: 6px; }
         }
 
         /* SAFE AREA (iOS NOTCH / DYNAMIC ISLAND FIXES) */
         @supports (padding-top: env(safe-area-inset-top)) {
-            .app-topbar { 
-                padding-top: env(safe-area-inset-top, 0px) !important; 
-                height: calc(70px + env(safe-area-inset-top, 0px)) !important; 
-            }
-            @media (max-width: 768px) {
-                .app-topbar { height: calc(60px + env(safe-area-inset-top, 0px)) !important; }
-            }
-            aside { 
-                padding-top: calc(24px + env(safe-area-inset-top, 0px)); 
-                padding-bottom: env(safe-area-inset-bottom, 0px); 
-            }
-            .content-scroll { 
-                padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); 
-            }
-            .menu-toggle { 
-                bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; 
-            }
-            .modal { 
-                padding-top: env(safe-area-inset-top, 0px); 
-                padding-bottom: env(safe-area-inset-bottom, 0px); 
-            }
+            .app-topbar { padding-top: env(safe-area-inset-top, 0px) !important; height: calc(70px + env(safe-area-inset-top, 0px)) !important; }
+            @media (max-width: 768px) { .app-topbar { height: calc(60px + env(safe-area-inset-top, 0px)) !important; } }
+            aside { padding-top: calc(24px + env(safe-area-inset-top, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+            .content-scroll { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+            .menu-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; }
+            .modal { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
         }
     </style>
 </head>
@@ -265,7 +263,7 @@
             <div style="font-weight:700; font-size:1.2rem; color:var(--text-main);">Painel Executivo</div>
             <div style="display:flex; align-items:center; gap:15px;">
                 <button class="btn-outline" style="min-width:auto; padding:8px 12px; border-radius: 8px;" onclick="app.toggleDarkMode()">🌓 Tema</button>
-                <div style="width:38px; height:38px; border-radius:50%; background:var(--primary-gradient); color:white; display:flex; align-items:center; justify-content:center; font-weight: 700;">Dr</div>
+                <div id="topbar-avatar" style="width:38px; height:38px; border-radius:50%; background:var(--primary-gradient); color:white; display:flex; align-items:center; justify-content:center; font-weight: 700; overflow:hidden;">Dr</div>
             </div>
         </div>
 
@@ -273,7 +271,7 @@
             
             <section id="view-dashboard">
                 <div class="dash-header">
-                    <div><h2>Olá, Doutor(a)</h2><p style="color:var(--text-secondary); margin-top:4px;">Resumo estratégico do escritório.</p></div>
+                    <div><h2 id="dash-greeting">Olá, Doutor(a)</h2><p style="color:var(--text-secondary); margin-top:4px;">Resumo estratégico do escritório.</p></div>
                     <div class="quick-actions flex-gap">
                         <button class="btn btn-outline" onclick="app.openModal('modal-case')">➕ Processo</button>
                         <button class="btn btn-primary" onclick="app.openModal('modal-import')">📋 Importar Pub.</button>
@@ -311,39 +309,141 @@
             </section>
 
             <section id="view-cases" class="hidden">
-                <div class="flex-between" style="margin-bottom:1.5rem;"><h2>Processos</h2><button class="btn btn-primary" onclick="app.openModal('modal-case')">+ Novo Processo</button></div>
-                <div class="card" style="overflow-x:auto; padding:0; border-radius: var(--radius-md);"><table style="width:100%"><thead><tr><th>Número</th><th>Cliente</th><th>Área</th><th>Status</th><th>Ações</th></tr></thead><tbody id="cases-table-body"></tbody></table></div>
+                <div class="flex-between" style="margin-bottom:1.5rem;">
+                    <h2>Processos</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <select class="sort-select" onchange="app.changeSort('cases', this.value)">
+                            <option value="date">🕒 Data</option>
+                            <option value="name">A-Z Nome</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="app.openModal('modal-case')">+ Novo Processo</button>
+                    </div>
+                </div>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Número</th><th>Cliente</th><th>Área</th><th>Status</th><th>Ações</th></tr></thead><tbody id="cases-table-body"></tbody></table></div>
             </section>
 
             <section id="view-updates" class="hidden">
                 <div class="dash-header">
                     <div><h2>Central de Publicações</h2><p style="color:var(--text-secondary); margin-top:4px;">Análise inteligente via IA.</p></div>
-                    <button class="btn btn-primary" onclick="app.openModal('modal-import')">✨ Analisar Nova</button>
+                    <div class="quick-actions" style="display:flex; gap:10px; align-items:center;">
+                        <select class="sort-select" onchange="app.changeSort('updates', this.value)">
+                            <option value="date">🕒 Data</option>
+                            <option value="name">A-Z Cliente</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="app.openModal('modal-import')">✨ Analisar Nova</button>
+                    </div>
                 </div>
                 <div id="updates-list-full"></div>
             </section>
 
-            <section id="view-clients" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Clientes</h2></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Posição</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div></section>
+            <section id="view-clients" class="hidden">
+                <div class="flex-between" style="margin-bottom:1.5rem;">
+                    <h2>Clientes</h2>
+                    <select class="sort-select" onchange="app.changeSort('clients', this.value)">
+                        <option value="name">A-Z Nome</option>
+                        <option value="value">💰 Maior Valor</option>
+                    </select>
+                </div>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Cliente</th><th>Posição</th><th>Processos Ativos</th><th>Total Causa</th><th>Ações</th></tr></thead><tbody id="clients-table-body"></tbody></table></div>
+            </section>
             
             <section id="view-finance" class="hidden">
-                <div class="flex-between" style="margin-bottom:1.5rem;"><h2>Financeiro</h2><button class="btn btn-primary" onclick="app.openModal('modal-payment')">+ Novo Lançamento</button></div>
+                <div class="flex-between" style="margin-bottom:1.5rem;">
+                    <h2>Financeiro</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <select class="sort-select" onchange="app.changeSort('finance', this.value)">
+                            <option value="date">🕒 Mais Recentes</option>
+                            <option value="name">A-Z Cliente</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="app.openModal('modal-payment')">+ Novo</button>
+                    </div>
+                </div>
                 <div class="stats-grid">
                     <div class="stat-card" style="border-top: 4px solid var(--info)"><div class="stat-title">A Receber</div><div class="stat-value" id="fin-pending">R$ 0,00</div></div>
-                    <div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Entradas</div><div class="stat-value text-success" id="fin-received">R$ 0,00</div></div>
-                    <div class="stat-card" style="border-top: 4px solid var(--danger)"><div class="stat-title">Saídas</div><div class="stat-value text-danger" id="fin-expenses">R$ 0,00</div></div>
-                    <div class="stat-card" style="border-top: 4px solid var(--primary)"><div class="stat-title">Saldo Líquido</div><div class="stat-value" id="fin-balance">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--success)"><div class="stat-title">Entradas</div><div class="stat-value text-success" id="fin-received-tab">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--danger)"><div class="stat-title">Saídas</div><div class="stat-value text-danger" id="fin-expenses-tab">R$ 0,00</div></div>
+                    <div class="stat-card" style="border-top: 4px solid var(--primary)"><div class="stat-title">Saldo Líquido</div><div class="stat-value" id="fin-balance-tab">R$ 0,00</div></div>
                 </div>
                 
+                <h3 style="margin-bottom: 1rem; margin-top:2rem;">Histórico Geral de Caixa (Lançamentos)</h3>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Cliente</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="finance-ledger-body"></tbody></table></div>
+                
                 <h3 style="margin-bottom: 1rem; margin-top:2rem;">Balanço por Processo</h3>
-                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Ações</th></tr></thead><tbody id="finance-table-body"></tbody></table></div>
-
-                <h3 style="margin-bottom: 1rem; margin-top:2rem;">Histórico Geral de Caixa</h3>
-                <div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Processo/Cliente</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="finance-ledger-body"></tbody></table></div>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Cliente / Processo</th><th>Contrato</th><th>Recebido</th><th>Saldo Devedor</th><th>Ações</th></tr></thead><tbody id="finance-table-body"></tbody></table></div>
             </section>
 
-            <section id="view-deadlines" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Prazos</h2><button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div></section>
-            <section id="view-tasks" class="hidden"><div class="flex-between" style="margin-bottom:1.5rem;"><h2>Tarefas</h2><button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button></div><div class="card" style="padding:0; overflow-x:auto;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div></section>
-            <section id="view-settings" class="hidden"><h2>Configurações</h2><div class="card" style="max-width: 400px; margin-top:20px;"><button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema</button><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Dados e Backup</h4><button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Salvar Backup (JSON)</button><button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup</button><input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)"><hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);"><button class="btn btn-danger" style="width:100%;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button></div></section>
+            <section id="view-deadlines" class="hidden">
+                <div class="flex-between" style="margin-bottom:1.5rem;">
+                    <h2>Prazos</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <select class="sort-select" onchange="app.changeSort('deadlines', this.value)">
+                            <option value="date">🕒 Próximos</option>
+                            <option value="name">A-Z Processo</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="app.openModal('modal-deadline')">+ Novo</button>
+                    </div>
+                </div>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Data</th><th>Tipo</th><th>Processo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="deadlines-table-body"></tbody></table></div>
+            </section>
+            
+            <section id="view-tasks" class="hidden">
+                <div class="flex-between" style="margin-bottom:1.5rem;">
+                    <h2>Tarefas</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <select class="sort-select" onchange="app.changeSort('tasks', this.value)">
+                            <option value="date">🕒 Próximas</option>
+                            <option value="name">A-Z Descrição</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="app.openModal('modal-task')">+ Tarefa</button>
+                    </div>
+                </div>
+                <div class="card" style="overflow-x:auto; padding-bottom: 0;"><table style="width:100%"><thead><tr><th>Prioridade</th><th>Descrição</th><th>Vínculo</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="tasks-table-body"></tbody></table></div>
+            </section>
+            
+            <section id="view-settings" class="hidden">
+                <h2>Configurações</h2>
+                <div class="card" style="max-width: 500px; margin-top:20px;">
+                    
+                    <h4 style="margin-bottom: 10px; font-size:0.9rem; color:var(--text-secondary);">Perfil do Usuário</h4>
+                    
+                    <label>Foto de Perfil</label>
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items: center;">
+                        <input type="file" id="settings-profile-pic" accept="image/*" style="margin-bottom:0;" onchange="app.saveProfilePic(event)">
+                        <button class="btn btn-outline btn-sm" onclick="app.removeProfilePic()">Remover</button>
+                    </div>
+
+                    <label>Nome de Exibição (Reflete no Dashboard)</label>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="text" id="settings-user-name" placeholder="Ex: Dr. João Silva" style="margin-bottom:0;">
+                        <button class="btn btn-primary" onclick="app.saveUserName()">Salvar</button>
+                    </div>
+
+                    <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color);">
+                    
+                    <h4 style="margin-bottom: 15px; font-size:0.9rem; color:var(--text-secondary);">Integrações e Produtividade</h4>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Sincronizar Financeiro com Notion</span> <span style="font-size: 1.2rem;">🔗</span>
+                    </button>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Alertas de Prazos via WhatsApp</span> <span style="font-size: 1.2rem;">📱</span>
+                    </button>
+
+                    <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color);">
+
+                    <h4 style="margin-bottom: 15px; font-size:0.9rem; color:var(--text-secondary);">Aparência do Sistema</h4>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="app.toggleDarkMode()">🌓 Alternar Tema Claro/Escuro</button>
+                    
+                    <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color);">
+                    
+                    <h4 style="margin-bottom: 15px; font-size:0.9rem; color:var(--text-secondary);">Gerenciamento de Dados</h4>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:10px; color: var(--info); border-color: var(--info);" onclick="app.exportBackup()">💾 Fazer Backup de Segurança (.json)</button>
+                    <button class="btn btn-outline" style="width:100%; margin-bottom:20px; color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('import-file').click()">📂 Restaurar Backup Antigo</button>
+                    <input type="file" id="import-file" style="display:none" accept=".json" onchange="app.importBackup(event)">
+                    
+                    <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="app.clearData()">⚠️ Limpar Todos os Dados</button>
+                </div>
+            </section>
+
             <section id="view-case-detail" class="hidden"><button class="btn btn-outline" onclick="app.navigate('cases')" style="margin-bottom:1rem;">← Voltar</button><div id="case-detail-content"></div></section>
         </div>
 
@@ -482,39 +582,6 @@
             </div>
         </div>
 
-        <div id="modal-receipt-config" class="modal">
-            <div class="modal-content" style="max-width: 500px;">
-                <div class="flex-between" style="margin-bottom:20px">
-                    <h3>Configurar Recibo</h3>
-                    <button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-receipt-config')">✕</button>
-                </div>
-                
-                <label>Pagador (Nome do Cliente)</label>
-                <input type="text" id="rcpt-client" list="rcpt-client-list" placeholder="Nome completo ou Razão Social">
-                <datalist id="rcpt-client-list"></datalist>
-                
-                <div class="flex-gap">
-                    <div style="flex:1"><label>Valor (R$)</label><input type="number" id="rcpt-amount" step="0.01"></div>
-                    <div style="flex:1"><label>Data</label><input type="date" id="rcpt-date"></div>
-                </div>
-                
-                <label>Referente a</label>
-                <textarea id="rcpt-desc" rows="3" placeholder="Ex: Honorários advocatícios referentes ao processo..."></textarea>
-                
-                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="app.generateReceipt()">Visualizar Recibo</button>
-            </div>
-        </div>
-
-        <div id="modal-receipt" class="modal">
-            <div class="modal-content" style="max-width: 700px;">
-                <div id="receipt-content"></div>
-                <div style="margin-top:20px; text-align:center; display:flex; gap:10px; justify-content:center;">
-                    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
-                    <button class="btn btn-outline" onclick="app.closeModal('modal-receipt')">Fechar</button>
-                </div>
-            </div>
-        </div>
-
         <div id="modal-client-detail" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px;"><h3>Ficha</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-client-detail')">✕</button></div><div id="client-detail-body"></div></div></div>
         
         <div id="modal-day-details" class="modal"><div class="modal-content" style="max-width:500px"><div class="flex-between" style="margin-bottom:20px"><h3 id="day-details-title">Detalhes</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-day-details')">✕</button></div><div id="day-details-body"></div></div></div>
@@ -523,7 +590,8 @@
 
     <script>
         const app = {
-            data: { cases: [], deadlines: [], transactions: [], updates: [], tasks: [], settings: { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'] } },
+            data: { cases: [], deadlines: [], transactions: [], updates: [], tasks: [], settings: { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'], userName: 'Doutor(a)', profilePic: null } },
+            sortState: { cases: 'date', updates: 'date', clients: 'name', deadlines: 'date', tasks: 'date', finance: 'date' },
             currentStatusId: null,
             tempParsedData: null,
             isDragging: false,
@@ -620,11 +688,76 @@
                 }
 
                 this.renderDashboard();
+                this.updateGreeting();
                 document.addEventListener('click', (e) => { 
                     if (!e.target.closest('.badge') && !e.target.closest('.status-dropdown')) {
                         document.getElementById('status-menu').classList.remove('show'); 
                     }
                 });
+            },
+
+            changeSort(view, criteria) {
+                this.sortState[view] = criteria;
+                if (view === 'cases') this.renderCases();
+                if (view === 'updates') this.renderUpdatesFull();
+                if (view === 'clients') this.renderClients();
+                if (view === 'deadlines') this.renderDeadlines();
+                if (view === 'tasks') this.renderTasks();
+                if (view === 'finance') this.renderFinance();
+            },
+
+            updateGreeting() {
+                const name = this.data.settings.userName || 'Doutor(a)';
+                const greetingEl = document.getElementById('dash-greeting');
+                if(greetingEl) greetingEl.innerText = `Olá, ${name}`;
+                
+                const avatarEl = document.getElementById('topbar-avatar');
+                if(avatarEl) {
+                    if (this.data.settings.profilePic) {
+                        avatarEl.style.backgroundImage = `url(${this.data.settings.profilePic})`;
+                        avatarEl.style.backgroundSize = 'cover';
+                        avatarEl.style.backgroundPosition = 'center';
+                        avatarEl.innerText = '';
+                    } else {
+                        avatarEl.style.backgroundImage = 'var(--primary-gradient)';
+                        let initials = name.substring(0,2).toUpperCase();
+                        if(name.includes(' ') && name.split(' ').length > 1) {
+                            const parts = name.split(' ');
+                            initials = (parts[0][0] + parts[1][0]).toUpperCase();
+                        }
+                        avatarEl.innerText = initials;
+                    }
+                }
+                
+                const inputEl = document.getElementById('settings-user-name');
+                if(inputEl) inputEl.value = name === 'Doutor(a)' ? '' : name;
+            },
+
+            saveUserName() {
+                const input = document.getElementById('settings-user-name').value.trim();
+                this.data.settings.userName = input || 'Doutor(a)';
+                this.saveToStorage();
+                this.updateGreeting();
+                alert('Nome de perfil salvo com sucesso!');
+            },
+
+            saveProfilePic(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    this.data.settings.profilePic = event.target.result;
+                    this.saveToStorage();
+                    this.updateGreeting();
+                };
+                reader.readAsDataURL(file);
+            },
+
+            removeProfilePic() {
+                this.data.settings.profilePic = null;
+                document.getElementById('settings-profile-pic').value = '';
+                this.saveToStorage();
+                this.updateGreeting();
             },
 
             analyzeWithAI(platform) {
@@ -953,7 +1086,20 @@ ${textToAnalyze}`;
                     return;
                 }
                 
-                [...this.data.updates].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(u => { 
+                let arr = [...this.data.updates];
+                const sortBy = this.sortState.updates || 'date';
+                
+                if (sortBy === 'name') {
+                    arr.sort((a,b) => {
+                        let ca = this.data.cases.find(x=>x.id===a.caseId);
+                        let cb = this.data.cases.find(x=>x.id===b.caseId);
+                        return (ca ? ca.client : 'Z').localeCompare(cb ? cb.client : 'Z');
+                    });
+                } else {
+                    arr.sort((a,b)=>new Date(b.date)-new Date(a.date));
+                }
+
+                arr.forEach(u => { 
                     const a = u.analysis || {};
                     const caseRef = this.data.cases.find(caseItem => caseItem.id === u.caseId);
                     const clientRole = caseRef ? (caseRef.client_role || 'autor') : 'autor';
@@ -1366,10 +1512,136 @@ ${textToAnalyze}`;
                 }
             },
 
-            renderCases() { const t = document.getElementById('cases-table-body'); t.innerHTML = ''; const s = document.getElementById('search-case') ? document.getElementById('search-case').value.toLowerCase() : ''; const fl = document.getElementById('filter-lawyer') ? document.getElementById('filter-lawyer').value : ''; const fa = document.getElementById('filter-area') ? document.getElementById('filter-area').value : ''; this.data.cases.filter(c => (c.client.toLowerCase().includes(s) || c.number.includes(s)) && (fl === "" || c.lawyer === fl) && (fa === "" || c.area === fa) ).forEach(c => { let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; }); },
-            renderDeadlines() { const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; [...this.data.deadlines].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d => { const c = this.data.cases.find(x=>x.id==d.caseId); t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; }); },
-            renderTasks() { const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; [...this.data.tasks].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tsk => { const c = this.data.cases.find(x=>x.id==tsk.caseId); let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; }); },
-            renderClients() { const t = document.getElementById('clients-table-body'); t.innerHTML = ''; const cs = {}; this.data.cases.forEach(c => { if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0, roles:new Set()}; if(c.status==='Em andamento') cs[c.client].count++; cs[c.client].val += (parseFloat(c.value)||0); cs[c.client].roles.add(c.client_role === 'reu' ? 'Réu' : 'Autor'); }); Object.values(cs).forEach(cl => { const rolesStr = Array.from(cl.roles).join(' / '); t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; }); },
+            renderCases() { 
+                const t = document.getElementById('cases-table-body'); t.innerHTML = ''; 
+                
+                let arr = [...this.data.cases];
+                if(this.sortState.cases === 'name') {
+                    arr.sort((a,b) => a.client.localeCompare(b.client));
+                } else {
+                    arr.sort((a,b) => new Date(b.date_created||0) - new Date(a.date_created||0));
+                }
+
+                arr.forEach(c => { 
+                    let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); 
+                    t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; 
+                }); 
+            },
+            
+            renderDeadlines() { 
+                const t = document.getElementById('deadlines-table-body'); t.innerHTML = ''; 
+                
+                let arr = [...this.data.deadlines];
+                if(this.sortState.deadlines === 'name') {
+                    arr.sort((a,b) => {
+                        let ca = this.data.cases.find(x=>x.id==a.caseId);
+                        let cb = this.data.cases.find(x=>x.id==b.caseId);
+                        return (ca?ca.client:'Z').localeCompare(cb?cb.client:'Z');
+                    });
+                } else {
+                    arr.sort((a,b)=>new Date(a.date)-new Date(b.date));
+                }
+
+                arr.forEach(d => { 
+                    const c = this.data.cases.find(x=>x.id==d.caseId); 
+                    t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; 
+                }); 
+            },
+
+            renderTasks() { 
+                const t = document.getElementById('tasks-table-body'); t.innerHTML = ''; 
+                let arr = [...this.data.tasks];
+                
+                if(this.sortState.tasks === 'name') {
+                    arr.sort((a,b) => a.desc.localeCompare(b.desc));
+                } else {
+                    arr.sort((a,b)=>new Date(a.date)-new Date(b.date));
+                }
+
+                arr.forEach(tsk => { 
+                    const c = this.data.cases.find(x=>x.id==tsk.caseId); 
+                    let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); 
+                    t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; 
+                }); 
+            },
+
+            renderClients() { 
+                const t = document.getElementById('clients-table-body'); t.innerHTML = ''; 
+                const cs = {}; 
+                this.data.cases.forEach(c => { 
+                    if(!cs[c.client]) cs[c.client] = {name:c.client, count:0, val:0, roles:new Set()}; 
+                    if(c.status==='Em andamento') cs[c.client].count++; 
+                    cs[c.client].val += (parseFloat(c.value)||0); 
+                    cs[c.client].roles.add(c.client_role === 'reu' ? 'Réu' : 'Autor'); 
+                }); 
+
+                let arr = Object.values(cs);
+                if(this.sortState.clients === 'name') {
+                    arr.sort((a,b) => a.name.localeCompare(b.name));
+                } else {
+                    arr.sort((a,b) => b.val - a.val);
+                }
+
+                arr.forEach(cl => { 
+                    const rolesStr = Array.from(cl.roles).join(' / '); 
+                    t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; 
+                }); 
+            },
+
+            renderFinance() {
+                // Atualizar Cards de Resumo
+                let pending = 0, received = 0, expenses = 0;
+                this.data.transactions.forEach(t => {
+                    if(t.type === 'income') received += t.amount;
+                    if(t.type === 'expense') expenses += t.amount;
+                });
+                document.getElementById('fin-received-tab').innerText = this.formatCurrency(received);
+                document.getElementById('fin-expenses-tab').innerText = this.formatCurrency(expenses);
+                document.getElementById('fin-balance-tab').innerText = this.formatCurrency(received - expenses);
+                
+                // Renderizar Histórico (Lançamentos Gerais)
+                const tBody = document.getElementById('finance-ledger-body');
+                tBody.innerHTML = '';
+                let ledger = [...this.data.transactions];
+                
+                if(this.sortState.finance === 'name') {
+                    ledger.sort((a,b) => {
+                        let ca = this.data.cases.find(x=>x.id==a.caseId);
+                        let cb = this.data.cases.find(x=>x.id==b.caseId);
+                        return (ca?ca.client:'Z').localeCompare(cb?cb.client:'Z');
+                    });
+                } else {
+                    ledger.sort((a,b) => b.id - a.id); 
+                }
+                
+                ledger.forEach(t => {
+                    const c = this.data.cases.find(x=>x.id==t.caseId);
+                    const isInc = t.type === 'income';
+                    tBody.innerHTML += `<tr>
+                        <td>${new Date(t.id).toLocaleDateString('pt-BR')}</td>
+                        <td><span class="badge ${isInc?'badge-green':'badge-red'}">${isInc?'Entrada':'Saída'}</span></td>
+                        <td>${t.desc}</td>
+                        <td style="font-weight:600">${c ? c.client : '-'}</td>
+                        <td style="color:${isInc?'var(--success)':'var(--danger)'}; font-weight:600;">${isInc?'+':'-'} ${this.formatCurrency(t.amount)}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${t.id})">🗑</button></td>
+                    </tr>`;
+                });
+                
+                // Renderizar Tabela de Balanço por Processo
+                const bBody = document.getElementById('finance-table-body');
+                bBody.innerHTML = '';
+                this.data.cases.forEach(c => {
+                    if(!c.fees && !this.data.transactions.some(t=>t.caseId===c.id)) return;
+                    const rec = this.data.transactions.filter(t=>t.caseId===c.id && t.type==='income').reduce((a,v)=>a+v.amount,0);
+                    bBody.innerHTML += `<tr>
+                        <td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted); font-family:monospace;">${c.number}</small></td>
+                        <td>${this.formatCurrency(c.fees||0)}</td>
+                        <td><span style="color:var(--success); font-weight:600;">${this.formatCurrency(rec)}</span></td>
+                        <td style="font-weight:600; color:var(--text-main);">${this.formatCurrency((c.fees||0)-rec)}</td>
+                        <td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment', ${c.id})">+ Lançamento</button></td>
+                    </tr>`;
+                });
+            },
             
             openClientDetail(name) { 
                 const cl = this.data.cases.filter(c=>c.client===name); 
@@ -1439,7 +1711,20 @@ ${textToAnalyze}`;
             toggleTask(id) { const i = this.data.tasks.findIndex(t=>t.id===id); if(i>-1) { this.data.tasks[i].done = !this.data.tasks[i].done; this.saveToStorage(); this.renderTasks(); } },
             
             saveToStorage() { localStorage.setItem('lexData', JSON.stringify(this.data)); },
-            loadData() { const d = localStorage.getItem('lexData'); if(d) this.data = JSON.parse(d); if(!this.data.tasks) this.data.tasks = []; if(!this.data.updates) this.data.updates = []; if(!this.data.settings) this.data.settings = { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'] }; const l = [...new Set(this.data.cases.map(c=>c.lawyer).filter(Boolean))]; const ls = document.getElementById('filter-lawyer'); if(ls) l.forEach(x => ls.add(new Option(x,x))); const a = [...new Set(this.data.cases.map(c=>c.area).filter(Boolean))]; const as = document.getElementById('filter-area'); if(as) a.forEach(x => as.add(new Option(x,x))); },
+            loadData() { 
+                const d = localStorage.getItem('lexData'); 
+                if(d) this.data = JSON.parse(d); 
+                if(!this.data.tasks) this.data.tasks = []; 
+                if(!this.data.updates) this.data.updates = []; 
+                if(!this.data.settings) this.data.settings = { theme: 'light', dashOrder: ['ativos', 'prazos', 'saldo'], userName: 'Doutor(a)', profilePic: null }; 
+                if(this.data.settings && !this.data.settings.userName) this.data.settings.userName = 'Doutor(a)';
+                const l = [...new Set(this.data.cases.map(c=>c.lawyer).filter(Boolean))]; 
+                const ls = document.getElementById('filter-lawyer'); 
+                if(ls) l.forEach(x => ls.add(new Option(x,x))); 
+                const a = [...new Set(this.data.cases.map(c=>c.area).filter(Boolean))]; 
+                const as = document.getElementById('filter-area'); 
+                if(as) a.forEach(x => as.add(new Option(x,x))); 
+            },
             toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('lexTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); },
             clearData() { if(confirm('ATENÇÃO: Isso irá apagar TODOS os processos, clientes e financeiro do seu navegador. Não há como desfazer. Confirmar?')) { localStorage.removeItem('lexData'); location.reload(); } },
             formatCurrency(v) { return new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(v); }
