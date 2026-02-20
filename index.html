@@ -108,7 +108,6 @@
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: var(--bg-surface); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
         label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 
-        /* NOVO: Estilo para o seletor de classificação (Ordenação) */
         .sort-select { width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 8px; margin-bottom: 0; border: 1px solid var(--border-color); background-color: var(--bg-surface); color: var(--text-main); cursor: pointer; font-weight: 500; }
         .sort-select:hover { border-color: var(--primary); }
 
@@ -219,14 +218,77 @@
             
             .analysis-grid { grid-template-columns: 1fr; }
 
-            /* OTIMIZAÇÃO DE ALTA DENSIDADE PARA TABELAS NO MOBILE */
-            #view-cases .card, #view-clients .card, #view-deadlines .card, #view-tasks .card, #view-finance .card { padding: 0; border-radius: var(--radius-md); }
-            #view-cases td, #view-cases th, #view-clients td, #view-clients th, #view-deadlines td, #view-deadlines th, #view-tasks td, #view-tasks th, #view-finance td, #view-finance th { padding: 10px 6px; font-size: 0.75rem; }
-            #view-cases th, #view-clients th, #view-deadlines th, #view-tasks th, #view-finance th { font-size: 0.65rem; letter-spacing: -0.5px; }
             .badge { padding: 4px 6px; font-size: 0.65rem; }
             td .btn-sm { padding: 6px 8px; font-size: 0.7rem; }
-            
             .sort-select { padding: 6px; font-size: 0.75rem; border-radius: 6px; }
+
+            /* TABELAS CARD NO MOBILE */
+            .card { overflow-x: hidden; } 
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; } 
+            tr { margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; background: var(--bg-surface); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+            tr:last-child { margin-bottom: 0; }
+            td { border: none; border-bottom: 1px solid var(--border-color); position: relative; padding: 8px 0; display: flex; justify-content: space-between; align-items: center; text-align: right; min-height: 35px; }
+            td:last-child { border-bottom: none; justify-content: flex-end; gap: 8px; padding-top: 12px; }
+            td::before { content: attr(data-label); float: left; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; text-align: left; }
+
+            /* =========================================================
+               OTIMIZAÇÃO DE MODAIS E FORMULÁRIOS PARA TELA ÚNICA
+            ========================================================= */
+            
+            /* Modal Container */
+            .modal-content { padding: 16px !important; width: 95% !important; border-radius: 20px !important; overflow-y: auto; max-height: 95vh; }
+            .modal h3 { font-size: 1.1rem !important; margin: 0 !important; }
+            .modal .flex-between { margin-bottom: 12px !important; }
+
+            /* Grid System para Formulários Mobile (Lado a Lado) */
+            .flex-gap { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; flex-direction: row !important; }
+            .mobile-full { grid-column: span 2; } /* Classe utilitária se precisar */
+
+            /* Compactação Extrema de Inputs */
+            .modal input, .modal select, .modal textarea {
+                padding: 0 10px !important; 
+                height: 38px !important; /* Altura fixa compacta */
+                font-size: 0.9rem !important;
+                margin-bottom: 8px !important;
+                border-radius: 8px !important;
+            }
+            .modal textarea { height: 60px !important; padding-top: 8px !important; } /* Obs pequena */
+            
+            .modal label {
+                font-size: 0.7rem !important;
+                margin-bottom: 2px !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-secondary);
+            }
+            
+            /* Botões do Modal */
+            .modal button[type="submit"], .modal .btn-primary, .modal .btn-success {
+                margin-top: 5px !important;
+                height: 44px;
+                font-size: 1rem;
+            }
+
+            /* Ajustes Específicos para o Modal de Processo (O mais denso) */
+            #modal-case form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            #modal-case form > div { margin: 0 !important; } /* Reseta margins dos wrappers antigos */
+            #modal-case .flex-gap { display: contents !important; } /* Ignora o flex-gap antigo para usar o grid do form */
+            
+            /* Campos que devem ocupar a linha inteira no grid do Processo */
+            #modal-case input[name="client"], 
+            #modal-case input[name="opponent"], 
+            #modal-case input[name="lawyer"],
+            #modal-case textarea[name="obs"],
+            #modal-case button { 
+                grid-column: span 2; 
+            }
+
+            /* Ajuste específico para o seletor de cliente */
+            #case-selector-container { margin-bottom: 5px; }
+            
+            /* Ficha do Cliente */
+            #modal-client-detail table, #modal-client-detail thead, #modal-client-detail tbody, #modal-client-detail tr, #modal-client-detail td { display: block; width: 100%; }
         }
 
         /* SAFE AREA (iOS NOTCH / DYNAMIC ISLAND FIXES) */
@@ -513,44 +575,97 @@
             </div>
         </div>
 
-        <div id="modal-case" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div><form onsubmit="app.saveCase(event)"><input type="hidden" name="id"><div class="flex-gap"><div style="flex:1"><label>Número</label><input type="text" name="number" required></div><div style="flex:1"><label>Status</label><select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div>
-        
-        <div class="flex-between" style="margin-bottom: 5px;">
-            <label style="margin: 0;">Partes do Processo</label>
-            <button type="button" class="btn-outline btn-sm" style="border:none; color:var(--primary); font-weight:700; padding:4px;" onclick="app.swapClientOpponent()">🔁 Inverter Partes</button>
+        <div id="modal-case" class="modal">
+            <div class="modal-content">
+                <div class="flex-between"><h3>Processo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-case')">✕</button></div>
+                <form onsubmit="app.saveCase(event)">
+                    <input type="hidden" name="id">
+                    
+                    <div style="display:flex; flex-direction:column;">
+                        <label>Número</label><input type="text" name="number" required>
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <label>Status</label>
+                        <select name="status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select>
+                    </div>
+
+                    <div class="mobile-full" style="display:flex; justify-content:flex-end;">
+                        <button type="button" class="btn-outline btn-sm" style="border:none; color:var(--primary); font-weight:700; padding:2px;" onclick="app.swapClientOpponent()">🔁 Inverter Partes</button>
+                    </div>
+                    
+                    <div style="grid-column: span 2;">
+                        <label>Meu Cliente</label><input type="text" name="client" required>
+                    </div>
+
+                    <div>
+                        <label>Posição</label>
+                        <select name="client_role"><option value="autor">Autor</option><option value="reu">Réu</option></select>
+                    </div>
+                    <div>
+                        <label>Área</label>
+                        <select name="area">
+                            <option>Cível</option><option>Trabalhista</option><option>Família</option><option>Penal</option>
+                            <option>Previdenc.</option><option>Tributário</option><option>Empresarial</option><option>Consumidor</option>
+                        </select>
+                    </div>
+                    
+                    <div style="grid-column: span 2;">
+                        <label>Parte Adversa</label><input type="text" name="opponent">
+                    </div>
+                    
+                    <div>
+                        <label>Valor (R$)</label><input type="number" name="value" step="0.01">
+                    </div>
+                    <div>
+                        <label>Data Início</label><input type="date" name="date_start">
+                    </div>
+
+                    <div>
+                        <label>Honorários</label><input type="number" name="fees" step="0.01">
+                    </div>
+                    <div>
+                        <label>Advogado</label><input type="text" name="lawyer">
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label>Obs</label><textarea name="obs"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:0;">Salvar</button>
+                </form>
+            </div>
         </div>
         
-        <div class="flex-gap" style="margin-bottom: 0;">
-            <div style="flex:2"><label style="font-size:0.75rem; font-weight:normal;">Meu Cliente</label><input type="text" name="client" required></div>
-            <div style="flex:1"><label style="font-size:0.75rem; font-weight:normal;">Posição</label><select name="client_role"><option value="autor">Autor / Reclamante</option><option value="reu">Réu / Reclamado</option></select></div>
+        <div id="modal-deadline" class="modal">
+            <div class="modal-content">
+                <div class="flex-between"><h3>Prazo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-deadline')">✕</button></div>
+                <form onsubmit="app.saveDeadline(event)">
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="caseId" id="deadline-case-id">
+                    
+                    <div id="case-selector-container">
+                        <label>Processo</label>
+                        <select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select>
+                    </div>
+                    
+                    <label>Tipo</label>
+                    <input type="text" name="type" required>
+                    
+                    <div class="flex-gap">
+                        <div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div>
+                        <div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:5px;">Salvar Prazo</button>
+                </form>
+            </div>
         </div>
-        <label style="font-size:0.75rem; font-weight:normal;">Parte Adversa</label><input type="text" name="opponent">
-        
-        <div class="flex-gap"><div style="flex:1"><label>Área</label><select name="area">
-            <option>Cível</option>
-            <option>Trabalhista</option>
-            <option>Família e Sucessões</option>
-            <option>Penal</option>
-            <option>Previdenciário</option>
-            <option>Tributário</option>
-            <option>Empresarial</option>
-            <option>Consumidor</option>
-            <option>Imobiliário</option>
-            <option>Digital / Proteção de Dados</option>
-            <option>Outros</option>
-        </select></div><div style="flex:1"><label>Valor da Causa (R$)</label><input type="number" name="value" step="0.01"></div></div>
-        <div class="flex-gap"><div style="flex:1"><label>Data Início (Opcional)</label><input type="date" name="date_start"></div><div style="flex:1"><label>Honorários (R$)</label><input type="number" name="fees" step="0.01"></div></div>
-        <label>Advogado Responsável</label><input type="text" name="lawyer">
-        <label>Observações</label><textarea name="obs"></textarea>
-        <button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar</button></form></div></div>
-        
-        <div id="modal-deadline" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Prazo</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-deadline')">✕</button></div><form onsubmit="app.saveDeadline(event)"><input type="hidden" name="id"><input type="hidden" name="caseId" id="deadline-case-id"><div id="case-selector-container" style="margin-bottom:1rem"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div><label>Tipo</label><input type="text" name="type" required><div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;">Salvar Prazo</button></form></div></div>
 
         <div id="modal-task" class="modal"><div class="modal-content"><div class="flex-between" style="margin-bottom:20px"><h3>Tarefa</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-task')">✕</button></div><form onsubmit="app.saveTask(event)"><input type="hidden" name="id"><label>Vínculo</label><select id="task-case-select" name="caseId"><option value="">Geral</option></select><label>Descrição</label><input type="text" name="desc" required><div class="flex-gap"><div style="flex:1"><label>Prioridade</label><select name="priority"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div><div style="flex:1"><label>Data</label><input type="date" name="date" required></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;">Adicionar</button></form></div></div>
 
         <div id="modal-payment" class="modal">
             <div class="modal-content">
-                <div class="flex-between" style="margin-bottom:20px">
+                <div class="flex-between">
                     <h3>Novo Lançamento</h3>
                     <button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-payment')">✕</button>
                 </div>
@@ -574,10 +689,10 @@
                         </div>
                     </div>
                     
-                    <label>Descrição do Lançamento</label>
-                    <input type="text" name="desc" placeholder="Ex: Custas, honorários, diligência..." required>
+                    <label>Descrição</label>
+                    <input type="text" name="desc" placeholder="Ex: Custas, honorários..." required>
                     
-                    <button class="btn btn-success" style="width:100%; margin-top:10px;">Registrar no Caixa</button>
+                    <button class="btn btn-success" style="width:100%; margin-top:5px;">Registrar</button>
                 </form>
             </div>
         </div>
@@ -1524,7 +1639,14 @@ ${textToAnalyze}`;
 
                 arr.forEach(c => { 
                     let bg = c.status === 'Em andamento' ? 'badge-blue' : (c.status === 'Finalizado' ? 'badge-green' : 'badge-gray'); 
-                    t.innerHTML += `<tr><td style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td><td style="font-weight:600;">${c.client}</td><td>${c.area}</td><td><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td><td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td></tr>`; 
+                    // Add data-label for mobile card view
+                    t.innerHTML += `<tr>
+                        <td data-label="Número" style="font-family:monospace; font-size:0.95rem;"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.number}</span></td>
+                        <td data-label="Cliente" style="font-weight:600;">${c.client}</td>
+                        <td data-label="Área">${c.area}</td>
+                        <td data-label="Status"><span class="badge ${bg}" onclick="app.openStatusMenu(this,${c.id})">${c.status} ▾</span></td>
+                        <td data-label="Ações"><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-case',${c.id})">✏️</button></td>
+                    </tr>`; 
                 }); 
             },
             
@@ -1544,7 +1666,14 @@ ${textToAnalyze}`;
 
                 arr.forEach(d => { 
                     const c = this.data.cases.find(x=>x.id==d.caseId); 
-                    t.innerHTML += `<tr><td style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-gray">${d.type}</span></td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td><td>${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td></tr>`; 
+                    // Add data-label for mobile card view
+                    t.innerHTML += `<tr>
+                        <td data-label="Data Fatal" style="font-weight:700; color:${d.done ? 'var(--text-muted)' : 'var(--danger)'}; text-decoration:${d.done?'line-through':'none'}">${new Date(d.date).toLocaleDateString('pt-BR')}</td>
+                        <td data-label="Tipo"><span class="badge badge-gray">${d.type}</span></td>
+                        <td data-label="Processo">${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '-'}</td>
+                        <td data-label="Status">${d.done ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-red">Pendente</span>'}</td>
+                        <td data-label="Ações"><button class="btn btn-outline btn-sm" onclick="app.toggleDeadline(${d.id})">${d.done ? 'Desfazer' : 'Concluir'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-deadline',${d.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="app.deleteDeadline(${d.id})">🗑</button></td>
+                    </tr>`; 
                 }); 
             },
 
@@ -1561,7 +1690,13 @@ ${textToAnalyze}`;
                 arr.forEach(tsk => { 
                     const c = this.data.cases.find(x=>x.id==tsk.caseId); 
                     let badgeClass = tsk.priority === 'Alta' ? 'badge-red' : (tsk.priority === 'Média' ? 'badge-yellow' : 'badge-blue'); 
-                    t.innerHTML += `<tr><td><span class="badge ${badgeClass}">${tsk.priority}</span></td><td style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td><td>${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td><td>${new Date(tsk.date).toLocaleDateString('pt-BR')}</td><td><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td></tr>`; 
+                    t.innerHTML += `<tr>
+                        <td data-label="Prioridade"><span class="badge ${badgeClass}">${tsk.priority}</span></td>
+                        <td data-label="Descrição" style="font-weight:600; text-decoration:${tsk.done?'line-through':'none'}; color:${tsk.done?'var(--text-muted)':'var(--text-main)'}">${tsk.desc}</td>
+                        <td data-label="Vínculo">${c ? `<span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span>` : '<span style="color:var(--text-muted)">Geral</span>'}</td>
+                        <td data-label="Prazo">${new Date(tsk.date).toLocaleDateString('pt-BR')}</td>
+                        <td data-label="Ações"><button class="btn btn-outline btn-sm" onclick="app.toggleTask(${tsk.id})">${tsk.done ? 'Reabrir' : 'Feito'}</button> <button class="btn btn-outline btn-sm" onclick="app.openModal('modal-task',${tsk.id})">✏️</button></td>
+                    </tr>`; 
                 }); 
             },
 
@@ -1584,7 +1719,13 @@ ${textToAnalyze}`;
 
                 arr.forEach(cl => { 
                     const rolesStr = Array.from(cl.roles).join(' / '); 
-                    t.innerHTML += `<tr><td><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td><td><span class="badge badge-gray">${rolesStr}</span></td><td><span class="badge badge-blue">${cl.count}</span> ativos</td><td style="font-weight:600;">${this.formatCurrency(cl.val)}</td><td><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td></tr>`; 
+                    t.innerHTML += `<tr>
+                        <td data-label="Cliente"><span class="clickable-link" onclick="app.openClientDetail('${cl.name}')">${cl.name}</span></td>
+                        <td data-label="Posição"><span class="badge badge-gray">${rolesStr}</span></td>
+                        <td data-label="Processos Ativos"><span class="badge badge-blue">${cl.count}</span> ativos</td>
+                        <td data-label="Total Causa" style="font-weight:600;">${this.formatCurrency(cl.val)}</td>
+                        <td data-label="Ações"><button class="btn btn-danger btn-sm" onclick="app.deleteClient('${cl.name}')">🗑</button></td>
+                    </tr>`; 
                 }); 
             },
 
@@ -1618,12 +1759,12 @@ ${textToAnalyze}`;
                     const c = this.data.cases.find(x=>x.id==t.caseId);
                     const isInc = t.type === 'income';
                     tBody.innerHTML += `<tr>
-                        <td>${new Date(t.id).toLocaleDateString('pt-BR')}</td>
-                        <td><span class="badge ${isInc?'badge-green':'badge-red'}">${isInc?'Entrada':'Saída'}</span></td>
-                        <td>${t.desc}</td>
-                        <td style="font-weight:600">${c ? c.client : '-'}</td>
-                        <td style="color:${isInc?'var(--success)':'var(--danger)'}; font-weight:600;">${isInc?'+':'-'} ${this.formatCurrency(t.amount)}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${t.id})">🗑</button></td>
+                        <td data-label="Data">${new Date(t.id).toLocaleDateString('pt-BR')}</td>
+                        <td data-label="Tipo"><span class="badge ${isInc?'badge-green':'badge-red'}">${isInc?'Entrada':'Saída'}</span></td>
+                        <td data-label="Descrição">${t.desc}</td>
+                        <td data-label="Cliente" style="font-weight:600">${c ? c.client : '-'}</td>
+                        <td data-label="Valor" style="color:${isInc?'var(--success)':'var(--danger)'}; font-weight:600;">${isInc?'+':'-'} ${this.formatCurrency(t.amount)}</td>
+                        <td data-label="Ações"><button class="btn btn-danger btn-sm" onclick="app.deleteTransaction(${t.id})">🗑</button></td>
                     </tr>`;
                 });
                 
@@ -1634,11 +1775,11 @@ ${textToAnalyze}`;
                     if(!c.fees && !this.data.transactions.some(t=>t.caseId===c.id)) return;
                     const rec = this.data.transactions.filter(t=>t.caseId===c.id && t.type==='income').reduce((a,v)=>a+v.amount,0);
                     bBody.innerHTML += `<tr>
-                        <td><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted); font-family:monospace;">${c.number}</small></td>
-                        <td>${this.formatCurrency(c.fees||0)}</td>
-                        <td><span style="color:var(--success); font-weight:600;">${this.formatCurrency(rec)}</span></td>
-                        <td style="font-weight:600; color:var(--text-main);">${this.formatCurrency((c.fees||0)-rec)}</td>
-                        <td><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment', ${c.id})">+ Lançamento</button></td>
+                        <td data-label="Processo"><span class="clickable-link" onclick="app.openCaseDetail(${c.id})">${c.client}</span><br><small style="color:var(--text-muted); font-family:monospace;">${c.number}</small></td>
+                        <td data-label="Contrato">${this.formatCurrency(c.fees||0)}</td>
+                        <td data-label="Recebido"><span style="color:var(--success); font-weight:600;">${this.formatCurrency(rec)}</span></td>
+                        <td data-label="Saldo Devedor" style="font-weight:600; color:var(--text-main);">${this.formatCurrency((c.fees||0)-rec)}</td>
+                        <td data-label="Ações"><button class="btn btn-outline btn-sm" onclick="app.openModal('modal-payment', ${c.id})">+ Lançamento</button></td>
                     </tr>`;
                 });
             },
@@ -1648,7 +1789,7 @@ ${textToAnalyze}`;
                 let h = `<div style="margin-bottom:20px; font-size:1.1rem;">Total consolidado: <b>${cl.length} processo(s)</b></div><table style="width:100%"><thead><tr><th>Nº CNJ</th><th>Posição</th><th>Status</th><th>Valor Causa</th></tr></thead><tbody>`; 
                 cl.forEach(c => {
                     const roleLabel = c.client_role === 'reu' ? '<span class="badge badge-yellow">Réu</span>' : '<span class="badge badge-blue">Autor</span>';
-                    h += `<tr><td style="font-weight:600;"><span class="clickable-link" onclick="app.closeModal('modal-client-detail'); app.openCaseDetail(${c.id})">${c.number}</span></td><td>${roleLabel}</td><td><span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></td><td>${this.formatCurrency(c.value)}</td></tr>`;
+                    h += `<tr><td data-label="Nº CNJ" style="font-weight:600;"><span class="clickable-link" onclick="app.closeModal('modal-client-detail'); app.openCaseDetail(${c.id})">${c.number}</span></td><td data-label="Posição">${roleLabel}</td><td data-label="Status"><span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></td><td data-label="Valor Causa">${this.formatCurrency(c.value)}</td></tr>`;
                 }); 
                 document.getElementById('client-detail-body').innerHTML = h + `</tbody></table>`; 
                 document.getElementById('modal-client-detail').classList.add('active'); 
