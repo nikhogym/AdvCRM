@@ -301,6 +301,23 @@
             #modal-case form > div { margin: 0 !important; }
             #modal-case .flex-gap { display: contents !important; }
             #modal-case input[name="client"], #modal-case input[name="opponent"], #modal-case input[name="lawyer"], #modal-case textarea[name="obs"], #modal-case button { grid-column: span 2; }
+
+            /* ESTILOS DA PÁGINA DE DETALHES DO PROCESSO (SINGLE PAGE FEEL) */
+            .case-detail-card { padding: 0; background: transparent; box-shadow: none; border: none; margin-bottom: 20px; }
+            .case-header-mobile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+            .case-header-mobile h2 { font-size: 1.4rem; letter-spacing: -0.5px; }
+            
+            .case-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+            .info-item label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; letter-spacing: 0.5px; }
+            .info-item div { font-size: 0.95rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            .finance-compact { background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+            .finance-compact .finance-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-secondary); }
+            .finance-compact b { color: var(--text-main); }
+            .finance-compact .finance-progress { height: 6px; border-radius: 4px; }
+            
+            .btn-group-mobile { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+            .btn-group-mobile button { width: 100%; margin: 0; }
         }
 
         /* SAFE AREA */
@@ -881,11 +898,46 @@
             },
 
             openCaseDetail(id) { 
-                const c = this.data.cases.find(x=>x.id===id); if(!c) return; const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
+                const c = this.data.cases.find(x=>x.id===id); if(!c) return; 
+                const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
                 let timeline = []; const initialDate = c.date_start || c.date_created; timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
-                timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); const clientLabel = c.client_role === 'reu' ? 'Réu / Cliente' : 'Autor / Cliente'; const opponentLabel = c.client_role === 'reu' ? 'Autor / Adverso' : 'Réu / Adverso';
-                document.getElementById('case-detail-content').innerHTML = `<div class="card" style="margin-bottom: 30px;"><div class="flex-between"><h2 style="font-size:1.8rem; font-family:monospace; letter-spacing:-1px;">${c.number}</h2> <span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin:25px 0; background:var(--bg-body); padding:20px; border-radius:var(--radius-lg); border: 1px solid var(--border-color);"><div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">${clientLabel}</span><br><b style="font-size:1.1rem;">${c.client}</b></div><div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">${opponentLabel}</span><br><b style="font-size:1.1rem;">${c.opponent||'-'}</b></div><div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Área</span><br><b>${c.area}</b></div><div><span style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Valor da Causa</span><br><b>${this.formatCurrency(c.value)}</b></div></div><div class="finance-summary-bar"><div class="finance-values"><span style="color:var(--text-secondary);">Contrato: <b style="color:var(--text-main);">${this.formatCurrency(contracted)}</b></span><span style="color:var(--success); font-weight:600;">Recebido: <b>${this.formatCurrency(received)}</b></span></div><div class="finance-progress"><div class="progress-received" style="width:${pctReceived}%"></div><div class="progress-pending" style="width:${100-pctReceived}%"></div></div></div><div style="margin-top:25px; text-align:right; border-top:1px solid var(--border-color); padding-top:20px; display:flex; justify-content:flex-end; gap:10px;"><button class="btn btn-outline" onclick="app.openModal('modal-case', ${c.id})">✏️ Editar Processo</button> <button class="btn btn-primary" onclick="app.openModal('modal-deadline', ${c.id})">⏳ Agendar Prazo</button></div></div><h3 style="margin-bottom: 20px;">Linha do Tempo (Histórico)</h3><div class="full-timeline">${timeline.map(t => { let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1.1rem; display:block; margin-bottom:5px;">${t.title}</b><div style="font-size:0.95rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; }).join('')}</div>`; 
+                timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
+
+                // MOBILE OPTIMIZED LAYOUT STRUCTURE
+                document.getElementById('case-detail-content').innerHTML = `
+                    <div class="case-detail-card">
+                        <div class="case-header-mobile">
+                            <h2 style="font-family:monospace; margin:0; color:var(--text-main);">${c.number}</h2>
+                            <span class="badge ${c.status==='Em andamento'?'badge-blue':'badge-gray'}">${c.status}</span>
+                        </div>
+                        
+                        <div class="case-info-grid">
+                            <div class="info-item"><label>Cliente</label><div>${c.client}</div></div>
+                            <div class="info-item"><label>Adverso</label><div>${c.opponent||'-'}</div></div>
+                            <div class="info-item"><label>Área</label><div>${c.area}</div></div>
+                            <div class="info-item"><label>Valor</label><div>${this.formatCurrency(c.value)}</div></div>
+                        </div>
+
+                        <div class="finance-compact">
+                            <div class="finance-row"><span>Contrato: <b>${this.formatCurrency(contracted)}</b></span><span>Recebido: <b style="color:var(--success)">${this.formatCurrency(received)}</b></span></div>
+                            <div class="finance-progress"><div class="progress-received" style="width:${pctReceived}%"></div><div class="progress-pending" style="width:${100-pctReceived}%"></div></div>
+                        </div>
+
+                        <div class="btn-group-mobile">
+                            <button class="btn btn-outline" onclick="app.openModal('modal-case', ${c.id})">✏️ Editar</button> 
+                            <button class="btn btn-primary" onclick="app.openModal('modal-deadline', ${c.id})">⏳ Prazo</button>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 20px; font-size:1.1rem; border-top:1px solid var(--border-color); padding-top:20px;">Linha do Tempo</h3>
+                    <div class="full-timeline">
+                        ${timeline.map(t => { 
+                            let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; 
+                            return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; 
+                        }).join('')}
+                    </div>`; 
+                
                 this.navigate('case-detail'); 
             },
 
@@ -906,4 +958,4 @@
         app.init();
     </script>
 </body>
-</html>```
+</html>
