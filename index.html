@@ -73,37 +73,22 @@
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
         /* =========================================
-           TOPBAR REFORMULADA (CORREÇÃO PEDIDA)
+           TOPBAR LIMPA (SEM STATUS BAR FAKE)
         ========================================= */
         .app-topbar { 
             background-color: var(--bg-surface); 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
-            flex-direction: column; /* Organização vertical */
+            align-items: center; /* Centraliza verticalmente */
             justify-content: center;
             padding: 10px 24px; 
             flex-shrink: 0; 
             transition: background-color 0.3s, border-color 0.3s;
-            height: auto; /* Altura automática para acomodar conteúdo */
-            min-height: 80px;
+            height: 70px; /* Altura padrão desktop */
             z-index: 40;
         }
 
-        /* Linha 1: Status Bar (Horário e Ícones) */
-        .topbar-status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-        .status-icons { display: flex; gap: 6px; align-items: center; }
-        .status-icons svg { width: 14px; height: 14px; fill: currentColor; }
-
-        /* Linha 2: Header Principal */
+        /* Container do Header Principal */
         .topbar-main-row {
             display: flex;
             justify-content: space-between;
@@ -240,8 +225,16 @@
             .menu-toggle { display: flex; bottom: 20px; } 
             .calendar-widget { grid-template-columns: 1fr; } 
             
-            /* Ajuste Topbar Mobile */
-            .app-topbar { padding: 10px 16px; }
+            /* Ajuste Topbar Mobile - SEM DADOS DUPLICADOS */
+            .app-topbar { 
+                padding: 10px 16px; 
+                height: auto;
+                min-height: 70px;
+                /* Espaço extra para o sistema nativo (notch) */
+                padding-top: calc(10px + env(safe-area-inset-top)); 
+                justify-content: flex-end; /* Alinha o header na parte de baixo */
+            }
+            
             .content-scroll { padding: 16px; }
             
             .dash-header { flex-direction: column; gap: 12px; margin-bottom: 16px; }
@@ -367,8 +360,8 @@
 
         /* SAFE AREA */
         @supports (padding-top: env(safe-area-inset-top)) {
-            .app-topbar { padding-top: calc(10px + env(safe-area-inset-top)) !important; height: auto !important; }
-            @media (max-width: 768px) { .app-topbar { min-height: 80px; } }
+            .app-topbar { padding-top: calc(10px + env(safe-area-inset-top)) !important; }
+            @media (max-width: 768px) { .app-topbar { padding-top: env(safe-area-inset-top) !important; } }
             aside { padding-top: calc(24px + env(safe-area-inset-top, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
             .content-scroll { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
             .menu-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; }
@@ -396,15 +389,6 @@
 
     <main>
         <div class="app-topbar">
-            <div class="topbar-status-row">
-                <div id="live-clock">00:00</div>
-                <div class="status-icons">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
-                </div>
-            </div>
-            
             <div class="topbar-main-row">
                 <div class="header-titles">
                     <h1>Painel Executivo</h1>
@@ -750,20 +734,9 @@
                     dashGrid.addEventListener('touchend', endTouch); dashGrid.addEventListener('touchcancel', endTouch);
                 }
 
-                // Clock functionality
-                this.updateClock();
-                setInterval(() => this.updateClock(), 60000);
-
                 this.renderDashboard();
                 this.updateGreeting();
                 document.addEventListener('click', (e) => { if (!e.target.closest('.badge') && !e.target.closest('.status-dropdown')) { document.getElementById('status-menu').classList.remove('show'); } });
-            },
-
-            updateClock() {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const clockEl = document.getElementById('live-clock');
-                if(clockEl) clockEl.innerText = timeString;
             },
 
             changeSort(view, criteria) {
