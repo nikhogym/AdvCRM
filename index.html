@@ -785,10 +785,10 @@
 
                     <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
                         <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('gemini')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M11.1 2.89c.35-1.12 1.45-1.12 1.8 0 .96 3.08 3.39 5.51 6.47 6.47 1.12.35 1.12 1.45 0 1.8-3.08.96-5.51 3.39-6.47 6.47-.35 1.12-1.45 1.12-1.8 0-.96-3.08-3.39-5.51-6.47-6.47-1.12-.35-1.12-1.45 0-1.8 3.08-.96 5.51-3.39 6.47-6.47z"/></svg> Gemini
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
                         </button>
                         <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('chatgpt')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.0002 0.899902C12.9806 0.899902 13.9298 1.1274 14.8115 1.54716C15.6932 1.96693 16.5028 2.56947 17.1852 3.29285C17.8676 4.01623 18.4232 4.86937 18.8256 5.81169C19.2279 6.75402 19.4678 7.76189 19.5298 8.78652L21.0267 8.71189C20.9599 7.47291 20.6698 6.25539 20.1834 5.11624C19.697 3.97709 19.0253 2.94589 18.2001 2.07125C17.3749 1.19661 16.396 0.468239 15.3299 -0.0392336C14.2638 -0.546706 13.1163 -0.821731 11.9312 -0.821731C10.7461 -0.821731 9.5986 -0.546706 8.5325 -0.0392336C7.4664 0.468239 6.48753 1.19661 5.66228 2.07125C4.83704 2.94589 4.16538 3.97709 3.67897 5.11624C3.19256 6.25539 2.90249 7.47291 2.83572 8.71189L4.33261 8.78652C4.39462 7.76189 4.6345 6.75402 5.03683 5.81169C5.43916 4.86937 5.99482 4.01623 6.67721 3.29285C7.3596 2.56947 8.16918 1.96693 9.05088 1.54716C9.93259 1.1274 10.8818 0.899902 11.8622 0.899902H12.0002Z"/></svg> ChatGPT
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
                         </button>
                     </div>
 
@@ -816,7 +816,9 @@
         <div id="modal-full-analysis" class="modal">
             <div class="modal-content">
                 <div class="flex-between" style="margin-bottom:20px;"><h3>Análise Completa de Autos</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-full-analysis')">✕</button></div>
-                <input type="hidden" id="full-analysis-edit-id"> <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Texto ou Processo</label>
+                <input type="hidden" id="full-analysis-edit-id"> 
+                
+                <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Texto ou Processo</label>
                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Selecione um processo cadastrado para incluir o histórico ou cole o texto.</p>
                 
                 <label>Carregar Histórico do Processo</label>
@@ -834,10 +836,10 @@
 
                 <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
                     <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M11.1 2.89c.35-1.12 1.45-1.12 1.8 0 .96 3.08 3.39 5.51 6.47 6.47 1.12.35 1.12 1.45 0 1.8-3.08.96-5.51 3.39-6.47 6.47-.35 1.12-1.45 1.12-1.8 0-.96-3.08-3.39-5.51-6.47-6.47-1.12-.35-1.12-1.45 0-1.8 3.08-.96 5.51-3.39 6.47-6.47z"/></svg> Gemini
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
                     </button>
                     <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('chatgpt')">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.0002 0.899902C12.9806 0.899902 13.9298 1.1274 14.8115 1.54716C15.6932 1.96693 16.5028 2.56947 17.1852 3.29285C17.8676 4.01623 18.4232 4.86937 18.8256 5.81169C19.2279 6.75402 19.4678 7.76189 19.5298 8.78652L21.0267 8.71189C20.9599 7.47291 20.6698 6.25539 20.1834 5.11624C19.697 3.97709 19.0253 2.94589 18.2001 2.07125C17.3749 1.19661 16.396 0.468239 15.3299 -0.0392336C14.2638 -0.546706 13.1163 -0.821731 11.9312 -0.821731C10.7461 -0.821731 9.5986 -0.546706 8.5325 -0.0392336C7.4664 0.468239 6.48753 1.19661 5.66228 2.07125C4.83704 2.94589 4.16538 3.97709 3.67897 5.11624C3.19256 6.25539 2.90249 7.47291 2.83572 8.71189L4.33261 8.78652C4.39462 7.76189 4.6345 6.75402 5.03683 5.81169C5.43916 4.86937 5.99482 4.01623 6.67721 3.29285C7.3596 2.56947 8.16918 1.96693 9.05088 1.54716C9.93259 1.1274 10.8818 0.899902 11.8622 0.899902H12.0002Z"/></svg> ChatGPT
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
                     </button>
                 </div>
 
@@ -896,6 +898,12 @@
                     <div id="case-selector-container"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div>
                     <label>Tipo</label><input type="text" name="type" required>
                     <div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div>
+                    
+                    <div style="margin-top:15px; margin-bottom:5px; padding:10px; background:var(--bg-body); border-radius:var(--radius-md); display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" name="googleCalendar" id="gcal-check" style="width:auto; margin:0;">
+                        <label for="gcal-check" style="margin:0; font-weight:500; cursor:pointer;">Criar evento no Google Agenda 📅</label>
+                    </div>
+
                     <button class="btn btn-primary" style="width:100%; margin-top:5px;">Salvar Prazo</button>
                 </form>
             </div>
@@ -1300,14 +1308,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     const match = text.match(new RegExp(regexStr)); 
                     let content = match ? match[1].trim() : '';
                     
-                    // CORREÇÃO: Remove a primeira linha se for duplicata do título (Item 5)
                     if (content) {
                         const lines = content.split('\n');
                         if (lines.length > 0) {
-                            // Verifica se a primeira linha parece um título (curta e sem :)
                             const firstLine = lines[0].trim();
-                            const titleKey = titlesMap[current.replace(/[^0-9]/g, 'b')]; // b1, b2...
-                            // Simples heurística: se a primeira linha contém palavras chaves do título esperado
                             if (firstLine.length < 50 && !firstLine.includes(':')) {
                                 content = lines.slice(1).join('\n').trim();
                             }
@@ -1318,7 +1322,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
                 const formatContent = (text) => {
                     if (!text) return '<span style="color:var(--text-muted)">Sem dados.</span>';
-                    // Mesma formatação para ambas as abas (Item 1)
                     return text.replace(/^([^:\n]+):/gm, '<span class="analysis-label">$1</span><span class="analysis-val">')
                                .replace(/$/gm, '</span>');
                 };
@@ -1328,7 +1331,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     const key = 'b' + i;
                     const emoji = i + '️⃣';
                     const nextEmoji = (i+1) + '️⃣';
-                    // Para o último bloco, o próximo delimitador varia
                     const nextDelim = i === 9 ? (mode === 'pub' ? '⚖️' : null) : nextEmoji;
                     
                     const blockContent = extract(rawText, emoji, nextDelim);
@@ -1356,7 +1358,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     b7: "Prazo Fatal", b8: "Próximo Cenário", b9: "Resumo Cliente"
                 };
 
-                // Reconstrói texto completo se não estiver salvo bruto com emojis
                 let textToParse = pub.rawText;
                 if (pub.analysis && pub.analysis.blocks) {
                     const b = pub.analysis.blocks;
@@ -1368,7 +1369,7 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 
                 // Configura botão de ação
                 document.getElementById('pub-view-action-btn').onclick = () => { app.closeModal('modal-publication-view'); app.openModal('modal-deadline', pub.caseId); };
-                document.getElementById('pub-view-edit-btn').style.display = 'none'; // Sem edição complexa para pub por enquanto
+                document.getElementById('pub-view-edit-btn').style.display = 'none'; 
                 
                 document.getElementById('modal-publication-view').classList.add('active');
             },
@@ -1404,7 +1405,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const container = document.getElementById('strategies-list-full');
                 container.innerHTML = '';
                 
-                // Coleta todas as estratégias de todos os processos
                 let allStrategies = [];
                 this.data.cases.forEach(c => {
                     if (c.full_analyses) {
@@ -1422,7 +1422,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 }
 
                 allStrategies.forEach(s => {
-                    // Extrai resumo do bloco 1 ou 9 para o card
                     const match = s.text.match(/1️⃣([\s\S]*?)2️⃣/);
                     let preview = match ? match[1].substring(0, 150) + '...' : 'Clique para ver detalhes.';
                     
@@ -1441,6 +1440,45 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 });
             },
 
+            exportBackup() { const dataStr = JSON.stringify(this.data, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `LexManager_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); },
+            
+            // CORREÇÃO DO BACKUP (Item 4)
+            importBackup(event) { 
+                const file = event.target.files[0]; 
+                if (!file) return; 
+                
+                const reader = new FileReader(); 
+                
+                // Usando arrow function para manter o escopo 'this' do 'app'
+                reader.onload = (e) => { 
+                    try { 
+                        const content = e.target.result;
+                        const importedData = JSON.parse(content); 
+                        
+                        if (importedData && Array.isArray(importedData.cases)) { 
+                            if (confirm('Atenção: Restaurar o backup substituirá todos os dados atuais na sua tela. Deseja continuar?')) { 
+                                // Atualiza os dados internos do app
+                                app.data = importedData; 
+                                // Salva explicitamente no localStorage
+                                localStorage.setItem('lexData', JSON.stringify(app.data));
+                                alert('✅ Backup restaurado com sucesso! A página será recarregada.'); 
+                                location.reload(); 
+                            } 
+                        } else { 
+                            alert('❌ Arquivo de backup inválido. A estrutura não corresponde ao LexManager.'); 
+                        } 
+                    } catch (err) { 
+                        console.error(err);
+                        alert('❌ Erro ao ler o arquivo JSON. Verifique se o arquivo está corrompido.'); 
+                    } 
+                }; 
+                
+                reader.readAsText(file); 
+                // Limpa o input para permitir selecionar o mesmo arquivo novamente se falhar
+                event.target.value = ''; 
+            },
+
+            fixDate(dateStr) { if(!dateStr) return null; return new Date(dateStr + 'T12:00:00'); },
             toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); },
             navigate(view) {
                 document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
@@ -1451,7 +1489,7 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 document.getElementById('sidebar').classList.remove('active');
                 if(view === 'dashboard') this.renderDashboard(); 
                 if(view === 'updates') this.renderUpdatesFull(); 
-                if(view === 'strategies') this.renderStrategies(); // Nova renderização
+                if(view === 'strategies') this.renderStrategies(); 
                 if(view === 'cases') this.renderCases(); 
                 if(view === 'deadlines') this.renderDeadlines(); 
                 if(view === 'finance') this.renderFinance(); 
@@ -1495,7 +1533,63 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
             },
             closeModal(id) { document.getElementById(id).classList.remove('active'); },
             saveCase(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const d = { number: f.get('number'), client: f.get('client'), client_role: f.get('client_role') || 'autor', opponent: f.get('opponent'), status: f.get('status'), area: f.get('area'), value: parseFloat(f.get('value')||0), fees: parseFloat(f.get('fees')||0), obs: f.get('obs'), lawyer: f.get('lawyer'), date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null }; if(id){ const i = this.data.cases.findIndex(c=>c.id==id); this.data.cases[i]={...this.data.cases[i],...d}; } else { this.data.cases.push({...d, id:Date.now(), date_created:new Date().toISOString()}); } this.saveToStorage(); this.closeModal('modal-case'); this.navigate('cases'); },
-            saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); const payload = { caseId: parseInt(cid), type: f.get('type'), date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null, date: this.fixDate(f.get('date')).toISOString(), done: false }; if(id) { const idx = this.data.deadlines.findIndex(d => d.id == id); if(idx > -1) { payload.done = this.data.deadlines[idx].done; this.data.deadlines[idx] = { ...this.data.deadlines[idx], ...payload }; } } else { this.data.deadlines.push({ id: Date.now(), ...payload }); } this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
+            
+            // ATUALIZAÇÃO ITEM 1 E 2
+            saveDeadline(e) { 
+                e.preventDefault(); 
+                const f = new FormData(e.target); 
+                const id = f.get('id'); 
+                const cid = f.get('caseId')||f.get('caseSelect'); 
+                if(!cid) return alert('Selecione um processo.'); 
+                
+                const type = f.get('type');
+                const dateFatal = f.get('date');
+                const dateStart = f.get('date_start');
+                
+                const payload = { 
+                    caseId: parseInt(cid), 
+                    type: type, 
+                    date_start: dateStart ? this.fixDate(dateStart).toISOString() : null, 
+                    date: this.fixDate(dateFatal).toISOString(), 
+                    done: false 
+                }; 
+                
+                if(id) { 
+                    const idx = this.data.deadlines.findIndex(d => d.id == id); 
+                    if(idx > -1) { 
+                        payload.done = this.data.deadlines[idx].done; 
+                        this.data.deadlines[idx] = { ...this.data.deadlines[idx], ...payload }; 
+                    } 
+                } else { 
+                    this.data.deadlines.push({ id: Date.now(), ...payload }); 
+                } 
+                
+                // ITEM 2: Google Agenda Logic
+                if (f.get('googleCalendar')) {
+                    const c = this.data.cases.find(x => x.id == cid);
+                    const clientName = c ? c.client : 'Cliente';
+                    const title = `Prazo: ${type} - ${clientName}`;
+                    const details = `Processo: ${c ? c.number : ''}\nCliente: ${clientName}\nTipo: ${type}`;
+                    
+                    // Formata data para YYYYMMDD
+                    const dObj = new Date(dateFatal);
+                    // Google Calendar All Day event: Start date / End date (exclusive, so +1 day)
+                    const fmt = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "").slice(0,8);
+                    
+                    const start = fmt(dObj);
+                    const nextDay = new Date(dObj); 
+                    nextDay.setDate(dObj.getDate() + 1);
+                    const end = fmt(nextDay);
+                    
+                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}`;
+                    window.open(url, '_blank');
+                }
+
+                this.saveToStorage(); 
+                this.closeModal('modal-deadline'); 
+                this.navigate('deadlines'); 
+            },
+
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const payload = { desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }; if(id) { const idx = this.data.tasks.findIndex(t => t.id == id); if(idx > -1) { payload.done = this.data.tasks[idx].done; this.data.tasks[idx] = { ...this.data.tasks[idx], ...payload }; } } else { this.data.tasks.push({ id: Date.now(), ...payload }); } this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
             saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')), desc: f.get('desc') }); this.saveToStorage(); this.closeModal('modal-payment'); this.navigate('finance'); },
             deleteTransaction(id) { if(confirm('Tem certeza que deseja excluir este lançamento permanentemente?')) { this.data.transactions = this.data.transactions.filter(t => t.id !== id); this.saveToStorage(); this.navigate('finance'); } },
@@ -1546,16 +1640,13 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
                 let timeline = []; const initialDate = c.date_start || c.date_created; timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
-                // ADICIONADO: Análise Completa na Linha do Tempo (Item 1)
                 if(c.full_analyses) {
                     c.full_analyses.forEach(fa => {
-                        // Renderização como CARD CLICÁVEL que chama a nova função viewStrategicAnalysis
                         timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Clique para ver a análise completa', id: null, originalId: fa.id});
                     });
                 }
                 timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
 
-                // MOBILE OPTIMIZED LAYOUT STRUCTURE
                 document.getElementById('case-detail-content').innerHTML = `
                     <div class="case-detail-card">
                         
@@ -1589,7 +1680,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     <div class="full-timeline">
                         ${timeline.map(t => { 
                             let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; 
-                            // Evento de clique para a Análise Estratégica (Item 3: Ícone Cerebro)
                             if (t.type === 'analysis') {
                                 clickAct = `onclick="app.viewStrategicAnalysis(${c.id}, ${t.originalId})" style="cursor:pointer;"`;
                                 return `<div class="ft-item" ${clickAct}><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`;
