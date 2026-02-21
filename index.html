@@ -721,8 +721,12 @@
                     </select>
 
                     <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
-                        <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white;" onclick="app.analyzeWithAI('gemini')">✨ Gemini</button>
-                        <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white;" onclick="app.analyzeWithAI('chatgpt')">🤖 ChatGPT</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('gemini')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M11.1 2.89c.35-1.12 1.45-1.12 1.8 0 .96 3.08 3.39 5.51 6.47 6.47 1.12.35 1.12 1.45 0 1.8-3.08.96-5.51 3.39-6.47 6.47-.35 1.12-1.45 1.12-1.8 0-.96-3.08-3.39-5.51-6.47-6.47-1.12-.35-1.12-1.45 0-1.8 3.08-.96 5.51-3.39 6.47-6.47z"/></svg> Gemini
+                        </button>
+                        <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('chatgpt')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.0002 0.899902C12.9806 0.899902 13.9298 1.1274 14.8115 1.54716C15.6932 1.96693 16.5028 2.56947 17.1852 3.29285C17.8676 4.01623 18.4232 4.86937 18.8256 5.81169C19.2279 6.75402 19.4678 7.76189 19.5298 8.78652L21.0267 8.71189C20.9599 7.47291 20.6698 6.25539 20.1834 5.11624C19.697 3.97709 19.0253 2.94589 18.2001 2.07125C17.3749 1.19661 16.396 0.468239 15.3299 -0.0392336C14.2638 -0.546706 13.1163 -0.821731 11.9312 -0.821731C10.7461 -0.821731 9.5986 -0.546706 8.5325 -0.0392336C7.4664 0.468239 6.48753 1.19661 5.66228 2.07125C4.83704 2.94589 4.16538 3.97709 3.67897 5.11624C3.19256 6.25539 2.90249 7.47291 2.83572 8.71189L4.33261 8.78652C4.39462 7.76189 4.6345 6.75402 5.03683 5.81169C5.43916 4.86937 5.99482 4.01623 6.67721 3.29285C7.3596 2.56947 8.16918 1.96693 9.05088 1.54716C9.93259 1.1274 10.8818 0.899902 11.8622 0.899902H12.0002Z"/></svg> ChatGPT
+                        </button>
                     </div>
 
                     <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
@@ -967,7 +971,21 @@ Resumo: Indicar expressamente se a decisão foi POSITIVA ou NEGATIVA para o meu 
 Segue a publicação para análise:
 ${textToAnalyze}`;
 
-                navigator.clipboard.writeText(geminiPrompt).then(() => { alert(`✅ Prompt copiado com sucesso!\n\nEstou abrindo o ${platform === 'gemini' ? 'Gemini' : 'ChatGPT'}. Cole o texto lá (Ctrl+V), aguarde a resposta e copie o resultado de volta para o Passo 2.`); if(platform === 'gemini') window.open('https://gemini.google.com/app', '_blank'); else window.open('https://chatgpt.com', '_blank'); }).catch(err => { console.error('Falha ao copiar:', err); alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); });
+                navigator.clipboard.writeText(geminiPrompt).then(() => { 
+                    alert(`✅ Prompt copiado com sucesso!\n\nEstou abrindo o ${platform === 'gemini' ? 'Gemini' : 'ChatGPT'}. Cole o texto lá (Ctrl+V), aguarde a resposta e copie o resultado de volta para o Passo 2.`); 
+                    
+                    // Universal Links (Deep Links)
+                    if(platform === 'gemini') {
+                        // Tenta abrir o App do Gemini/Google, fallback para site
+                        window.open('https://gemini.google.com/app', '_blank'); 
+                    } else {
+                        // Tenta abrir o App do ChatGPT, fallback para site
+                        window.open('https://chatgpt.com', '_blank'); 
+                    }
+                }).catch(err => { 
+                    console.error('Falha ao copiar:', err); 
+                    alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); 
+                });
             },
 
             parseAIResult() {
