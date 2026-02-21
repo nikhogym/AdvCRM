@@ -31,6 +31,10 @@
             --text-muted: #94A3B8;
             --text-on-dark: #F8FAFC;
             --border-color: #E2E8F0;
+
+            /* NOVAS CORES PERGUNTA/RESPOSTA */
+            --text-question: #2563EB; /* Azul */
+            --text-answer: #1E293B;   /* Preto */
             
             --radius-sm: 8px;
             --radius-md: 12px; 
@@ -56,6 +60,10 @@
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
+            
+            /* NOVAS CORES PERGUNTA/RESPOSTA DARK MODE */
+            --text-question: #60A5FA; /* Azul Claro */
+            --text-answer: #F8FAFC;   /* Branco */
         }
 
         body.dark-mode .pub-full-text {
@@ -69,7 +77,7 @@
             color: #fcd34d;
         }
 
-        /* ESTILOS PARA VISUALIZAÇÃO ESTRATÉGICA (ITEM 1 E EXPANSIVO) */
+        /* ESTILOS PARA VISUALIZAÇÃO ESTRATÉGICA E EXPANSIVO */
         .strat-block-container {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
@@ -110,20 +118,29 @@
             display: none;
         }
         
+        /* CORREÇÃO DAS CORES E LAYOUT DA PERGUNTA/RESPOSTA */
         .strat-row {
             margin-bottom: 8px;
-            font-size: 0.9rem;
             line-height: 1.5;
+            display: block;
         }
         .strat-label {
             font-weight: 700;
-            color: var(--text-secondary);
-            display: block;
-            font-size: 0.8rem;
+            color: var(--text-question);
+            display: inline;
+            font-size: 0.9rem;
+            margin-right: 4px;
         }
         .strat-value {
-            color: var(--text-main);
+            color: var(--text-answer);
+            display: inline;
+            font-size: 0.9rem;
+            word-break: break-word;
         }
+        
+        /* Ajuste fino caso haja itens aninhados dentro da aba de publicações */
+        .analysis-val .strat-row { margin-bottom: 6px; }
+        .analysis-val .strat-row:last-child { margin-bottom: 0; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
@@ -139,18 +156,19 @@
 
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        /* TOPBAR LIMPA */
+        /* CORREÇÃO TOPBAR RESTAURADA */
         .app-topbar { 
             background-color: var(--bg-surface); 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
             align-items: center; 
-            justify-content: center;
+            justify-content: space-between; 
             padding: 10px 24px; 
             flex-shrink: 0; 
             transition: background-color 0.3s, border-color 0.3s;
             height: 70px; 
             z-index: 40;
+            width: 100%;
         }
 
         .topbar-main-row {
@@ -293,9 +311,8 @@
                 height: auto;
                 min-height: 70px;
                 padding-top: calc(10px + env(safe-area-inset-top)); 
-                justify-content: flex-start; 
-                position: sticky; 
-                top: 0;
+                position: relative;
+                z-index: 40;
             }
             .topbar-main-row { width: 100%; }
 
@@ -967,15 +984,27 @@
             saveProfilePic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { this.data.settings.profilePic = event.target.result; this.saveToStorage(); this.updateGreeting(); }; reader.readAsDataURL(file); },
             removeProfilePic() { this.data.settings.profilePic = null; document.getElementById('settings-profile-pic').value = ''; this.saveToStorage(); this.updateGreeting(); },
 
+            // FUNÇÃO CORRIGIDA PARA REMOVER O CABEÇALHO DUPLICADO COMPLETAMENTE
             cleanBlockText(text, keywordFilter) {
                 if(!text) return '-';
-                // Remove the first line if it looks like a repeating title from the AI (e.g., "1 Diagnostico geral")
-                const lines = text.split('\n');
-                if(lines.length > 1) {
-                    const firstLineLower = lines[0].toLowerCase();
-                    if(firstLineLower.includes(keywordFilter.toLowerCase()) || 
-                       /^(?:\d️⃣|\d\.?)\s*(diagnóstico|análise|postura|resumo|cenário|oportunidades|pedidos|determinações|natureza|partes)/i.test(firstLineLower)) {
-                        lines.shift();
+                let lines = text.split('\n');
+                // Remove linhas em branco do começo
+                while(lines.length > 0 && lines[0].trim() === '') lines.shift();
+                
+                if(lines.length > 0) {
+                    const firstLine = lines[0].trim();
+                    // Regex cobre todas as variações e sinônimos dos títulos que a IA pode devolver
+                    const regexHeaders = /^(?:\d️⃣|\d\.)?\s*(Identificaç|Diagnóstico|Partes|Análise|Natureza|Postura|Resumo|Determinaç|Recursos|Pedidos|Simulaç|Prazo|Mapa|Próximo)/i;
+                    
+                    if (regexHeaders.test(firstLine)) {
+                        let parts = firstLine.split(':');
+                        // Se a IA gerou o título na mesma linha da primeira resposta (ex: "9️⃣ Resumo: O caso foi bom")
+                        if (parts.length > 1 && parts.slice(1).join(':').trim() !== '') {
+                            lines[0] = parts.slice(1).join(':').trim();
+                        } else {
+                            // Se for só o título (ex: "2️⃣ Análise Estratégica das Partes"), apaga a linha inteira.
+                            lines.shift();
+                        }
                     }
                 }
                 return lines.join('\n').trim();
@@ -1266,7 +1295,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 if (linkedCaseId || this.editAnalysisId) {
                     
                     if(this.editAnalysisId) {
-                        // Encontrar o processo e a analise para atualizar
                         for(let c of this.data.cases) {
                             if(c.full_analyses) {
                                 let fIndex = c.full_analyses.findIndex(fa => fa.id === this.editAnalysisId);
@@ -1293,9 +1321,8 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     alert(`Análise salva e vinculada ao processo!`);
                     this.closeModal('modal-full-analysis');
                     this.editAnalysisId = null;
-                    this.renderAnalyses(); // Atualiza a aba Estratégias
+                    this.renderAnalyses(); 
                     
-                    // Se foi aberto pela ficha do processo, recarrega
                     if(!document.getElementById('view-case-detail').classList.contains('hidden')) {
                         this.openCaseDetail(linkedCaseId);
                     }
@@ -1310,10 +1337,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 if(!item) return;
                 
                 this.editAnalysisId = analysisId;
-                document.getElementById('full-analysis-step-1').style.display = 'none'; // Esconde primeiro passo
+                document.getElementById('full-analysis-step-1').style.display = 'none'; 
                 document.getElementById('full-analysis-result').value = item.text;
                 
-                this.closeModal('modal-publication-view'); // Fecha a visão de leitura se estiver aberta
+                this.closeModal('modal-publication-view'); 
                 document.getElementById('modal-full-analysis').classList.add('active');
             },
 
@@ -1353,18 +1380,30 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     b7: "7️⃣ Oportunidades", b8: "8️⃣ Próximo Cenário", b9: "9️⃣ Resumo para Advogada"
                 };
 
+                // FUNÇÃO REVISADA QUE SEPARA A PERGUNTA (AZUL) DA RESPOSTA (PRETA)
                 const formatContent = (text, key) => {
                     if (!text) return '<span style="color:var(--text-muted)">Sem dados.</span>';
-                    // Remove título duplicado usando função de limpeza
                     text = this.cleanBlockText(text, titles[key].substring(4));
-                    return text.replace(/^([^:\n]+):/gm, '<div class="strat-row"><span class="strat-label">$1</span><span class="strat-value">')
-                               .replace(/$/gm, '</span></div>');
+                    
+                    let formatted = '';
+                    let lines = text.split('\n');
+                    for(let l of lines) {
+                        let match = l.match(/^([^:]+):(.*)/);
+                        if(match) {
+                            if(formatted !== '') formatted += '</span></div>';
+                            formatted += `<div class="strat-row"><span class="strat-label">${match[1]}:</span><span class="strat-value">${match[2]}`;
+                        } else {
+                            if(formatted !== '') formatted += '<br>' + l;
+                            else formatted += l;
+                        }
+                    }
+                    if(formatted !== '') formatted += '</span></div>';
+                    return formatted || text;
                 };
 
                 let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
                 for (let i = 1; i <= 9; i++) {
                     let key = 'b' + i;
-                    // Acordeon default abertos no começo para primeira visualização (tirar 'collapsed' das classes)
                     html += `<div class="strat-block-container" style="padding:10px 16px;">
                                 <div class="strat-header" onclick="app.toggleStratBlock(this)">${titles[key]}</div>
                                 <div class="strat-content">${formatContent(blocks[key], key)}</div>
@@ -1375,11 +1414,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 document.getElementById('pub-view-summary').innerHTML = html;
                 document.getElementById('pub-view-text').innerText = item.text; 
                 
-                // Botão de Editar Análise
                 const extraActions = document.getElementById('pub-view-extra-actions');
                 extraActions.innerHTML = `<button class="btn btn-outline" onclick="app.openEditStrategicAnalysis(${c.id}, ${item.id})">✏️ Editar Análise</button>`;
                 
-                document.getElementById('pub-view-action-btn').style.display = 'none'; // Esconde botão de ir para prazos
+                document.getElementById('pub-view-action-btn').style.display = 'none'; 
                 document.getElementById('modal-publication-view').classList.add('active');
             },
 
@@ -1417,13 +1455,12 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const updatePayload = { id: isEditId ? parseInt(isEditId) : Date.now(), date: this.tempParsedData.dispDate || new Date().toISOString(), rawText: this.tempParsedData.rawText, caseId: cid, analysis: { caseNumber: this.tempParsedData.caseNumber, type: this.tempParsedData.type, outcome: this.tempParsedData.outcome, blocks: this.tempParsedData.blocks } };
                 if(isEditId) { const idx = this.data.updates.findIndex(u => u.id == isEditId); if(idx > -1) { updatePayload.date = this.tempParsedData.dispDate || this.data.updates[idx].date; this.data.updates[idx] = updatePayload; } } else { this.data.updates.unshift(updatePayload); }
                 
-                // Extrair a Data Fatal do Bloco 7
                 let extractedDeadline = '';
                 const dateRegex = /(\d{2})\/(\d{2})\/(\d{4})/;
                 if(this.tempParsedData.blocks.b7) {
                     let m = this.tempParsedData.blocks.b7.match(/Data final exata:\s*(\d{2}\/\d{2}\/\d{4})/i);
                     if(!m) m = this.tempParsedData.blocks.b7.match(dateRegex);
-                    if(m) extractedDeadline = `${m[3]}-${m[2]}-${m[1]}`; // Para preenchimento no campo input[type="date"]
+                    if(m) extractedDeadline = `${m[3]}-${m[2]}-${m[1]}`; 
                 }
                 
                 this.saveToStorage(); document.getElementById('import-text').value = ''; document.getElementById('ai-result-text').value = ''; document.getElementById('import-id').value = ''; document.getElementById('import-client-role').value = 'desconhecido'; this.tempParsedData = null; this.closeModal('modal-import'); this.navigate('updates'); this.backToStep1();
@@ -1439,40 +1476,55 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
             viewPublication(id) {
                 const pub = this.data.updates.find(u => u.id === id); if(!pub) return; const b = pub.analysis.blocks || {}; 
+                
+                // FUNÇÃO REVISADA PARA APLICAR A COR AZUL/PRETO IGUAL À VISÃO ESTRATÉGICA
                 const formatBlock = (text, keyName) => { 
                     if(!text) return '-'; 
                     text = this.cleanBlockText(text, keyName);
-                    return text.replace(/^([^:\n]+):/gm, '<span style="color:var(--primary); font-weight:700;">$1:</span>'); 
+                    
+                    let formatted = '';
+                    let lines = text.split('\n');
+                    for(let l of lines) {
+                        let match = l.match(/^([^:]+):(.*)/);
+                        if(match) {
+                            if(formatted !== '') formatted += '</span></div>';
+                            formatted += `<div class="strat-row"><span class="strat-label">${match[1]}:</span><span class="strat-value">${match[2]}`;
+                        } else {
+                            if(formatted !== '') formatted += '<br>' + l;
+                            else formatted += l;
+                        }
+                    }
+                    if(formatted !== '') formatted += '</span></div>';
+                    return formatted || text;
                 };
                 
-                // Aplicada a mesma lógica de Accordeon na view da publicação
                 const summaryHtml = `
                     <div style="display:flex; flex-direction:column; gap:15px;">
                         <div class="analysis-grid">
-                            <div class="analysis-item"><span class="analysis-label">1️⃣ Identificação</span><span class="analysis-val">${formatBlock(b.b1, "Identificação") || pub.analysis.caseNumber || '-'}</span></div>
-                            <div class="analysis-item"><span class="analysis-label">2️⃣ Partes</span><span class="analysis-val">${formatBlock(b.b2, "Partes") || '-'}</span></div>
-                            <div class="analysis-item"><span class="analysis-label">3️⃣ Natureza</span><span class="analysis-val">${formatBlock(b.b3, "Natureza") || pub.analysis.type}</span></div>
-                            <div class="analysis-item"><span class="analysis-label">4️⃣ Resumo</span><span class="analysis-val">${formatBlock(b.b4, "Resumo") || '-'}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">1️⃣ Identificação</span><div class="analysis-val">${formatBlock(b.b1, "Identificação")}</div></div>
+                            <div class="analysis-item"><span class="analysis-label">2️⃣ Partes</span><div class="analysis-val">${formatBlock(b.b2, "Partes")}</div></div>
+                            <div class="analysis-item"><span class="analysis-label">3️⃣ Natureza</span><div class="analysis-val">${formatBlock(b.b3, "Natureza")}</div></div>
+                            <div class="analysis-item"><span class="analysis-label">4️⃣ Resumo</span><div class="analysis-val">${formatBlock(b.b4, "Resumo")}</div></div>
                         </div>
                         
                         <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0;">
                             <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">5️⃣ Determinações do Juiz</span></div>
-                            <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b5, "Determinações")}</div></div>
+                            <div class="strat-content"><div>${formatBlock(b.b5, "Determinações")}</div></div>
                         </div>
                         
                         <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0;">
                             <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">6️⃣ Pedidos e Recursos</span></div>
-                            <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b6, "Pedidos e Recursos")}</div></div>
+                            <div class="strat-content"><div>${formatBlock(b.b6, "Pedidos e Recursos")}</div></div>
                         </div>
                         
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
                             <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0; border-top: 4px solid var(--danger);">
                                 <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="color:var(--danger); margin:0;">7️⃣ Prazo Fatal</span></div>
-                                <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b7, "Prazo Fatal")}</div></div>
+                                <div class="strat-content"><div>${formatBlock(b.b7, "Prazo Fatal")}</div></div>
                             </div>
                             <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0; border-top: 4px solid var(--info);">
                                 <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">8️⃣ Próximo Cenário</span></div>
-                                <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b8, "Próximo Cenário")}</div></div>
+                                <div class="strat-content"><div>${formatBlock(b.b8, "Próximo Cenário")}</div></div>
                             </div>
                         </div>
                         
@@ -1482,13 +1534,12 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 document.getElementById('pub-view-summary').innerHTML = summaryHtml; 
                 document.getElementById('pub-view-text').innerText = pub.rawText || 'Texto original não salvo.'; 
                 
-                document.getElementById('pub-view-extra-actions').innerHTML = ''; // Limpar botão de editar q pertence à análise completa
-                document.getElementById('pub-view-action-btn').style.display = 'block'; // Mostrar botão de prazo
+                document.getElementById('pub-view-extra-actions').innerHTML = ''; 
+                document.getElementById('pub-view-action-btn').style.display = 'block'; 
                 
                 const btn = document.getElementById('pub-view-action-btn'); 
                 btn.onclick = () => { 
                     this.closeModal('modal-publication-view'); 
-                    // Tentar extrair data para preencher no botão "Ir para prazos" da visualização também
                     let extractedDeadline = '';
                     if(b.b7) {
                         let m = b.b7.match(/Data final exata:\s*(\d{2}\/\d{2}\/\d{4})/i);
@@ -1516,7 +1567,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 }); 
             },
 
-            // NOVA FUNÇÃO RENDERIZAÇÃO ESTRATÉGIAS
             renderAnalyses() {
                 const cList = document.getElementById('analyses-list-full'); cList.innerHTML = '';
                 let analysesArr = [];
@@ -1535,7 +1585,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 analysesArr.forEach(item => {
                     const c = item.caseData;
                     const fa = item.analysis;
-                    // Tentar extrair o bloco 9 para resumo rápido
                     const b9Match = fa.text.match(/9️⃣([^\n]*(?:\n[^\n]*)*)/);
                     const b9Resumo = b9Match ? b9Match[1].replace(/Resumo Estratégico para Auxiliar Minha Advogada/i, '').trim() : 'Clique para ver a análise completa';
                     
@@ -1612,7 +1661,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
             openModal(id, dataId = null, extraDate = null) { 
                 document.getElementById(id).classList.add('active'); const form = document.querySelector(`#${id} form`); if(form) form.reset(); 
                 
-                // Aplicar data extra se enviada via análise importada
                 if (extraDate && id === 'modal-deadline') {
                     document.querySelector('#modal-deadline [name="date"]').value = extraDate;
                 }
@@ -1655,7 +1703,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 this.closeModal('modal-deadline'); 
                 this.navigate('deadlines'); 
 
-                // Evento Google Agenda
                 if(confirm('Prazo salvo! Deseja criar um evento ou tarefa no Google Agenda?')) {
                     const cRef = this.data.cases.find(x => x.id == parseInt(cid));
                     const clientName = cRef ? cRef.client : "Processo";
@@ -1723,7 +1770,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 
                 if(c.full_analyses) {
                     c.full_analyses.forEach(fa => {
-                        // Ícone do cérebro adicionado para o diagnóstico estratégico
                         timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Clique para ver a análise completa', id: null, originalId: fa.id});
                     });
                 }
@@ -1765,7 +1811,6 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                             
                             if (t.type === 'analysis') {
                                 clickAct = `onclick="app.viewStrategicAnalysis(${c.id}, ${t.originalId})" style="cursor:pointer;"`;
-                                // Ícone do Cérebro aqui
                                 return `<div class="ft-item" ${clickAct}><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`;
                             }
                             return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; 
