@@ -58,7 +58,6 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
-        /* Correção Dark Mode Específica */
         body.dark-mode .pub-full-text {
             color: var(--text-main); 
             border-color: var(--border-color);
@@ -70,55 +69,61 @@
             color: #fcd34d;
         }
 
-        /* ESTILOS PARA ACCORDION (EXPANSIVO) */
-        .accordion-item {
-            background: var(--bg-body);
+        /* ESTILOS PARA VISUALIZAÇÃO ESTRATÉGICA (ITEM 1 E EXPANSIVO) */
+        .strat-block-container {
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            margin-bottom: 8px;
-            overflow: hidden;
-            transition: var(--transition);
+            padding: 16px;
+            margin-bottom: 16px;
         }
-        .accordion-header {
-            padding: 14px 16px;
-            cursor: pointer;
+        
+        .strat-header {
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 0;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: 700;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            background: var(--bg-surface);
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            cursor: pointer;
             user-select: none;
         }
-        .accordion-header:hover {
-            background: rgba(79, 70, 229, 0.05);
+        
+        .strat-header::after {
+            content: '▼';
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
         }
-        .accordion-content {
-            padding: 0 16px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease;
-            opacity: 0;
+        .strat-header.collapsed::after {
+            transform: rotate(-90deg);
         }
-        .accordion-item.open .accordion-content {
-            padding: 16px;
-            max-height: 2000px; /* Valor alto para permitir conteúdo longo */
-            opacity: 1;
-            border-top: 1px solid var(--border-color);
+        .strat-content {
+            margin-top: 12px;
+            display: block;
         }
-        .accordion-icon {
-            transition: transform 0.3s;
-            font-size: 0.8rem;
+        .strat-content.collapsed {
+            display: none;
+        }
+        
+        .strat-row {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .strat-label {
+            font-weight: 700;
             color: var(--text-secondary);
+            display: block;
+            font-size: 0.8rem;
         }
-        .accordion-item.open .accordion-icon {
-            transform: rotate(180deg);
+        .strat-value {
+            color: var(--text-main);
         }
-
-        /* Reutilizando estilos da análise para manter consistência */
-        .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
-        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; line-height: 1.5; margin-bottom: 12px; display:block; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
@@ -146,8 +151,6 @@
             transition: background-color 0.3s, border-color 0.3s;
             height: 70px; 
             z-index: 40;
-            position: sticky;
-            top: 0;
         }
 
         .topbar-main-row {
@@ -244,7 +247,8 @@
 
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem; margin-bottom: 20px; }
         .analysis-item { display: flex; flex-direction: column; background: var(--bg-body); padding: 12px; border-radius: var(--radius-md); }
-        /* styles for analysis-label and analysis-val moved to global scope for reuse */
+        .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap; word-break: break-word; }
         .client-summary-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: var(--radius-md); margin-top: 10px; font-size: 0.95rem; color: #b45309; line-height: 1.5; font-style: italic;}
         
         .full-timeline { position: relative; margin-top: 2rem; }
@@ -269,7 +273,6 @@
         .modal-content { background: var(--bg-surface); padding: 32px; border-radius: var(--radius-xl); width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .pub-view-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        /* Correção Item 3 e Dark Mode (Item 2) */
         .pub-full-text { background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border-color); word-break: break-word; }
         
         .menu-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; box-shadow: var(--shadow-lg); z-index: 100; font-size: 24px; align-items: center; justify-content: center; border: none; }
@@ -285,20 +288,17 @@
             .menu-toggle { display: flex; bottom: 20px; } 
             .calendar-widget { grid-template-columns: 1fr; } 
             
-            /* Correção Item 1: Painel Superior Mobile Escondido */
             .app-topbar { 
                 padding: 10px 16px; 
                 height: auto;
                 min-height: 70px;
                 padding-top: calc(10px + env(safe-area-inset-top)); 
-                justify-content: flex-start; /* Ajustado para não esconder o título */
-                position: sticky; /* Fix para não sumir no scroll */
+                justify-content: flex-start; 
+                position: sticky; 
                 top: 0;
             }
-            /* Garantir largura total para o conteúdo interno */
             .topbar-main-row { width: 100%; }
 
-            /* Correção Item 3: Visão Estratégica (Grid) */
             .analysis-grid { grid-template-columns: 1fr; } 
             
             .content-scroll { padding: 16px; }
@@ -317,9 +317,8 @@
             .card { padding: 10px; margin-bottom: 16px; border-radius: var(--radius-md); overflow-x: hidden; }
             .calendar-widget { display: flex; flex-direction: column-reverse; gap: 16px; }
             
-            /* RESET DE TABELAS PARA CARD GRID */
             table, thead, tbody, th, td, tr { display: block; width: 100%; border: none; }
-            thead { display: none; } /* Esconde cabeçalho */
+            thead { display: none; } 
             
             tr { 
                 background: var(--bg-surface);
@@ -343,87 +342,71 @@
                 min-height: auto;
             }
             
-            td::before { content: none !important; } /* Remove labels antigos */
+            td::before { content: none !important; }
 
-            /* --- OTIMIZAÇÃO ESPECÍFICA POR TELA (LAYOUT 2x2 OU PERSONALIZADO) --- */
-
-            /* 1. CLIENTES (Layout: Nome topo, Pos/Proc, Val/Ações) */
             #clients-table-body tr { grid-template-areas: "name name" "role count" "val act"; }
-            #clients-table-body td:nth-child(1) { grid-area: name; font-weight: 800; font-size: 1rem; margin-bottom: 6px; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } /* Nome */
-            #clients-table-body td:nth-child(2) { grid-area: role; font-size: 0.8rem; color: var(--text-secondary); } /* Posição */
-            #clients-table-body td:nth-child(3) { grid-area: count; justify-content: flex-end; } /* Processos */
-            #clients-table-body td:nth-child(4) { grid-area: val; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-top: 4px; } /* Valor */
-            #clients-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; margin-top: 4px; } /* Ações */
+            #clients-table-body td:nth-child(1) { grid-area: name; font-weight: 800; font-size: 1rem; margin-bottom: 6px; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } 
+            #clients-table-body td:nth-child(2) { grid-area: role; font-size: 0.8rem; color: var(--text-secondary); } 
+            #clients-table-body td:nth-child(3) { grid-area: count; justify-content: flex-end; } 
+            #clients-table-body td:nth-child(4) { grid-area: val; font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-top: 4px; } 
+            #clients-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; margin-top: 4px; } 
 
-            /* 2. PROCESSOS (Layout: Cliente topo, Num/Status, Area/Ações) */
             #cases-table-body tr { grid-template-areas: "num num" "client status" "area act"; }
-            #cases-table-body td:nth-child(1) { grid-area: num; font-family: monospace; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; } /* Numero */
-            #cases-table-body td:nth-child(2) { grid-area: client; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; padding-right: 5px; } /* Cliente */
-            #cases-table-body td:nth-child(3) { grid-area: area; color: var(--text-secondary); font-size: 0.8rem; } /* Area */
-            #cases-table-body td:nth-child(4) { grid-area: status; justify-content: flex-end; } /* Status */
-            #cases-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } /* Ações */
+            #cases-table-body td:nth-child(1) { grid-area: num; font-family: monospace; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; } 
+            #cases-table-body td:nth-child(2) { grid-area: client; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; padding-right: 5px; } 
+            #cases-table-body td:nth-child(3) { grid-area: area; color: var(--text-secondary); font-size: 0.8rem; } 
+            #cases-table-body td:nth-child(4) { grid-area: status; justify-content: flex-end; } 
+            #cases-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } 
 
-            /* 3. PRAZOS (Layout: Data destaque, Tipo, Cliente/Status, Ações) */
             #deadlines-table-body tr { grid-template-areas: "date type" "proc proc" "status act"; }
-            #deadlines-table-body td:nth-child(1) { grid-area: date; font-weight: 800; font-size: 0.95rem; } /* Data */
-            #deadlines-table-body td:nth-child(2) { grid-area: type; justify-content: flex-end; } /* Tipo badge */
-            #deadlines-table-body td:nth-child(3) { grid-area: proc; font-size: 0.85rem; color: var(--text-main); margin: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } /* Processo */
-            #deadlines-table-body td:nth-child(4) { grid-area: status; } /* Status badge */
-            #deadlines-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } /* Ações */
+            #deadlines-table-body td:nth-child(1) { grid-area: date; font-weight: 800; font-size: 0.95rem; } 
+            #deadlines-table-body td:nth-child(2) { grid-area: type; justify-content: flex-end; } 
+            #deadlines-table-body td:nth-child(3) { grid-area: proc; font-size: 0.85rem; color: var(--text-main); margin: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } 
+            #deadlines-table-body td:nth-child(4) { grid-area: status; } 
+            #deadlines-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } 
 
-            /* 4. TAREFAS (Layout: Prioridade/Data, Desc, Vinculo/Ações) */
             #tasks-table-body tr { grid-template-areas: "desc desc" "date prio" "link act"; }
-            #tasks-table-body td:nth-child(1) { grid-area: prio; justify-content: flex-end; } /* Prioridade */
-            #tasks-table-body td:nth-child(2) { grid-area: desc; font-weight: 600; margin-bottom: 4px; } /* Descrição */
-            #tasks-table-body td:nth-child(3) { grid-area: link; font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } /* Vinculo */
-            #tasks-table-body td:nth-child(4) { grid-area: date; font-size: 0.85rem; } /* Data */
-            #tasks-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } /* Ações */
+            #tasks-table-body td:nth-child(1) { grid-area: prio; justify-content: flex-end; } 
+            #tasks-table-body td:nth-child(2) { grid-area: desc; font-weight: 600; margin-bottom: 4px; } 
+            #tasks-table-body td:nth-child(3) { grid-area: link; font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; } 
+            #tasks-table-body td:nth-child(4) { grid-area: date; font-size: 0.85rem; } 
+            #tasks-table-body td:nth-child(5) { grid-area: act; justify-content: flex-end; } 
 
-            /* 5. FINANCEIRO (Layout Simples) */
             #finance-ledger-body tr, #finance-table-body tr { display: flex !important; flex-direction: column; gap: 6px; }
             #finance-ledger-body td, #finance-table-body td { width: 100%; justify-content: space-between; }
             
-            /* Ajustes Gerais Mobile */
             .badge { padding: 4px 8px; font-size: 0.7rem; }
             .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
             .sort-select { padding: 6px; font-size: 0.75rem; border-radius: 6px; }
 
-            /* Modais Otimizados */
             .modal-content { padding: 16px !important; width: 95% !important; border-radius: 16px !important; overflow-y: auto; max-height: 95vh; }
             .modal h3 { font-size: 1.1rem !important; margin: 0 !important; }
             .modal .flex-between { margin-bottom: 12px !important; }
             .flex-gap { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; flex-direction: row !important; }
             .mobile-full { grid-column: span 2; }
             
-            /* Inputs Compactos */
             .modal input, .modal select, .modal textarea { padding: 0 10px !important; height: 38px !important; font-size: 0.9rem !important; margin-bottom: 8px !important; border-radius: 8px !important; }
             .modal textarea { height: 60px !important; padding-top: 8px !important; }
             .modal label { font-size: 0.7rem !important; margin-bottom: 2px !important; text-transform: uppercase; color: var(--text-secondary); }
             
-            /* Ajustes Modal Processo */
             #modal-case form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
             #modal-case form > div { margin: 0 !important; }
             #modal-case .flex-gap { display: contents !important; }
             #modal-case input[name="client"], #modal-case input[name="opponent"], #modal-case input[name="lawyer"], #modal-case textarea[name="obs"], #modal-case button { grid-column: span 2; }
 
-            /* =======================================================
-               ESTILOS ESPECÍFICOS PARA DETALHES DO PROCESSO (MOBILE)
-               Correção solicitada: Limpeza, alinhamento e tipografia
-            ======================================================= */
             .case-detail-card { 
                 padding: 0; 
                 background: transparent; 
                 box-shadow: none; 
                 border: none; 
                 margin-bottom: 24px; 
-                margin-top: 10px; /* Respiro superior */
+                margin-top: 10px;
             }
             
-            /* Novo Cabeçalho do Processo Otimizado */
             .case-header-optimized {
                 display: flex;
                 justify-content: space-between;
-                align-items: center; /* Alinha verticalmente no centro */
+                align-items: center; 
                 padding-bottom: 16px;
                 border-bottom: 1px solid var(--border-color);
                 margin-bottom: 20px;
@@ -434,8 +417,8 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                flex: 1; /* Ocupa o espaço disponível */
-                min-width: 0; /* Permite ellipsis */
+                flex: 1;
+                min-width: 0; 
             }
 
             .case-number-label {
@@ -448,17 +431,16 @@
             }
 
             .case-number-main {
-                font-family: 'Courier New', Courier, monospace; /* Tipografia jurídica */
-                font-size: 1rem; /* Tamanho controlado */
-                font-weight: 600; /* Peso médio/leve */
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 1rem; 
+                font-weight: 600; 
                 color: var(--text-main);
                 letter-spacing: -0.5px;
                 line-height: 1.2;
-                white-space: normal; /* Permite quebra se necessário */
-                word-break: break-all; /* Quebra em telas muito pequenas */
+                white-space: normal; 
+                word-break: break-all;
             }
             
-            /* Grid de Informações 2x2 */
             .case-info-grid { 
                 display: grid; 
                 grid-template-columns: 1fr 1fr; 
@@ -520,7 +502,7 @@
             .btn-group-mobile button { 
                 width: 100%; 
                 margin: 0; 
-                height: 48px; /* Botão mais alto para toque */
+                height: 48px; 
             }
         }
 
@@ -544,8 +526,8 @@
         <nav>
             <button onclick="app.navigate('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</button>
             <button onclick="app.navigate('updates')" id="nav-updates">📢 Publicações</button>
+            <button onclick="app.navigate('analyses')" id="nav-analyses">🧠 Estratégias</button>
             <button onclick="app.navigate('cases')" id="nav-cases">⚖️ Processos</button>
-            <button onclick="app.navigate('strategies')" id="nav-strategies">🧠 Estratégia</button>
             <button onclick="app.navigate('clients')" id="nav-clients">👥 Clientes</button>
             <button onclick="app.navigate('deadlines')" id="nav-deadlines">⏳ Prazos</button>
             <button onclick="app.navigate('tasks')" id="nav-tasks">📝 Tarefas</button>
@@ -637,15 +619,15 @@
                 </div>
                 <div id="updates-list-full"></div>
             </section>
-
-            <section id="view-strategies" class="hidden">
+            
+            <section id="view-analyses" class="hidden">
                 <div class="dash-header">
-                    <div><h2>Central Estratégica</h2><p style="color:var(--text-secondary); margin-top:4px;">Diagnósticos e análises de autos.</p></div>
+                    <div><h2>Análises Estratégicas</h2><p style="color:var(--text-secondary); margin-top:4px;">Diagnósticos de autos completos.</p></div>
                     <div class="quick-actions" style="display:flex; gap:10px; align-items:center;">
-                        <button class="btn btn-primary" onclick="app.openFullAnalysisModal()">🧠 Nova Análise</button>
+                        <button class="btn btn-primary" onclick="app.openFullAnalysisModal()">✨ Nova Análise</button>
                     </div>
                 </div>
-                <div id="strategies-list-full"></div>
+                <div id="analyses-list-full"></div>
             </section>
 
             <section id="view-clients" class="hidden">
@@ -785,10 +767,10 @@
 
                     <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
                         <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('gemini')">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0001 0.354126C12.0001 0.354126 12.3789 7.74971 18.0001 11.2501C18.0001 11.2501 11.854 12.8727 12.0001 23.646C12.0001 23.646 11.6212 16.2505 6.00007 12.75C6.00007 12.75 12.1462 11.1274 12.0001 0.354126Z"/></svg> Gemini
                         </button>
                         <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('chatgpt')">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A6.0651 6.0651 0 0 0 19.0193 19.82a5.9847 5.9847 0 0 0 3.9977-2.9 6.0462 6.0462 0 0 0-.735-7.0988zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.8956zm16.0993 3.8558L12.604 8.3829V3.8105a.0757.0757 0 0 1 .0332-.0615l4.83-2.7866a4.504 4.504 0 0 1 6.136 1.6464 4.4708 4.4708 0 0 1 .5346 3.0137l-.1419-.0852-4.783-2.7582a.7712.7712 0 0 0-.7806 0zM8.4065 5.394C8.8253 4.0967 10.0461 3.2 11.411 3.2h.023l-.1419.0804-4.7783 2.7582a.7948.7948 0 0 0-.3927.6813v6.7369l-2.02-1.1686a.071.071 0 0 1-.038-.052V6.6528a4.504 4.504 0 0 1 4.3434-1.2588zm2.3438 6.2624l-2.5126-1.4503V7.3054l2.5126-1.4503 2.5126 1.4503v2.9007z"/></svg> ChatGPT
                         </button>
                     </div>
 
@@ -815,35 +797,35 @@
 
         <div id="modal-full-analysis" class="modal">
             <div class="modal-content">
-                <div class="flex-between" style="margin-bottom:20px;"><h3>Análise Completa de Autos</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-full-analysis')">✕</button></div>
-                <input type="hidden" id="full-analysis-edit-id"> 
+                <div class="flex-between" style="margin-bottom:20px;"><h3>Análise Completa de Autos</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-full-analysis'); app.editAnalysisId=null;">✕</button></div>
                 
-                <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Texto ou Processo</label>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Selecione um processo cadastrado para incluir o histórico ou cole o texto.</p>
-                
-                <label>Carregar Histórico do Processo</label>
-                <select id="full-analysis-case-select" onchange="app.loadCaseContext()" style="margin-bottom:10px;">
-                    <option value="">-- Selecione ou use texto avulso --</option>
-                </select>
+                <div id="full-analysis-step-1">
+                    <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Texto ou Processo</label>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Selecione um processo cadastrado para incluir o histórico ou cole o texto.</p>
+                    
+                    <label>Carregar Histórico do Processo</label>
+                    <select id="full-analysis-case-select" onchange="app.loadCaseContext()" style="margin-bottom:10px;">
+                        <option value="">-- Selecione ou use texto avulso --</option>
+                    </select>
 
-                <label>Meu Cliente é:</label>
-                <select id="full-analysis-role" style="margin-bottom:10px;">
-                    <option value="autor">Autor / Reclamante</option>
-                    <option value="reu">Réu / Reclamado</option>
-                </select>
+                    <label>Meu Cliente é:</label>
+                    <select id="full-analysis-role" style="margin-bottom:10px;">
+                        <option value="autor">Autor / Reclamante</option>
+                        <option value="reu">Réu / Reclamado</option>
+                    </select>
 
-                <textarea id="full-analysis-text" rows="5" placeholder="Cole o texto do processo ou histórico aqui..."></textarea>
+                    <textarea id="full-analysis-text" rows="5" placeholder="Cole o texto do processo ou histórico aqui..."></textarea>
 
-                <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
-                    <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('chatgpt')">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
-                    </button>
+                    <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
+                        <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.0001 0.354126C12.0001 0.354126 12.3789 7.74971 18.0001 11.2501C18.0001 11.2501 11.854 12.8727 12.0001 23.646C12.0001 23.646 11.6212 16.2505 6.00007 12.75C6.00007 12.75 12.1462 11.1274 12.0001 0.354126Z"/></svg> Gemini
+                        </button>
+                        <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('chatgpt')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A6.0651 6.0651 0 0 0 19.0193 19.82a5.9847 5.9847 0 0 0 3.9977-2.9 6.0462 6.0462 0 0 0-.735-7.0988zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.8956zm16.0993 3.8558L12.604 8.3829V3.8105a.0757.0757 0 0 1 .0332-.0615l4.83-2.7866a4.504 4.504 0 0 1 6.136 1.6464 4.4708 4.4708 0 0 1 .5346 3.0137l-.1419-.0852-4.783-2.7582a.7712.7712 0 0 0-.7806 0zM8.4065 5.394C8.8253 4.0967 10.0461 3.2 11.411 3.2h.023l-.1419.0804-4.7783 2.7582a.7948.7948 0 0 0-.3927.6813v6.7369l-2.02-1.1686a.071.071 0 0 1-.038-.052V6.6528a4.504 4.504 0 0 1 4.3434-1.2588zm2.3438 6.2624l-2.5126-1.4503V7.3054l2.5126-1.4503 2.5126 1.4503v2.9007z"/></svg> ChatGPT
+                        </button>
+                    </div>
+                    <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
                 </div>
-
-                <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
                 
                 <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 2: Resultado da Análise</label>
                 <textarea id="full-analysis-result" rows="8" placeholder="Cole aqui a análise estratégica gerada pela IA..."></textarea>
@@ -857,12 +839,12 @@
                 <div class="pub-view-grid">
                     <div id="pub-view-summary"></div>
                     <div style="margin-top:20px;">
-                        <label>Texto Original:</label>
+                        <label>Texto Original Diário Oficial:</label>
                         <div class="pub-full-text" id="pub-view-text"></div>
                     </div>
                 </div>
-                <div style="margin-top:20px; text-align:right; border-top:1px solid var(--border-color); padding-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                    <button class="btn btn-outline" id="pub-view-edit-btn" style="display:none;">✏️ Editar Análise</button>
+                <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border-color); padding-top:20px;">
+                    <div id="pub-view-extra-actions"></div>
                     <button class="btn btn-primary" id="pub-view-action-btn">📅 Ir para Prazos</button>
                 </div>
             </div>
@@ -898,12 +880,6 @@
                     <div id="case-selector-container"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div>
                     <label>Tipo</label><input type="text" name="type" required>
                     <div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div>
-                    
-                    <div style="margin-top:15px; margin-bottom:5px; padding:10px; background:var(--bg-body); border-radius:var(--radius-md); display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" name="googleCalendar" id="gcal-check" style="width:auto; margin:0;">
-                        <label for="gcal-check" style="margin:0; font-weight:500; cursor:pointer;">Criar evento no Google Agenda 📅</label>
-                    </div>
-
                     <button class="btn btn-primary" style="width:100%; margin-top:5px;">Salvar Prazo</button>
                 </form>
             </div>
@@ -936,6 +912,7 @@
             currentStatusId: null,
             tempParsedData: null,
             isDragging: false,
+            editAnalysisId: null,
 
             init() {
                 this.loadData();
@@ -990,11 +967,26 @@
             saveProfilePic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { this.data.settings.profilePic = event.target.result; this.saveToStorage(); this.updateGreeting(); }; reader.readAsDataURL(file); },
             removeProfilePic() { this.data.settings.profilePic = null; document.getElementById('settings-profile-pic').value = ''; this.saveToStorage(); this.updateGreeting(); },
 
+            cleanBlockText(text, keywordFilter) {
+                if(!text) return '-';
+                // Remove the first line if it looks like a repeating title from the AI (e.g., "1 Diagnostico geral")
+                const lines = text.split('\n');
+                if(lines.length > 1) {
+                    const firstLineLower = lines[0].toLowerCase();
+                    if(firstLineLower.includes(keywordFilter.toLowerCase()) || 
+                       /^(?:\d️⃣|\d\.?)\s*(diagnóstico|análise|postura|resumo|cenário|oportunidades|pedidos|determinações|natureza|partes)/i.test(firstLineLower)) {
+                        lines.shift();
+                    }
+                }
+                return lines.join('\n').trim();
+            },
+
             analyzeWithAI(platform) {
                 const textToAnalyze = document.getElementById('import-text').value;
                 if (!textToAnalyze || !textToAnalyze.trim()) { alert('⚠️ Cole o texto da publicação no Passo 1 primeiro.'); return; }
                 
                 const roleFromImport = document.getElementById('import-client-role').value;
+                
                 let specificClientInstruction = "Se meu cliente é o RÉU/RECLAMADO ou AUTOR/RECLAMANTE";
                 if(roleFromImport === 'autor') specificClientInstruction = "Meu cliente é o AUTOR/RECLAMANTE";
                 if(roleFromImport === 'reu') specificClientInstruction = "Meu cliente é o RÉU/RECLAMADO";
@@ -1011,7 +1003,7 @@ A contagem deve:
 	•	Considerar a data de disponibilização e a data de publicação quando aplicável.
 	•	Indicar corretamente o termo inicial.
 	•	Desconsiderar feriados apenas se houver informação expressa.
-	•	Indicar a DATA FINAL EXATA (prazo fatal).
+	•	Indicar a DATA FINAL EXATA (prazo fatal). No formato DD/MM/AAAA.
 Exemplo: Se a publicação ocorreu em 19/02, informe exatamente qual é o último dia para recurso segundo a lei vigente aplicável ao caso.
 
 ⚠️ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
@@ -1079,22 +1071,29 @@ ${textToAnalyze}`;
 
                 navigator.clipboard.writeText(geminiPrompt).then(() => { 
                     alert(`✅ Prompt copiado com sucesso!\n\nEstou abrindo o ${platform === 'gemini' ? 'Gemini' : 'ChatGPT'}. Cole o texto lá (Ctrl+V), aguarde a resposta e copie o resultado de volta para o Passo 2.`); 
-                    if(platform === 'gemini') { window.open('https://gemini.google.com/app', '_blank'); } else { window.open('https://chatgpt.com', '_blank'); }
-                }).catch(err => { console.error('Falha ao copiar:', err); alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); });
+                    
+                    if(platform === 'gemini') {
+                        window.open('https://gemini.google.com/app', '_blank'); 
+                    } else {
+                        window.open('https://chatgpt.com', '_blank'); 
+                    }
+                }).catch(err => { 
+                    console.error('Falha ao copiar:', err); 
+                    alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); 
+                });
             },
 
-            openFullAnalysisModal(existingId = null, existingText = '') {
+            openFullAnalysisModal() {
+                this.editAnalysisId = null;
                 const sel = document.getElementById('full-analysis-case-select');
                 sel.innerHTML = '<option value="">-- Selecione ou use texto avulso --</option>';
                 this.data.cases.forEach(c => {
                     sel.add(new Option(`${c.client} - ${c.number}`, c.id));
                 });
                 
-                // Reset ou Preenchimento para Edição
-                document.getElementById('full-analysis-edit-id').value = existingId || '';
-                document.getElementById('full-analysis-result').value = existingText || '';
-                document.getElementById('full-analysis-text').value = ''; 
-                
+                document.getElementById('full-analysis-text').value = '';
+                document.getElementById('full-analysis-result').value = '';
+                document.getElementById('full-analysis-step-1').style.display = 'block';
                 document.getElementById('modal-full-analysis').classList.add('active');
             },
 
@@ -1113,11 +1112,10 @@ ${textToAnalyze}`;
                     updates.forEach(u => {
                         const a = u.analysis || {};
                         const b = a.blocks || {};
-                        // Extrai a visão estratégica (blocos 1-9)
                         const fullStrat = `1️⃣ ${b.b1||''}\n2️⃣ ${b.b2||''}\n3️⃣ ${b.b3||''}\n4️⃣ ${b.b4||''}\n5️⃣ ${b.b5||''}\n6️⃣ ${b.b6||''}\n7️⃣ ${b.b7||''}\n8️⃣ ${b.b8||''}\n9️⃣ ${b.b9||''}`;
                         
                         context += `\n[DATA: ${new Date(u.date).toLocaleDateString()}] - TIPO: ${a.type}\n`;
-                        context += `VISÃO ESTRATÉGICA REGISTRADA:\n${fullStrat}\n`;
+                        context += `ANÁLISE ANTERIOR:\n${fullStrat}\n`;
                         context += `-----------------------------------\n`;
                     });
                 }
@@ -1250,233 +1248,317 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
             saveFullAnalysis() {
                 const analysisText = document.getElementById('full-analysis-result').value;
-                const editId = document.getElementById('full-analysis-edit-id').value;
                 if(!analysisText.trim()) return alert("Cole o resultado da análise antes de salvar.");
 
                 let linkedCaseId = document.getElementById('full-analysis-case-select').value;
                 
-                if (!linkedCaseId) {
+                if (!linkedCaseId && !this.editAnalysisId) {
                     const caseMatch = analysisText.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
                     const caseNum = caseMatch ? caseMatch[0] : null;
                     if (caseNum) {
                         const found = this.data.cases.find(c => c.number === caseNum);
                         if (found) linkedCaseId = found.id;
                     }
-                } else {
+                } else if(linkedCaseId) {
                     linkedCaseId = parseInt(linkedCaseId);
                 }
 
-                if (linkedCaseId) {
-                    const cIndex = this.data.cases.findIndex(c => c.id === linkedCaseId);
-                    if (!this.data.cases[cIndex].full_analyses) this.data.cases[cIndex].full_analyses = [];
+                if (linkedCaseId || this.editAnalysisId) {
                     
-                    if (editId) {
-                        // Modo Edição
-                        const aIndex = this.data.cases[cIndex].full_analyses.findIndex(a => a.id == editId);
-                        if (aIndex > -1) {
-                            this.data.cases[cIndex].full_analyses[aIndex].text = analysisText;
-                            alert(`Análise atualizada com sucesso!`);
+                    if(this.editAnalysisId) {
+                        // Encontrar o processo e a analise para atualizar
+                        for(let c of this.data.cases) {
+                            if(c.full_analyses) {
+                                let fIndex = c.full_analyses.findIndex(fa => fa.id === this.editAnalysisId);
+                                if(fIndex > -1) {
+                                    c.full_analyses[fIndex].text = analysisText;
+                                    linkedCaseId = c.id;
+                                    break;
+                                }
+                            }
                         }
                     } else {
-                        // Novo Registro
+                        const cIndex = this.data.cases.findIndex(c => c.id === linkedCaseId);
+                        if (!this.data.cases[cIndex].full_analyses) this.data.cases[cIndex].full_analyses = [];
+                        
                         this.data.cases[cIndex].full_analyses.push({
                             id: Date.now(),
                             date: new Date().toISOString(),
                             text: analysisText,
                             type: 'strategic_analysis'
                         });
-                        alert(`Análise salva e vinculada ao processo!`);
                     }
+                    
                     this.saveToStorage();
+                    alert(`Análise salva e vinculada ao processo!`);
                     this.closeModal('modal-full-analysis');
-                    this.openCaseDetail(linkedCaseId);
+                    this.editAnalysisId = null;
+                    this.renderAnalyses(); // Atualiza a aba Estratégias
+                    
+                    // Se foi aberto pela ficha do processo, recarrega
+                    if(!document.getElementById('view-case-detail').classList.contains('hidden')) {
+                        this.openCaseDetail(linkedCaseId);
+                    }
                 } else {
                     alert('Não consegui vincular a um processo. Selecione o processo na lista antes de salvar ou certifique-se que o número CNJ consta no texto.');
                 }
             },
 
-            // FUNÇÃO GENÉRICA DE VISUALIZAÇÃO COM ACCORDION E FORMATAÇÃO UNIFICADA
-            toggleAccordion(header) {
-                const item = header.parentElement;
-                item.classList.toggle('open');
+            openEditStrategicAnalysis(caseId, analysisId) {
+                const c = this.data.cases.find(x => x.id === caseId);
+                const item = c.full_analyses.find(a => a.id === analysisId);
+                if(!item) return;
+                
+                this.editAnalysisId = analysisId;
+                document.getElementById('full-analysis-step-1').style.display = 'none'; // Esconde primeiro passo
+                document.getElementById('full-analysis-result').value = item.text;
+                
+                this.closeModal('modal-publication-view'); // Fecha a visão de leitura se estiver aberta
+                document.getElementById('modal-full-analysis').classList.add('active');
             },
 
-            buildAccordionView(rawText, titlesMap, mode) {
-                const extract = (text, current, next) => { 
-                    let regexStr = current + "([\\s\\S]*?)"; 
-                    regexStr += next ? "(?=" + next + "|$)" : "(?=$)"; 
-                    const match = text.match(new RegExp(regexStr)); 
-                    let content = match ? match[1].trim() : '';
-                    
-                    if (content) {
-                        const lines = content.split('\n');
-                        if (lines.length > 0) {
-                            const firstLine = lines[0].trim();
-                            if (firstLine.length < 50 && !firstLine.includes(':')) {
-                                content = lines.slice(1).join('\n').trim();
-                            }
-                        }
-                    }
-                    return content;
-                };
-
-                const formatContent = (text) => {
-                    if (!text) return '<span style="color:var(--text-muted)">Sem dados.</span>';
-                    return text.replace(/^([^:\n]+):/gm, '<span class="analysis-label">$1</span><span class="analysis-val">')
-                               .replace(/$/gm, '</span>');
-                };
-
-                let html = '<div style="display:flex; flex-direction:column;">';
-                for (let i = 1; i <= 9; i++) {
-                    const key = 'b' + i;
-                    const emoji = i + '️⃣';
-                    const nextEmoji = (i+1) + '️⃣';
-                    const nextDelim = i === 9 ? (mode === 'pub' ? '⚖️' : null) : nextEmoji;
-                    
-                    const blockContent = extract(rawText, emoji, nextDelim);
-                    const title = titlesMap[key];
-
-                    html += `<div class="accordion-item ${i===1?'open':''}">
-                                <div class="accordion-header" onclick="app.toggleAccordion(this)">
-                                    ${emoji} ${title}
-                                    <span class="accordion-icon">▼</span>
-                                </div>
-                                <div class="accordion-content">${formatContent(blockContent)}</div>
-                             </div>`;
-                }
-                html += '</div>';
-                return html;
+            toggleStratBlock(el) {
+                el.classList.toggle('collapsed');
+                el.nextElementSibling.classList.toggle('collapsed');
             },
 
-            // Visualização de Publicação (Diário Oficial)
-            viewPublication(id) {
-                const pub = this.data.updates.find(u => u.id === id); if(!pub) return;
-                
-                const titles = {
-                    b1: "Identificação", b2: "Partes", b3: "Natureza",
-                    b4: "Resumo", b5: "Determinações", b6: "Pedidos/Recursos",
-                    b7: "Prazo Fatal", b8: "Próximo Cenário", b9: "Resumo Cliente"
-                };
-
-                let textToParse = pub.rawText;
-                if (pub.analysis && pub.analysis.blocks) {
-                    const b = pub.analysis.blocks;
-                    textToParse = `1️⃣ ${b.b1||''}\n2️⃣ ${b.b2||''}\n3️⃣ ${b.b3||''}\n4️⃣ ${b.b4||''}\n5️⃣ ${b.b5||''}\n6️⃣ ${b.b6||''}\n7️⃣ ${b.b7||''}\n8️⃣ ${b.b8||''}\n9️⃣ ${b.b9||''} ⚖️`;
-                }
-
-                document.getElementById('pub-view-summary').innerHTML = this.buildAccordionView(textToParse, titles, 'pub');
-                document.getElementById('pub-view-text').innerText = pub.rawText || 'Texto original não disponível.';
-                
-                // Configura botão de ação
-                document.getElementById('pub-view-action-btn').onclick = () => { app.closeModal('modal-publication-view'); app.openModal('modal-deadline', pub.caseId); };
-                document.getElementById('pub-view-edit-btn').style.display = 'none'; 
-                
-                document.getElementById('modal-publication-view').classList.add('active');
-            },
-
-            // Visualização de Análise Estratégica (Item 1 e 2)
             viewStrategicAnalysis(caseId, analysisId) {
                 const c = this.data.cases.find(x => x.id === caseId);
                 const item = c.full_analyses.find(a => a.id === analysisId);
                 if (!item) return;
 
-                const titles = {
-                    b1: "Diagnóstico Geral", b2: "Análise das Partes", b3: "Postura do Juiz",
-                    b4: "Análise Técnica", b5: "Recursos Cabíveis", b6: "Simulação de Recurso",
-                    b7: "Oportunidades", b8: "Próximo Cenário", b9: "Resumo para Advogada"
+                const extract = (text, current, next) => { 
+                    let regexStr = current + "([\\s\\S]*?)"; 
+                    regexStr += next ? "(?=" + next + "|$)" : "(?=$)"; 
+                    const match = text.match(new RegExp(regexStr)); 
+                    if(match) return match[1].trim(); 
+                    return ''; 
                 };
 
-                document.getElementById('pub-view-summary').innerHTML = this.buildAccordionView(item.text, titles, 'strat');
+                const blocks = {
+                    b1: extract(item.text, '1️⃣', '2️⃣'),
+                    b2: extract(item.text, '2️⃣', '3️⃣'),
+                    b3: extract(item.text, '3️⃣', '4️⃣'),
+                    b4: extract(item.text, '4️⃣', '5️⃣'),
+                    b5: extract(item.text, '5️⃣', '6️⃣'),
+                    b6: extract(item.text, '6️⃣', '7️⃣'),
+                    b7: extract(item.text, '7️⃣', '8️⃣'),
+                    b8: extract(item.text, '8️⃣', '9️⃣'),
+                    b9: extract(item.text, '9️⃣', null)
+                };
+
+                const titles = {
+                    b1: "1️⃣ Diagnóstico Geral", b2: "2️⃣ Análise das Partes", b3: "3️⃣ Postura do Juiz",
+                    b4: "4️⃣ Análise Técnica", b5: "5️⃣ Recursos Cabíveis", b6: "6️⃣ Simulação de Recurso",
+                    b7: "7️⃣ Oportunidades", b8: "8️⃣ Próximo Cenário", b9: "9️⃣ Resumo para Advogada"
+                };
+
+                const formatContent = (text, key) => {
+                    if (!text) return '<span style="color:var(--text-muted)">Sem dados.</span>';
+                    // Remove título duplicado usando função de limpeza
+                    text = this.cleanBlockText(text, titles[key].substring(4));
+                    return text.replace(/^([^:\n]+):/gm, '<div class="strat-row"><span class="strat-label">$1</span><span class="strat-value">')
+                               .replace(/$/gm, '</span></div>');
+                };
+
+                let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+                for (let i = 1; i <= 9; i++) {
+                    let key = 'b' + i;
+                    // Acordeon default abertos no começo para primeira visualização (tirar 'collapsed' das classes)
+                    html += `<div class="strat-block-container" style="padding:10px 16px;">
+                                <div class="strat-header" onclick="app.toggleStratBlock(this)">${titles[key]}</div>
+                                <div class="strat-content">${formatContent(blocks[key], key)}</div>
+                             </div>`;
+                }
+                html += '</div>';
+
+                document.getElementById('pub-view-summary').innerHTML = html;
                 document.getElementById('pub-view-text').innerText = item.text; 
                 
-                // Configura botão de edição (Item 4)
-                const editBtn = document.getElementById('pub-view-edit-btn');
-                editBtn.style.display = 'inline-block';
-                editBtn.onclick = () => {
-                    app.closeModal('modal-publication-view');
-                    app.openFullAnalysisModal(item.id, item.text);
-                };
-
-                document.getElementById('pub-view-action-btn').onclick = () => { app.closeModal('modal-publication-view'); };
+                // Botão de Editar Análise
+                const extraActions = document.getElementById('pub-view-extra-actions');
+                extraActions.innerHTML = `<button class="btn btn-outline" onclick="app.openEditStrategicAnalysis(${c.id}, ${item.id})">✏️ Editar Análise</button>`;
+                
+                document.getElementById('pub-view-action-btn').style.display = 'none'; // Esconde botão de ir para prazos
                 document.getElementById('modal-publication-view').classList.add('active');
             },
 
-            renderStrategies() {
-                const container = document.getElementById('strategies-list-full');
-                container.innerHTML = '';
+            parseAIResult() {
+                const aiResult = document.getElementById('ai-result-text').value;
+                const rawImport = document.getElementById('import-text').value;
+                if(!aiResult.trim()) return alert("Cole o resultado gerado pela IA na caixa do Passo 2.");
+                const extract = (current, next) => { let regexStr = current + "([\\s\\S]*?)"; regexStr += next ? "(?=" + next + "|$)" : "(?=$)"; const match = aiResult.match(new RegExp(regexStr)); if(match) { let block = match[1].trim(); block = block.replace(/^[^\n]*\n/, '').replace(/\*\*/g, '').replace(/^\s*[\*\-]\s/gm, '').trim(); return block; } return '-'; };
+                const b1 = extract('1️⃣', '2️⃣'); const b2 = extract('2️⃣', '3️⃣'); const b3 = extract('3️⃣', '4️⃣'); const b4 = extract('4️⃣', '5️⃣'); const b5 = extract('5️⃣', '6️⃣'); const b6 = extract('6️⃣', '7️⃣'); const b7 = extract('7️⃣', '8️⃣'); const b8 = extract('8️⃣', '9️⃣'); const b9 = extract('9️⃣', '⚖️');
+                const caseMatch = (b1 + rawImport).match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+                const caseNum = caseMatch ? caseMatch[0] : '';
+                const autorMatch = b2.match(/Autor:\s*([^\n]+)/i); const reuMatch = b2.match(/Réu:\s*([^\n]+)/i);
+                const extractedAutor = autorMatch ? autorMatch[1].trim() : ''; const extractedReu = reuMatch ? reuMatch[1].trim() : '';
+                const dateMatch = b1.match(/Data de disponibilização:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+                let dispDate = null; if(dateMatch) { dispDate = new Date(`${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}T12:00:00`).toISOString(); }
+                let matchedId = null; if(caseNum) { const found = this.data.cases.find(c => c.number === caseNum); if(found) matchedId = found.id; }
+                const roleFromImport = document.getElementById('import-client-role').value;
+                this.tempParsedData = { rawText: rawImport, caseNumber: caseNum, matchedCaseId: matchedId, extractedAutor: extractedAutor, extractedReu: extractedReu, dispDate: dispDate, type: b3.split('\n')[0].replace('Classificação:', '').trim().substring(0, 40) || 'Ato Judicial', outcome: "Movimentação", blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 }, importRole: roleFromImport };
+                const matchDiv = document.getElementById('match-info');
+                if(matchedId) { matchDiv.innerHTML = `Processo identificado automaticamente na base: <b style="color:var(--text-main)">${caseNum}</b>. Será vinculado ao dossiê.`; } else if(caseNum) { matchDiv.innerHTML = `Processo <b style="color:var(--text-main)">${caseNum}</b> não encontrado na base. Um novo caso será criado com Autor(a): <b style="color:var(--text-main)">${extractedAutor || 'Desconhecido'}</b> e Réu: <b style="color:var(--text-main)">${extractedReu || 'Desconhecido'}</b>.`; } else { matchDiv.innerHTML = `Processo não identificado. Ficará registrado como análise avulsa.`; }
+                document.getElementById('step-1-import').style.display = 'none'; document.getElementById('step-2-import').style.display = 'block';
+            },
+
+            saveParsedImport() {
+                if(!this.tempParsedData) return;
+                let cid = this.tempParsedData.matchedCaseId;
+                if(!cid && this.tempParsedData.caseNumber) {
+                    let defClient = this.tempParsedData.extractedAutor || "Cliente Não Identificado";
+                    let defOpponent = this.tempParsedData.extractedReu || "-";
+                    if (this.tempParsedData.importRole === 'reu') { defClient = this.tempParsedData.extractedReu || "Cliente Não Identificado"; defOpponent = this.tempParsedData.extractedAutor || "-"; }
+                    const newCase = { id: Date.now(), number: this.tempParsedData.caseNumber, client: defClient, client_role: this.tempParsedData.importRole === 'desconhecido' ? 'autor' : this.tempParsedData.importRole, opponent: defOpponent, area: 'Cível', status: 'Em andamento', date_created: new Date().toISOString() };
+                    this.data.cases.push(newCase); cid = newCase.id;
+                }
+                const isEditId = document.getElementById('import-id').value;
+                const updatePayload = { id: isEditId ? parseInt(isEditId) : Date.now(), date: this.tempParsedData.dispDate || new Date().toISOString(), rawText: this.tempParsedData.rawText, caseId: cid, analysis: { caseNumber: this.tempParsedData.caseNumber, type: this.tempParsedData.type, outcome: this.tempParsedData.outcome, blocks: this.tempParsedData.blocks } };
+                if(isEditId) { const idx = this.data.updates.findIndex(u => u.id == isEditId); if(idx > -1) { updatePayload.date = this.tempParsedData.dispDate || this.data.updates[idx].date; this.data.updates[idx] = updatePayload; } } else { this.data.updates.unshift(updatePayload); }
                 
-                let allStrategies = [];
+                // Extrair a Data Fatal do Bloco 7
+                let extractedDeadline = '';
+                const dateRegex = /(\d{2})\/(\d{2})\/(\d{4})/;
+                if(this.tempParsedData.blocks.b7) {
+                    let m = this.tempParsedData.blocks.b7.match(/Data final exata:\s*(\d{2}\/\d{2}\/\d{4})/i);
+                    if(!m) m = this.tempParsedData.blocks.b7.match(dateRegex);
+                    if(m) extractedDeadline = `${m[3]}-${m[2]}-${m[1]}`; // Para preenchimento no campo input[type="date"]
+                }
+                
+                this.saveToStorage(); document.getElementById('import-text').value = ''; document.getElementById('ai-result-text').value = ''; document.getElementById('import-id').value = ''; document.getElementById('import-client-role').value = 'desconhecido'; this.tempParsedData = null; this.closeModal('modal-import'); this.navigate('updates'); this.backToStep1();
+                
+                if(confirm('Deseja agendar um Prazo relacionado a esta publicação agora mesmo?')) { 
+                    this.openModal('modal-deadline', cid, extractedDeadline); 
+                }
+            },
+
+            backToStep1() { document.getElementById('step-1-import').style.display = 'block'; document.getElementById('step-2-import').style.display = 'none'; },
+
+            getOutcomeColor(text, clientRole) { text = (text || '').toLowerCase(); let isPositive = null; if (text.includes('positivo')) return 'style="background:var(--success); color:white;" class="summary-tag"'; if (text.includes('negativo')) return 'style="background:var(--danger); color:white;" class="summary-tag"'; if (/deferi|procedent|provid|acolhid/i.test(text)) isPositive = true; else if (/indeferi|improcedent|improvid|rejeitad/i.test(text)) isPositive = false; if (isPositive === null) return 'class="summary-tag tag-blue"'; let goodForClient = clientRole === 'reu' ? !isPositive : isPositive; return goodForClient ? 'style="background:var(--success); color:white;" class="summary-tag"' : 'style="background:var(--danger); color:white;" class="summary-tag"'; },
+
+            viewPublication(id) {
+                const pub = this.data.updates.find(u => u.id === id); if(!pub) return; const b = pub.analysis.blocks || {}; 
+                const formatBlock = (text, keyName) => { 
+                    if(!text) return '-'; 
+                    text = this.cleanBlockText(text, keyName);
+                    return text.replace(/^([^:\n]+):/gm, '<span style="color:var(--primary); font-weight:700;">$1:</span>'); 
+                };
+                
+                // Aplicada a mesma lógica de Accordeon na view da publicação
+                const summaryHtml = `
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div class="analysis-grid">
+                            <div class="analysis-item"><span class="analysis-label">1️⃣ Identificação</span><span class="analysis-val">${formatBlock(b.b1, "Identificação") || pub.analysis.caseNumber || '-'}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">2️⃣ Partes</span><span class="analysis-val">${formatBlock(b.b2, "Partes") || '-'}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">3️⃣ Natureza</span><span class="analysis-val">${formatBlock(b.b3, "Natureza") || pub.analysis.type}</span></div>
+                            <div class="analysis-item"><span class="analysis-label">4️⃣ Resumo</span><span class="analysis-val">${formatBlock(b.b4, "Resumo") || '-'}</span></div>
+                        </div>
+                        
+                        <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0;">
+                            <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">5️⃣ Determinações do Juiz</span></div>
+                            <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b5, "Determinações")}</div></div>
+                        </div>
+                        
+                        <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0;">
+                            <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">6️⃣ Pedidos e Recursos</span></div>
+                            <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b6, "Pedidos e Recursos")}</div></div>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0; border-top: 4px solid var(--danger);">
+                                <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="color:var(--danger); margin:0;">7️⃣ Prazo Fatal</span></div>
+                                <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b7, "Prazo Fatal")}</div></div>
+                            </div>
+                            <div class="strat-block-container" style="padding:10px 15px; margin-bottom:0; border-top: 4px solid var(--info);">
+                                <div class="strat-header" onclick="app.toggleStratBlock(this)"><span class="analysis-label" style="margin:0;">8️⃣ Próximo Cenário</span></div>
+                                <div class="strat-content"><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b8, "Próximo Cenário")}</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="client-summary-box"><b>9️⃣ Resumo para o Cliente (Copie e envie no WhatsApp):</b><br><br><span style="white-space:pre-wrap; font-style: normal; font-size:1rem; color:var(--text-main);">${(b.b9 || '').replace(/^Resumo:/i, '').trim() || '-'}</span></div>
+                    </div>`;
+                    
+                document.getElementById('pub-view-summary').innerHTML = summaryHtml; 
+                document.getElementById('pub-view-text').innerText = pub.rawText || 'Texto original não salvo.'; 
+                
+                document.getElementById('pub-view-extra-actions').innerHTML = ''; // Limpar botão de editar q pertence à análise completa
+                document.getElementById('pub-view-action-btn').style.display = 'block'; // Mostrar botão de prazo
+                
+                const btn = document.getElementById('pub-view-action-btn'); 
+                btn.onclick = () => { 
+                    this.closeModal('modal-publication-view'); 
+                    // Tentar extrair data para preencher no botão "Ir para prazos" da visualização também
+                    let extractedDeadline = '';
+                    if(b.b7) {
+                        let m = b.b7.match(/Data final exata:\s*(\d{2}\/\d{2}\/\d{4})/i);
+                        if(!m) m = b.b7.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+                        if(m) extractedDeadline = `${m[3]}-${m[2]}-${m[1]}`;
+                    }
+                    this.openModal('modal-deadline', pub.caseId, extractedDeadline); 
+                }; 
+                document.getElementById('modal-publication-view').classList.add('active');
+            },
+
+            editUpdate(id) { const u = this.data.updates.find(x => x.id === id); if(!u) return; document.getElementById('import-id').value = u.id; document.getElementById('import-text').value = u.rawText; const b = u.analysis.blocks; const rebuilt = `1️⃣\n${b.b1}\n2️⃣\n${b.b2}\n3️⃣\n${b.b3}\n4️⃣\n${b.b4}\n5️⃣\n${b.b5}\n6️⃣\n${b.b6}\n7️⃣\n${b.b7}\n8️⃣\n${b.b8}\n9️⃣\n${b.b9}`; document.getElementById('ai-result-text').value = rebuilt; document.getElementById('modal-import').classList.add('active'); },
+            deleteUpdate(id) { if(confirm('Tem certeza que deseja excluir esta publicação do sistema?')) { this.data.updates = this.data.updates.filter(u => u.id !== id); this.saveToStorage(); this.renderUpdatesFull(); } },
+
+            renderUpdatesFull() { 
+                const c = document.getElementById('updates-list-full'); c.innerHTML = ''; 
+                if(this.data.updates.length === 0) { c.innerHTML = '<p style="color:var(--text-muted)">Nenhuma publicação analisada ainda.</p>'; return; }
+                let arr = [...this.data.updates];
+                const sortBy = this.sortState.updates || 'date';
+                if (sortBy === 'name') { arr.sort((a,b) => { let ca = this.data.cases.find(x=>x.id===a.caseId); let cb = this.data.cases.find(x=>x.id===b.caseId); return (ca ? ca.client : 'Z').localeCompare(cb ? cb.client : 'Z'); }); } else { arr.sort((a,b)=>new Date(b.date)-new Date(a.date)); }
+                arr.forEach(u => { 
+                    const a = u.analysis || {}; const caseRef = this.data.cases.find(caseItem => caseItem.id === u.caseId); const clientRole = caseRef ? (caseRef.client_role || 'autor') : 'autor'; const clientName = caseRef ? caseRef.client : "Cliente Não Vinculado";
+                    let outcomeColor = this.getOutcomeColor(a.blocks?.b4 || a.outcome, clientRole); let displayLabel = 'Movimentação'; if (outcomeColor.includes('success')) displayLabel = "Positivo"; if (outcomeColor.includes('danger')) displayLabel = "Negativo";
+                    c.innerHTML += `<div class="smart-summary" onclick="app.viewPublication(${u.id})"><div class="summary-header"><span style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${a.type || 'Ato Judicial'}</span> <span ${outcomeColor}>${displayLabel}</span></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;"><div><b style="color:var(--text-secondary)">Processo:</b> ${a.caseNumber || 'N/A'}</div><div><b style="color:var(--text-secondary)">Cliente:</b> <span style="color:var(--primary); font-weight:600;">${clientName}</span></div><div><b style="color:var(--text-secondary)">Publicado em:</b> ${new Date(u.date).toLocaleDateString('pt-BR')}</div></div><div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-left:4px solid var(--primary); font-size:0.95rem; line-height:1.5;"><b>Resumo Técnico:</b><br> ${(a.blocks && a.blocks.b4) ? a.blocks.b4.substring(0, 200) + '...' : 'Sem resumo.'}</div><div style="margin-top:20px; text-align:right; border-top:1px solid var(--border-color); padding-top:15px;"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); app.editUpdate(${u.id})">✏️ Editar</button> <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); app.deleteUpdate(${u.id})">🗑 Excluir</button></div></div>`; 
+                }); 
+            },
+
+            // NOVA FUNÇÃO RENDERIZAÇÃO ESTRATÉGIAS
+            renderAnalyses() {
+                const cList = document.getElementById('analyses-list-full'); cList.innerHTML = '';
+                let analysesArr = [];
                 this.data.cases.forEach(c => {
-                    if (c.full_analyses) {
-                        c.full_analyses.forEach(a => {
-                            allStrategies.push({...a, caseClient: c.client, caseNumber: c.number, caseId: c.id});
+                    if(c.full_analyses && c.full_analyses.length > 0) {
+                        c.full_analyses.forEach(fa => {
+                            analysesArr.push({ caseData: c, analysis: fa });
                         });
                     }
                 });
-
-                allStrategies.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-                if (allStrategies.length === 0) {
-                    container.innerHTML = '<p style="color:var(--text-muted); padding:20px;">Nenhuma análise estratégica realizada ainda.</p>';
-                    return;
-                }
-
-                allStrategies.forEach(s => {
-                    const match = s.text.match(/1️⃣([\s\S]*?)2️⃣/);
-                    let preview = match ? match[1].substring(0, 150) + '...' : 'Clique para ver detalhes.';
+                
+                if(analysesArr.length === 0) { cList.innerHTML = '<p style="color:var(--text-muted)">Nenhum diagnóstico estratégico realizado.</p>'; return; }
+                
+                analysesArr.sort((a,b) => new Date(b.analysis.date) - new Date(a.analysis.date));
+                
+                analysesArr.forEach(item => {
+                    const c = item.caseData;
+                    const fa = item.analysis;
+                    // Tentar extrair o bloco 9 para resumo rápido
+                    const b9Match = fa.text.match(/9️⃣([^\n]*(?:\n[^\n]*)*)/);
+                    const b9Resumo = b9Match ? b9Match[1].replace(/Resumo Estratégico para Auxiliar Minha Advogada/i, '').trim() : 'Clique para ver a análise completa';
                     
-                    container.innerHTML += `
-                    <div class="smart-summary" onclick="app.viewStrategicAnalysis(${s.caseId}, ${s.id})">
-                        <div class="summary-header">
-                            <span style="font-size:1rem; font-weight:800; color:var(--warning);">🧠 Diagnóstico Estratégico</span>
-                            <span class="summary-tag" style="background:var(--bg-body); border:1px solid var(--border-color); color:var(--text-secondary);">${new Date(s.date).toLocaleDateString('pt-BR')}</span>
-                        </div>
-                        <div style="margin-bottom:10px; font-size:0.9rem;">
-                            <div style="font-weight:700; color:var(--primary);">${s.caseClient}</div>
-                            <div style="font-family:monospace; color:var(--text-secondary); font-size:0.8rem;">${s.caseNumber}</div>
-                        </div>
-                        <div style="font-size:0.85rem; color:var(--text-main); line-height:1.4;">${preview}</div>
-                    </div>`;
+                    cList.innerHTML += `
+                        <div class="smart-summary" onclick="app.viewStrategicAnalysis(${c.id}, ${fa.id})">
+                            <div class="summary-header">
+                                <span style="font-size:1.1rem; font-weight:800; color:var(--text-main);">🧠 Diagnóstico Processual</span> 
+                                <span class="summary-tag" style="background:var(--warning); color:white;">ANÁLISE DE AUTOS</span>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;">
+                                <div><b style="color:var(--text-secondary)">Processo:</b> ${c.number || 'N/A'}</div>
+                                <div><b style="color:var(--text-secondary)">Cliente:</b> <span style="color:var(--primary); font-weight:600;">${c.client}</span></div>
+                                <div><b style="color:var(--text-secondary)">Gerado em:</b> ${new Date(fa.date).toLocaleDateString('pt-BR')}</div>
+                            </div>
+                            <div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-left:4px solid var(--warning); font-size:0.95rem; line-height:1.5;">
+                                <b>Resumo Rápido (Cenário):</b><br> ${b9Resumo.substring(0, 150)}...
+                            </div>
+                        </div>`;
                 });
             },
 
             exportBackup() { const dataStr = JSON.stringify(this.data, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `LexManager_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); },
-            
-            // CORREÇÃO DO BACKUP (Item 4)
-            importBackup(event) { 
-                const file = event.target.files[0]; 
-                if (!file) return; 
-                
-                const reader = new FileReader(); 
-                
-                // Usando arrow function para manter o escopo 'this' do 'app'
-                reader.onload = (e) => { 
-                    try { 
-                        const content = e.target.result;
-                        const importedData = JSON.parse(content); 
-                        
-                        if (importedData && Array.isArray(importedData.cases)) { 
-                            if (confirm('Atenção: Restaurar o backup substituirá todos os dados atuais na sua tela. Deseja continuar?')) { 
-                                // Atualiza os dados internos do app
-                                app.data = importedData; 
-                                // Salva explicitamente no localStorage
-                                localStorage.setItem('lexData', JSON.stringify(app.data));
-                                alert('✅ Backup restaurado com sucesso! A página será recarregada.'); 
-                                location.reload(); 
-                            } 
-                        } else { 
-                            alert('❌ Arquivo de backup inválido. A estrutura não corresponde ao LexManager.'); 
-                        } 
-                    } catch (err) { 
-                        console.error(err);
-                        alert('❌ Erro ao ler o arquivo JSON. Verifique se o arquivo está corrompido.'); 
-                    } 
-                }; 
-                
-                reader.readAsText(file); 
-                // Limpa o input para permitir selecionar o mesmo arquivo novamente se falhar
-                event.target.value = ''; 
-            },
+            importBackup(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importedData = JSON.parse(e.target.result); if (importedData && importedData.cases !== undefined) { if (confirm('Atenção: Restaurar o backup substituirá todos os dados atuais na sua tela. Deseja continuar?')) { this.data = importedData; this.saveToStorage(); alert('✅ Backup restaurado com sucesso! A página será recarregada.'); location.reload(); } } else { alert('❌ Arquivo de backup inválido. Não parece ser um backup do LexManager.'); } } catch (err) { alert('❌ Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON válido.'); } }; reader.readAsText(file); event.target.value = ''; },
 
             fixDate(dateStr) { if(!dateStr) return null; return new Date(dateStr + 'T12:00:00'); },
             toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); },
@@ -1489,12 +1571,12 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 document.getElementById('sidebar').classList.remove('active');
                 if(view === 'dashboard') this.renderDashboard(); 
                 if(view === 'updates') this.renderUpdatesFull(); 
-                if(view === 'strategies') this.renderStrategies(); 
                 if(view === 'cases') this.renderCases(); 
                 if(view === 'deadlines') this.renderDeadlines(); 
                 if(view === 'finance') this.renderFinance(); 
                 if(view === 'tasks') this.renderTasks(); 
                 if(view === 'clients') this.renderClients();
+                if(view === 'analyses') this.renderAnalyses();
             },
             
             renderDashboard() {
@@ -1526,15 +1608,22 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
             swapClientOpponent() { const clientInput = document.querySelector('#modal-case [name="client"]'); const opponentInput = document.querySelector('#modal-case [name="opponent"]'); const roleInput = document.querySelector('#modal-case [name="client_role"]'); if(clientInput && opponentInput && roleInput) { const temp = clientInput.value; clientInput.value = opponentInput.value; opponentInput.value = temp; roleInput.value = roleInput.value === 'autor' ? 'reu' : 'autor'; } },
             openStatusMenu(el, id) { this.currentStatusId = id; const m = document.getElementById('status-menu'); const r = el.getBoundingClientRect(); m.style.top = (r.bottom + window.scrollY + 8) + 'px'; m.style.left = r.left + 'px'; m.classList.add('show'); },
             changeStatus(st) { if(this.currentStatusId) { const i = this.data.cases.findIndex(c=>c.id===this.currentStatusId); if(i>-1) { this.data.cases[i].status=st; this.saveToStorage(); this.renderCases(); document.getElementById('status-menu').classList.remove('show'); } } },
-            openModal(id, dataId = null) { 
+            
+            openModal(id, dataId = null, extraDate = null) { 
                 document.getElementById(id).classList.add('active'); const form = document.querySelector(`#${id} form`); if(form) form.reset(); 
+                
+                // Aplicar data extra se enviada via análise importada
+                if (extraDate && id === 'modal-deadline') {
+                    document.querySelector('#modal-deadline [name="date"]').value = extraDate;
+                }
+
                 if(id==='modal-case' && dataId) { const c = this.data.cases.find(x=>x.id===dataId); if(c){ document.querySelector('[name="id"]').value=c.id; document.querySelector('[name="number"]').value=c.number; document.querySelector('[name="client"]').value=c.client; document.querySelector('[name="client_role"]').value=c.client_role || 'autor'; document.querySelector('[name="status"]').value=c.status; document.querySelector('[name="opponent"]').value=c.opponent||''; document.querySelector('[name="area"]').value=c.area||'Cível'; document.querySelector('[name="value"]').value=c.value||''; document.querySelector('[name="fees"]').value=c.fees||''; document.querySelector('[name="lawyer"]').value=c.lawyer||''; document.querySelector('[name="obs"]').value=c.obs||''; if(c.date_start) document.querySelector('[name="date_start"]').value=c.date_start.split('T')[0]; } } 
                 if(id==='modal-deadline' || id==='modal-task' || id==='modal-payment') { let selId = ''; if(id==='modal-deadline') selId = 'case-select-dropdown'; else if(id==='modal-task') selId = 'task-case-select'; else if(id==='modal-payment') selId = 'payment-case-select'; const sel = document.getElementById(selId); sel.innerHTML = id==='modal-task' ? '<option value="">Geral (Sem vínculo)</option>' : '<option value="">Selecione um processo...</option>'; this.data.cases.forEach(x=>sel.add(new Option(`${x.client} - ${x.number}`, x.id))); if(dataId && typeof dataId === 'number') { if(id==='modal-payment') { sel.value = dataId; } else { const item = id==='modal-deadline'?this.data.deadlines.find(x=>x.id===dataId):this.data.tasks.find(x=>x.id===dataId); if(item) { document.querySelector(`#${id} [name="id"]`).value=item.id; if(item.caseId) sel.value=item.caseId; if(id==='modal-deadline') { document.querySelector(`#${id} [name="type"]`).value = item.type || ''; if(item.date_start) document.querySelector(`#${id} [name="date_start"]`).value = item.date_start.split('T')[0]; if(item.date) document.querySelector(`#${id} [name="date"]`).value = item.date.split('T')[0]; } else if(id==='modal-task') { document.querySelector(`#${id} [name="desc"]`).value = item.desc || ''; document.querySelector(`#${id} [name="priority"]`).value = item.priority || 'Média'; if(item.date) document.querySelector(`#${id} [name="date"]`).value = item.date.split('T')[0]; } } } } else if (dataId && id==='modal-deadline') { document.getElementById('deadline-case-id').value=dataId; document.getElementById('case-selector-container').style.display='none'; } else { if(id==='modal-deadline') document.getElementById('case-selector-container').style.display='block'; } } 
             },
             closeModal(id) { document.getElementById(id).classList.remove('active'); },
+            
             saveCase(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const d = { number: f.get('number'), client: f.get('client'), client_role: f.get('client_role') || 'autor', opponent: f.get('opponent'), status: f.get('status'), area: f.get('area'), value: parseFloat(f.get('value')||0), fees: parseFloat(f.get('fees')||0), obs: f.get('obs'), lawyer: f.get('lawyer'), date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null }; if(id){ const i = this.data.cases.findIndex(c=>c.id==id); this.data.cases[i]={...this.data.cases[i],...d}; } else { this.data.cases.push({...d, id:Date.now(), date_created:new Date().toISOString()}); } this.saveToStorage(); this.closeModal('modal-case'); this.navigate('cases'); },
             
-            // ATUALIZAÇÃO ITEM 1 E 2
             saveDeadline(e) { 
                 e.preventDefault(); 
                 const f = new FormData(e.target); 
@@ -1542,15 +1631,14 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const cid = f.get('caseId')||f.get('caseSelect'); 
                 if(!cid) return alert('Selecione um processo.'); 
                 
-                const type = f.get('type');
-                const dateFatal = f.get('date');
-                const dateStart = f.get('date_start');
+                const dtStart = f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null;
+                const dtEnd = this.fixDate(f.get('date'));
                 
                 const payload = { 
                     caseId: parseInt(cid), 
-                    type: type, 
-                    date_start: dateStart ? this.fixDate(dateStart).toISOString() : null, 
-                    date: this.fixDate(dateFatal).toISOString(), 
+                    type: f.get('type'), 
+                    date_start: dtStart, 
+                    date: dtEnd.toISOString(), 
                     done: false 
                 }; 
                 
@@ -1563,31 +1651,23 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 } else { 
                     this.data.deadlines.push({ id: Date.now(), ...payload }); 
                 } 
-                
-                // ITEM 2: Google Agenda Logic
-                if (f.get('googleCalendar')) {
-                    const c = this.data.cases.find(x => x.id == cid);
-                    const clientName = c ? c.client : 'Cliente';
-                    const title = `Prazo: ${type} - ${clientName}`;
-                    const details = `Processo: ${c ? c.number : ''}\nCliente: ${clientName}\nTipo: ${type}`;
-                    
-                    // Formata data para YYYYMMDD
-                    const dObj = new Date(dateFatal);
-                    // Google Calendar All Day event: Start date / End date (exclusive, so +1 day)
-                    const fmt = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "").slice(0,8);
-                    
-                    const start = fmt(dObj);
-                    const nextDay = new Date(dObj); 
-                    nextDay.setDate(dObj.getDate() + 1);
-                    const end = fmt(nextDay);
-                    
-                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}`;
-                    window.open(url, '_blank');
-                }
-
                 this.saveToStorage(); 
                 this.closeModal('modal-deadline'); 
                 this.navigate('deadlines'); 
+
+                // Evento Google Agenda
+                if(confirm('Prazo salvo! Deseja criar um evento ou tarefa no Google Agenda?')) {
+                    const cRef = this.data.cases.find(x => x.id == parseInt(cid));
+                    const clientName = cRef ? cRef.client : "Processo";
+                    
+                    const dStr = dtEnd.toISOString().split('T')[0].replace(/-/g, '');
+                    const nextDay = new Date(dtEnd); nextDay.setDate(nextDay.getDate()+1);
+                    const dEndStr = nextDay.toISOString().split('T')[0].replace(/-/g, '');
+                    
+                    const eventTitle = `Prazo Final: ${f.get('type')} (${clientName})`;
+                    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${dStr}/${dEndStr}&details=${encodeURIComponent('Prazo gerado via LexManager para o cliente ' + clientName)}`;
+                    window.open(gcalUrl, '_blank');
+                }
             },
 
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const payload = { desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }; if(id) { const idx = this.data.tasks.findIndex(t => t.id == id); if(idx > -1) { payload.done = this.data.tasks[idx].done; this.data.tasks[idx] = { ...this.data.tasks[idx], ...payload }; } } else { this.data.tasks.push({ id: Date.now(), ...payload }); } this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
@@ -1640,8 +1720,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
                 let timeline = []; const initialDate = c.date_start || c.date_created; timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
+                
                 if(c.full_analyses) {
                     c.full_analyses.forEach(fa => {
+                        // Ícone do cérebro adicionado para o diagnóstico estratégico
                         timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Clique para ver a análise completa', id: null, originalId: fa.id});
                     });
                 }
@@ -1680,8 +1762,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     <div class="full-timeline">
                         ${timeline.map(t => { 
                             let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; 
+                            
                             if (t.type === 'analysis') {
                                 clickAct = `onclick="app.viewStrategicAnalysis(${c.id}, ${t.originalId})" style="cursor:pointer;"`;
+                                // Ícone do Cérebro aqui
                                 return `<div class="ft-item" ${clickAct}><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`;
                             }
                             return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; 
