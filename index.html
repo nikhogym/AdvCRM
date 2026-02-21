@@ -58,6 +58,18 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
+        /* Correção Dark Mode Específica (Item 2) */
+        body.dark-mode .pub-full-text {
+            color: var(--text-main); /* Contraste corrigido */
+            border-color: var(--border-color);
+            background-color: #0B0F19; /* Fundo ligeiramente mais escuro para destaque */
+        }
+        body.dark-mode .client-summary-box {
+            background: rgba(245, 158, 11, 0.05); /* Opacidade reduzida para não estourar no dark */
+            border-color: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; transition: background-color 0.3s, color 0.3s; font-size: 14px; -webkit-font-smoothing: antialiased; }
@@ -181,10 +193,9 @@
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem; margin-bottom: 20px; }
         .analysis-item { display: flex; flex-direction: column; background: var(--bg-body); padding: 12px; border-radius: var(--radius-md); }
         .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap;}
+        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap; word-break: break-word; /* Correção Item 3 (Layout) */}
         .client-summary-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: var(--radius-md); margin-top: 10px; font-size: 0.95rem; color: #b45309; line-height: 1.5; font-style: italic;}
-        body.dark-mode .client-summary-box { color: #fcd34d; }
-
+        
         .full-timeline { position: relative; margin-top: 2rem; }
         .full-timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
         .ft-item { position: relative; margin-bottom: 24px; padding-left: 60px; }
@@ -207,7 +218,8 @@
         .modal-content { background: var(--bg-surface); padding: 32px; border-radius: var(--radius-xl); width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .pub-view-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .pub-full-text { background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border-color); }
+        /* Correção Item 3 e Dark Mode (Item 2) */
+        .pub-full-text { background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border-color); word-break: break-word; }
         
         .menu-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; box-shadow: var(--shadow-lg); z-index: 100; font-size: 24px; align-items: center; justify-content: center; border: none; }
 
@@ -222,14 +234,21 @@
             .menu-toggle { display: flex; bottom: 20px; } 
             .calendar-widget { grid-template-columns: 1fr; } 
             
-            /* Ajuste Topbar Mobile - SEM DADOS DUPLICADOS */
+            /* Correção Item 1: Painel Superior Mobile Escondido */
             .app-topbar { 
                 padding: 10px 16px; 
                 height: auto;
                 min-height: 70px;
                 padding-top: calc(10px + env(safe-area-inset-top)); 
-                justify-content: flex-end; 
+                justify-content: flex-start; /* Ajustado para não esconder o título */
+                position: sticky; /* Fix para não sumir no scroll */
+                top: 0;
             }
+            /* Garantir largura total para o conteúdo interno */
+            .topbar-main-row { width: 100%; }
+
+            /* Correção Item 3: Visão Estratégica (Grid) */
+            .analysis-grid { grid-template-columns: 1fr; } 
             
             .content-scroll { padding: 16px; }
             
