@@ -58,17 +58,67 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
-        /* Correção Dark Mode Específica (Item 2) */
+        /* Correção Dark Mode Específica */
         body.dark-mode .pub-full-text {
-            color: var(--text-main); /* Contraste corrigido */
+            color: var(--text-main); 
             border-color: var(--border-color);
-            background-color: #0B0F19; /* Fundo ligeiramente mais escuro para destaque */
+            background-color: #0B0F19; 
         }
         body.dark-mode .client-summary-box {
-            background: rgba(245, 158, 11, 0.05); /* Opacidade reduzida para não estourar no dark */
+            background: rgba(245, 158, 11, 0.05); 
             border-color: rgba(245, 158, 11, 0.2);
             color: #fcd34d;
         }
+
+        /* ESTILOS PARA ACCORDION (EXPANSIVO) */
+        .accordion-item {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .accordion-header {
+            padding: 14px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            background: var(--bg-surface);
+            user-select: none;
+        }
+        .accordion-header:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+        .accordion-content {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            opacity: 0;
+        }
+        .accordion-item.open .accordion-content {
+            padding: 16px;
+            max-height: 2000px; /* Valor alto para permitir conteúdo longo */
+            opacity: 1;
+            border-top: 1px solid var(--border-color);
+        }
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Reutilizando estilos da análise para manter consistência */
+        .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
+        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; line-height: 1.5; margin-bottom: 12px; display:block; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
@@ -96,6 +146,8 @@
             transition: background-color 0.3s, border-color 0.3s;
             height: 70px; 
             z-index: 40;
+            position: sticky;
+            top: 0;
         }
 
         .topbar-main-row {
@@ -192,8 +244,7 @@
 
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem; margin-bottom: 20px; }
         .analysis-item { display: flex; flex-direction: column; background: var(--bg-body); padding: 12px; border-radius: var(--radius-md); }
-        .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-        .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap; word-break: break-word; /* Correção Item 3 (Layout) */}
+        /* styles for analysis-label and analysis-val moved to global scope for reuse */
         .client-summary-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: var(--radius-md); margin-top: 10px; font-size: 0.95rem; color: #b45309; line-height: 1.5; font-style: italic;}
         
         .full-timeline { position: relative; margin-top: 2rem; }
@@ -494,6 +545,7 @@
             <button onclick="app.navigate('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</button>
             <button onclick="app.navigate('updates')" id="nav-updates">📢 Publicações</button>
             <button onclick="app.navigate('cases')" id="nav-cases">⚖️ Processos</button>
+            <button onclick="app.navigate('strategies')" id="nav-strategies">🧠 Estratégia</button>
             <button onclick="app.navigate('clients')" id="nav-clients">👥 Clientes</button>
             <button onclick="app.navigate('deadlines')" id="nav-deadlines">⏳ Prazos</button>
             <button onclick="app.navigate('tasks')" id="nav-tasks">📝 Tarefas</button>
@@ -584,6 +636,16 @@
                     </div>
                 </div>
                 <div id="updates-list-full"></div>
+            </section>
+
+            <section id="view-strategies" class="hidden">
+                <div class="dash-header">
+                    <div><h2>Central Estratégica</h2><p style="color:var(--text-secondary); margin-top:4px;">Diagnósticos e análises de autos.</p></div>
+                    <div class="quick-actions" style="display:flex; gap:10px; align-items:center;">
+                        <button class="btn btn-primary" onclick="app.openFullAnalysisModal()">🧠 Nova Análise</button>
+                    </div>
+                </div>
+                <div id="strategies-list-full"></div>
             </section>
 
             <section id="view-clients" class="hidden">
@@ -754,12 +816,21 @@
         <div id="modal-full-analysis" class="modal">
             <div class="modal-content">
                 <div class="flex-between" style="margin-bottom:20px;"><h3>Análise Completa de Autos</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-full-analysis')">✕</button></div>
+                <input type="hidden" id="full-analysis-edit-id"> <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Texto ou Processo</label>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Selecione um processo cadastrado para incluir o histórico ou cole o texto.</p>
                 
-                <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Arquivo ou Texto</label>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Anexe o PDF ou cole o texto completo do processo para gerar uma estratégia.</p>
-                
-                <input type="file" style="margin-bottom:10px;">
-                <textarea id="full-analysis-text" rows="5" placeholder="Ou cole o texto do processo aqui..."></textarea>
+                <label>Carregar Histórico do Processo</label>
+                <select id="full-analysis-case-select" onchange="app.loadCaseContext()" style="margin-bottom:10px;">
+                    <option value="">-- Selecione ou use texto avulso --</option>
+                </select>
+
+                <label>Meu Cliente é:</label>
+                <select id="full-analysis-role" style="margin-bottom:10px;">
+                    <option value="autor">Autor / Reclamante</option>
+                    <option value="reu">Réu / Reclamado</option>
+                </select>
+
+                <textarea id="full-analysis-text" rows="5" placeholder="Cole o texto do processo ou histórico aqui..."></textarea>
 
                 <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
                     <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
@@ -784,11 +855,12 @@
                 <div class="pub-view-grid">
                     <div id="pub-view-summary"></div>
                     <div style="margin-top:20px;">
-                        <label>Texto Original Diário Oficial:</label>
+                        <label>Texto Original:</label>
                         <div class="pub-full-text" id="pub-view-text"></div>
                     </div>
                 </div>
-                <div style="margin-top:20px; text-align:right; border-top:1px solid var(--border-color); padding-top:20px;">
+                <div style="margin-top:20px; text-align:right; border-top:1px solid var(--border-color); padding-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="btn btn-outline" id="pub-view-edit-btn" style="display:none;">✏️ Editar Análise</button>
                     <button class="btn btn-primary" id="pub-view-action-btn">📅 Ir para Prazos</button>
                 </div>
             </div>
@@ -915,8 +987,6 @@
                 if (!textToAnalyze || !textToAnalyze.trim()) { alert('⚠️ Cole o texto da publicação no Passo 1 primeiro.'); return; }
                 
                 const roleFromImport = document.getElementById('import-client-role').value;
-                
-                // Cálculo da instrução específica do cliente
                 let specificClientInstruction = "Se meu cliente é o RÉU/RECLAMADO ou AUTOR/RECLAMANTE";
                 if(roleFromImport === 'autor') specificClientInstruction = "Meu cliente é o AUTOR/RECLAMANTE";
                 if(roleFromImport === 'reu') specificClientInstruction = "Meu cliente é o RÉU/RECLAMADO";
@@ -1001,79 +1071,166 @@ ${textToAnalyze}`;
 
                 navigator.clipboard.writeText(geminiPrompt).then(() => { 
                     alert(`✅ Prompt copiado com sucesso!\n\nEstou abrindo o ${platform === 'gemini' ? 'Gemini' : 'ChatGPT'}. Cole o texto lá (Ctrl+V), aguarde a resposta e copie o resultado de volta para o Passo 2.`); 
-                    
-                    // Universal Links (Deep Links)
-                    if(platform === 'gemini') {
-                        window.open('https://gemini.google.com/app', '_blank'); 
-                    } else {
-                        window.open('https://chatgpt.com', '_blank'); 
-                    }
-                }).catch(err => { 
-                    console.error('Falha ao copiar:', err); 
-                    alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); 
-                });
+                    if(platform === 'gemini') { window.open('https://gemini.google.com/app', '_blank'); } else { window.open('https://chatgpt.com', '_blank'); }
+                }).catch(err => { console.error('Falha ao copiar:', err); alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); });
             },
 
-            openFullAnalysisModal() {
+            openFullAnalysisModal(existingId = null, existingText = '') {
+                const sel = document.getElementById('full-analysis-case-select');
+                sel.innerHTML = '<option value="">-- Selecione ou use texto avulso --</option>';
+                this.data.cases.forEach(c => {
+                    sel.add(new Option(`${c.client} - ${c.number}`, c.id));
+                });
+                
+                // Reset ou Preenchimento para Edição
+                document.getElementById('full-analysis-edit-id').value = existingId || '';
+                document.getElementById('full-analysis-result').value = existingText || '';
+                document.getElementById('full-analysis-text').value = ''; 
+                
                 document.getElementById('modal-full-analysis').classList.add('active');
+            },
+
+            loadCaseContext() {
+                const cid = document.getElementById('full-analysis-case-select').value;
+                const txtArea = document.getElementById('full-analysis-text');
+                if (!cid) { txtArea.value = ''; return; }
+                
+                const updates = this.data.updates.filter(u => u.caseId == cid);
+                updates.sort((a,b) => new Date(a.date) - new Date(b.date)); 
+                
+                let context = `--- HISTÓRICO DO PROCESSO ---\n`;
+                if(updates.length === 0) {
+                    context += "Nenhuma publicação cadastrada neste processo.\n";
+                } else {
+                    updates.forEach(u => {
+                        const a = u.analysis || {};
+                        const b = a.blocks || {};
+                        // Extrai a visão estratégica (blocos 1-9)
+                        const fullStrat = `1️⃣ ${b.b1||''}\n2️⃣ ${b.b2||''}\n3️⃣ ${b.b3||''}\n4️⃣ ${b.b4||''}\n5️⃣ ${b.b5||''}\n6️⃣ ${b.b6||''}\n7️⃣ ${b.b7||''}\n8️⃣ ${b.b8||''}\n9️⃣ ${b.b9||''}`;
+                        
+                        context += `\n[DATA: ${new Date(u.date).toLocaleDateString()}] - TIPO: ${a.type}\n`;
+                        context += `VISÃO ESTRATÉGICA REGISTRADA:\n${fullStrat}\n`;
+                        context += `-----------------------------------\n`;
+                    });
+                }
+                txtArea.value = context;
             },
 
             analyzeFullCase(platform) {
                 const textToAnalyze = document.getElementById('full-analysis-text').value;
-                // Nota: O prompt não exige o texto anexado aqui se for PDF, mas se o usuário colou texto, vai junto.
+                const role = document.getElementById('full-analysis-role').value;
                 
-                const strategicPrompt = `Vou anexar um PDF contendo um processo judicial.
-Quero que você atue como analista jurídico estratégico, com foco em prática forense.
-Sou estudante do 5º semestre de Direito e quero compreender o caso para auxiliar minha advogada e desenvolver pensamento estratégico.
-Analise o processo e entregue:
-1) Diagnóstico Geral do Caso
-Qual é o conflito central?
-Qual é a tese jurídica de cada parte?
-Qual parte está em posição mais favorável no momento?
-Quais são os principais riscos processuais?
-2) Análise Estratégica das Partes 
-A estratégia do autor é consistente?
-A estratégia da defesa é tecnicamente adequada?
-Houve erro tático relevante?
-Há pedido mal formulado?
-Há preliminares não exploradas?
-O ônus da prova foi bem trabalhado?
-O que poderia ser feito de forma mais estratégica?
-3) Análise da Postura do Juiz 
-A decisão é tecnicamente sólida?
-Há fragilidade na fundamentação?
-Existe risco de nulidade?
-Houve enfrentamento de todos os argumentos?
-A decisão demonstra tendência favorável a alguma tese?
-Há margem clara para reforma em recurso?
-4) Análise Técnica Processual Profunda
-Natureza jurídica da ação
-Competência correta?
-Pressupostos processuais preenchidos?
-Há nulidades arguíveis?
-Preclusões ocorridas?
-Momento processual atual e próximos passos possíveis
-5) Simulação Estratégica de Recurso
-Se você fosse advogado da parte vencida, qual seria a linha argumentativa principal?
-Quais fundamentos legais utilizaria?
-Haveria tese de nulidade?
-Qual seria o ponto mais forte para tentar reforma?
-Vale a pena recorrer estrategicamente ou é melhor outra medida?
+                let specificClientInstruction = "Se meu cliente é AUTOR ou RÉU";
+                if(role === 'autor') specificClientInstruction = "Meu cliente é o AUTOR/RECLAMANTE";
+                if(role === 'reu') specificClientInstruction = "Meu cliente é o RÉU/RECLAMADO";
 
-6) Mapa de Oportunidades Estratégicas
-Existe possibilidade de acordo vantajoso?
-Existe tese alternativa não explorada?
-Existe risco de sucumbência agravada?
-Existe argumento que pode virar o jogo?
+                const strategicPrompt = `Analise o processo judicial completo contido no texto ou PDF anexado e extraia as informações de forma ESTRUTURADA, EXTREMAMENTE CONCISA, TÉCNICA e ESTRATÉGICA.
 
-7) Checklist para Auxiliar Minha Advogada
-Pontos que merecem atenção imediata
-Prazos críticos
-Provas que deveriam ser reforçadas
-Argumentos que merecem aprofundamento
-Seja técnico, estratégico e direto.
+Sou aluno do 5º semestre de Direito e quero utilizar esta análise para auxiliar minha advogada e desenvolver raciocínio estratégico profissional.
 
-Quero aprender a pensar como advogado e não apenas entender o conteúdo do processo.
+🚨 ATENÇÃO: ${specificClientInstruction}. Indique claramente se o cenário processual atual é FAVORÁVEL, DESFAVORÁVEL ou DE RISCO no Bloco 9.
+
+🚨 ATENÇÃO ESPECIAL AOS PRAZOS:
+Calcule o prazo processual de forma EXATA conforme a legislação aplicável (CPC, CPP, CLT ou lei específica).
+A contagem deve:
+• Considerar dias úteis quando a lei determinar.
+• Excluir o dia do começo e incluir o do vencimento.
+• Considerar data de intimação, disponibilização e publicação quando aplicável.
+• Indicar corretamente o termo inicial.
+• Desconsiderar feriados apenas se houver informação expressa.
+• Indicar a DATA FINAL EXATA (prazo fatal).
+Se não houver elemento suficiente para cálculo exato, indique EXPRESSAMENTE a limitação.
+Data de hoje: ${new Date().toLocaleDateString('pt-BR')}
+
+⚠️ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
+• NÃO USE formatação Markdown.
+• NÃO USE asteriscos.
+• NÃO USE bullet points.
+• Use APENAS texto puro.
+• Siga rigorosamente os emojis de 1️⃣ a 9️⃣ para separação dos blocos.
+• Responda exatamente no formato “Campo: Resposta objetiva” em linhas separadas.
+• Linguagem técnica, direta e estratégica.
+• Evite explicações longas. Priorize precisão.
+
+1️⃣ Diagnóstico Geral do Caso
+Conflito central:
+Tese do autor:
+Tese da defesa:
+Fase processual atual:
+Parte em posição mais favorável:
+Principais riscos processuais:
+Impacto financeiro estimado:
+Probabilidade estratégica de êxito:
+
+2️⃣ Análise Estratégica das Partes
+Estratégia do autor:
+Erro estratégico do autor:
+Estratégia da defesa:
+Erro estratégico da defesa:
+Ônus da prova bem trabalhado:
+Provas frágeis:
+Preliminares não exploradas:
+Oportunidade estratégica não utilizada:
+
+3️⃣ Análise da Postura do Juiz
+Fundamentação adequada:
+Há omissão relevante:
+Há contradição:
+Há obscuridade:
+Risco de nulidade:
+Tendência decisória identificável:
+Probabilidade de reforma em recurso:
+
+4️⃣ Análise Técnica Processual Profunda
+Natureza jurídica da ação:
+Competência adequada:
+Pressupostos processuais:
+Condições da ação:
+Preclusões ocorridas:
+Nulidades arguíveis:
+Regularidade procedimental:
+Momento processual:
+Próximo ato esperado:
+
+5️⃣ Recursos e Medidas Cabíveis
+Recurso cabível:
+Prazo legal:
+Fundamento legal:
+Tipo de contagem:
+Termo inicial:
+Termo final exato:
+Outra medida estratégica possível:
+Viabilidade recursal:
+
+6️⃣ Simulação Estratégica de Recurso
+Tese recursal principal:
+Fundamento jurídico central:
+Argumento mais forte:
+Tese subsidiária:
+Pedido recursal estratégico:
+Chance estimada de êxito:
+
+7️⃣ Mapa de Oportunidades Estratégicas
+Possibilidade de acordo:
+Risco de sucumbência:
+Risco de majoração de honorários:
+Tese alternativa viável:
+Prova que pode mudar o cenário:
+Medida preventiva recomendada:
+
+8️⃣ Próximo Cenário Processual
+Cenário provável:
+Cenário de risco:
+Movimento estratégico recomendado:
+Prioridade imediata:
+
+9️⃣ Resumo Estratégico para Auxiliar Minha Advogada
+Posição atual do cliente:
+Situação: Indicar expressamente se é FAVORÁVEL, DESFAVORÁVEL ou DE RISCO.
+Ponto crítico do processo:
+Data fatal do próximo prazo:
+Ação estratégica recomendada:
+Nível de urgência:
 
 ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
@@ -1085,104 +1242,205 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
             saveFullAnalysis() {
                 const analysisText = document.getElementById('full-analysis-result').value;
+                const editId = document.getElementById('full-analysis-edit-id').value;
                 if(!analysisText.trim()) return alert("Cole o resultado da análise antes de salvar.");
 
-                // Tenta encontrar número de processo no texto
-                const caseMatch = analysisText.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
-                const caseNum = caseMatch ? caseMatch[0] : null;
+                let linkedCaseId = document.getElementById('full-analysis-case-select').value;
                 
-                let linkedCaseId = null;
-                if (caseNum) {
-                    const found = this.data.cases.find(c => c.number === caseNum);
-                    if (found) linkedCaseId = found.id;
+                if (!linkedCaseId) {
+                    const caseMatch = analysisText.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+                    const caseNum = caseMatch ? caseMatch[0] : null;
+                    if (caseNum) {
+                        const found = this.data.cases.find(c => c.number === caseNum);
+                        if (found) linkedCaseId = found.id;
+                    }
+                } else {
+                    linkedCaseId = parseInt(linkedCaseId);
                 }
 
                 if (linkedCaseId) {
                     const cIndex = this.data.cases.findIndex(c => c.id === linkedCaseId);
                     if (!this.data.cases[cIndex].full_analyses) this.data.cases[cIndex].full_analyses = [];
                     
-                    this.data.cases[cIndex].full_analyses.push({
-                        id: Date.now(),
-                        date: new Date().toISOString(),
-                        text: analysisText,
-                        type: 'strategic_analysis'
-                    });
+                    if (editId) {
+                        // Modo Edição
+                        const aIndex = this.data.cases[cIndex].full_analyses.findIndex(a => a.id == editId);
+                        if (aIndex > -1) {
+                            this.data.cases[cIndex].full_analyses[aIndex].text = analysisText;
+                            alert(`Análise atualizada com sucesso!`);
+                        }
+                    } else {
+                        // Novo Registro
+                        this.data.cases[cIndex].full_analyses.push({
+                            id: Date.now(),
+                            date: new Date().toISOString(),
+                            text: analysisText,
+                            type: 'strategic_analysis'
+                        });
+                        alert(`Análise salva e vinculada ao processo!`);
+                    }
                     this.saveToStorage();
-                    alert(`Análise salva e vinculada ao processo ${caseNum}!`);
                     this.closeModal('modal-full-analysis');
                     this.openCaseDetail(linkedCaseId);
                 } else {
-                    alert('Não encontrei um número de processo cadastrado correspondente nesta análise. Crie o processo primeiro ou verifique se o número CNJ consta no texto.');
+                    alert('Não consegui vincular a um processo. Selecione o processo na lista antes de salvar ou certifique-se que o número CNJ consta no texto.');
                 }
             },
 
-            parseAIResult() {
-                const aiResult = document.getElementById('ai-result-text').value;
-                const rawImport = document.getElementById('import-text').value;
-                if(!aiResult.trim()) return alert("Cole o resultado gerado pela IA na caixa do Passo 2.");
-                const extract = (current, next) => { let regexStr = current + "([\\s\\S]*?)"; regexStr += next ? "(?=" + next + "|$)" : "(?=$)"; const match = aiResult.match(new RegExp(regexStr)); if(match) { let block = match[1].trim(); block = block.replace(/^[^\n]*\n/, '').replace(/\*\*/g, '').replace(/^\s*[\*\-]\s/gm, '').trim(); return block; } return '-'; };
-                const b1 = extract('1️⃣', '2️⃣'); const b2 = extract('2️⃣', '3️⃣'); const b3 = extract('3️⃣', '4️⃣'); const b4 = extract('4️⃣', '5️⃣'); const b5 = extract('5️⃣', '6️⃣'); const b6 = extract('6️⃣', '7️⃣'); const b7 = extract('7️⃣', '8️⃣'); const b8 = extract('8️⃣', '9️⃣'); const b9 = extract('9️⃣', '⚖️');
-                const caseMatch = (b1 + rawImport).match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
-                const caseNum = caseMatch ? caseMatch[0] : '';
-                const autorMatch = b2.match(/Autor:\s*([^\n]+)/i); const reuMatch = b2.match(/Réu:\s*([^\n]+)/i);
-                const extractedAutor = autorMatch ? autorMatch[1].trim() : ''; const extractedReu = reuMatch ? reuMatch[1].trim() : '';
-                const dateMatch = b1.match(/Data de disponibilização:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
-                let dispDate = null; if(dateMatch) { dispDate = new Date(`${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}T12:00:00`).toISOString(); }
-                let matchedId = null; if(caseNum) { const found = this.data.cases.find(c => c.number === caseNum); if(found) matchedId = found.id; }
-                const roleFromImport = document.getElementById('import-client-role').value;
-                this.tempParsedData = { rawText: rawImport, caseNumber: caseNum, matchedCaseId: matchedId, extractedAutor: extractedAutor, extractedReu: extractedReu, dispDate: dispDate, type: b3.split('\n')[0].replace('Classificação:', '').trim().substring(0, 40) || 'Ato Judicial', outcome: "Movimentação", blocks: { b1, b2, b3, b4, b5, b6, b7, b8, b9 }, importRole: roleFromImport };
-                const matchDiv = document.getElementById('match-info');
-                if(matchedId) { matchDiv.innerHTML = `Processo identificado automaticamente na base: <b style="color:var(--text-main)">${caseNum}</b>. Será vinculado ao dossiê.`; } else if(caseNum) { matchDiv.innerHTML = `Processo <b style="color:var(--text-main)">${caseNum}</b> não encontrado na base. Um novo caso será criado com Autor(a): <b style="color:var(--text-main)">${extractedAutor || 'Desconhecido'}</b> e Réu: <b style="color:var(--text-main)">${extractedReu || 'Desconhecido'}</b>.`; } else { matchDiv.innerHTML = `Processo não identificado. Ficará registrado como análise avulsa.`; }
-                document.getElementById('step-1-import').style.display = 'none'; document.getElementById('step-2-import').style.display = 'block';
+            // FUNÇÃO GENÉRICA DE VISUALIZAÇÃO COM ACCORDION E FORMATAÇÃO UNIFICADA
+            toggleAccordion(header) {
+                const item = header.parentElement;
+                item.classList.toggle('open');
             },
 
-            saveParsedImport() {
-                if(!this.tempParsedData) return;
-                let cid = this.tempParsedData.matchedCaseId;
-                if(!cid && this.tempParsedData.caseNumber) {
-                    let defClient = this.tempParsedData.extractedAutor || "Cliente Não Identificado";
-                    let defOpponent = this.tempParsedData.extractedReu || "-";
-                    if (this.tempParsedData.importRole === 'reu') { defClient = this.tempParsedData.extractedReu || "Cliente Não Identificado"; defOpponent = this.tempParsedData.extractedAutor || "-"; }
-                    const newCase = { id: Date.now(), number: this.tempParsedData.caseNumber, client: defClient, client_role: this.tempParsedData.importRole === 'desconhecido' ? 'autor' : this.tempParsedData.importRole, opponent: defOpponent, area: 'Cível', status: 'Em andamento', date_created: new Date().toISOString() };
-                    this.data.cases.push(newCase); cid = newCase.id;
+            buildAccordionView(rawText, titlesMap, mode) {
+                const extract = (text, current, next) => { 
+                    let regexStr = current + "([\\s\\S]*?)"; 
+                    regexStr += next ? "(?=" + next + "|$)" : "(?=$)"; 
+                    const match = text.match(new RegExp(regexStr)); 
+                    let content = match ? match[1].trim() : '';
+                    
+                    // CORREÇÃO: Remove a primeira linha se for duplicata do título (Item 5)
+                    if (content) {
+                        const lines = content.split('\n');
+                        if (lines.length > 0) {
+                            // Verifica se a primeira linha parece um título (curta e sem :)
+                            const firstLine = lines[0].trim();
+                            const titleKey = titlesMap[current.replace(/[^0-9]/g, 'b')]; // b1, b2...
+                            // Simples heurística: se a primeira linha contém palavras chaves do título esperado
+                            if (firstLine.length < 50 && !firstLine.includes(':')) {
+                                content = lines.slice(1).join('\n').trim();
+                            }
+                        }
+                    }
+                    return content;
+                };
+
+                const formatContent = (text) => {
+                    if (!text) return '<span style="color:var(--text-muted)">Sem dados.</span>';
+                    // Mesma formatação para ambas as abas (Item 1)
+                    return text.replace(/^([^:\n]+):/gm, '<span class="analysis-label">$1</span><span class="analysis-val">')
+                               .replace(/$/gm, '</span>');
+                };
+
+                let html = '<div style="display:flex; flex-direction:column;">';
+                for (let i = 1; i <= 9; i++) {
+                    const key = 'b' + i;
+                    const emoji = i + '️⃣';
+                    const nextEmoji = (i+1) + '️⃣';
+                    // Para o último bloco, o próximo delimitador varia
+                    const nextDelim = i === 9 ? (mode === 'pub' ? '⚖️' : null) : nextEmoji;
+                    
+                    const blockContent = extract(rawText, emoji, nextDelim);
+                    const title = titlesMap[key];
+
+                    html += `<div class="accordion-item ${i===1?'open':''}">
+                                <div class="accordion-header" onclick="app.toggleAccordion(this)">
+                                    ${emoji} ${title}
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">${formatContent(blockContent)}</div>
+                             </div>`;
                 }
-                const isEditId = document.getElementById('import-id').value;
-                const updatePayload = { id: isEditId ? parseInt(isEditId) : Date.now(), date: this.tempParsedData.dispDate || new Date().toISOString(), rawText: this.tempParsedData.rawText, caseId: cid, analysis: { caseNumber: this.tempParsedData.caseNumber, type: this.tempParsedData.type, outcome: this.tempParsedData.outcome, blocks: this.tempParsedData.blocks } };
-                if(isEditId) { const idx = this.data.updates.findIndex(u => u.id == isEditId); if(idx > -1) { updatePayload.date = this.tempParsedData.dispDate || this.data.updates[idx].date; this.data.updates[idx] = updatePayload; } } else { this.data.updates.unshift(updatePayload); }
-                this.saveToStorage(); document.getElementById('import-text').value = ''; document.getElementById('ai-result-text').value = ''; document.getElementById('import-id').value = ''; document.getElementById('import-client-role').value = 'desconhecido'; this.tempParsedData = null; this.closeModal('modal-import'); this.navigate('updates'); this.backToStep1();
-                if(confirm('Deseja agendar um Prazo relacionado a esta publicação agora mesmo?')) { this.openModal('modal-deadline', cid); }
+                html += '</div>';
+                return html;
             },
 
-            backToStep1() { document.getElementById('step-1-import').style.display = 'block'; document.getElementById('step-2-import').style.display = 'none'; },
-
-            getOutcomeColor(text, clientRole) { text = (text || '').toLowerCase(); let isPositive = null; if (text.includes('positivo')) return 'style="background:var(--success); color:white;" class="summary-tag"'; if (text.includes('negativo')) return 'style="background:var(--danger); color:white;" class="summary-tag"'; if (/deferi|procedent|provid|acolhid/i.test(text)) isPositive = true; else if (/indeferi|improcedent|improvid|rejeitad/i.test(text)) isPositive = false; if (isPositive === null) return 'class="summary-tag tag-blue"'; let goodForClient = clientRole === 'reu' ? !isPositive : isPositive; return goodForClient ? 'style="background:var(--success); color:white;" class="summary-tag"' : 'style="background:var(--danger); color:white;" class="summary-tag"'; },
-
+            // Visualização de Publicação (Diário Oficial)
             viewPublication(id) {
-                const pub = this.data.updates.find(u => u.id === id); if(!pub) return; const b = pub.analysis.blocks || {}; const formatBlock = (text) => { if(!text) return '-'; return text.replace(/^([^:\n]+):/gm, '<span style="color:var(--primary); font-weight:700;">$1:</span>'); };
-                const summaryHtml = `<div style="display:flex; flex-direction:column; gap:15px;"><div class="analysis-grid"><div class="analysis-item"><span class="analysis-label">1️⃣ Identificação</span><span class="analysis-val">${formatBlock(b.b1) || pub.analysis.caseNumber || '-'}</span></div><div class="analysis-item"><span class="analysis-label">2️⃣ Partes</span><span class="analysis-val">${formatBlock(b.b2) || '-'}</span></div><div class="analysis-item"><span class="analysis-label">3️⃣ Natureza</span><span class="analysis-val">${formatBlock(b.b3) || pub.analysis.type}</span></div><div class="analysis-item"><span class="analysis-label">4️⃣ Resumo</span><span class="analysis-val">${formatBlock(b.b4) || '-'}</span></div></div><div style="background: var(--bg-body); padding: 15px; border-radius: var(--radius-md);"><span class="analysis-label">5️⃣ Determinações do Juiz</span><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b5)}</div></div><div style="background: var(--bg-body); padding: 15px; border-radius: var(--radius-md);"><span class="analysis-label">6️⃣ Pedidos e Recursos</span><div style="margin-top:8px; font-size:0.95rem; color:var(--text-main); white-space:pre-wrap; line-height: 1.5;">${formatBlock(b.b6)}</div></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;"><div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-top: 4px solid var(--danger);"><span class="analysis-label" style="color:var(--danger)">7️⃣ Prazo Fatal</span><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b7)}</div></div><div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-top: 4px solid var(--info);"><span class="analysis-label">8️⃣ Próximo Cenário</span><div style="margin-top:8px; font-size:0.95rem; white-space:pre-wrap; color:var(--text-main);">${formatBlock(b.b8)}</div></div></div><div class="client-summary-box"><b>9️⃣ Resumo para o Cliente (Copie e envie no WhatsApp):</b><br><br><span style="white-space:pre-wrap; font-style: normal; font-size:1rem; color:var(--text-main);">${(b.b9 || '').replace(/^Resumo:/i, '').trim() || '-'}</span></div></div>`;
-                document.getElementById('pub-view-summary').innerHTML = summaryHtml; document.getElementById('pub-view-text').innerText = pub.rawText || 'Texto original não salvo.'; const btn = document.getElementById('pub-view-action-btn'); btn.onclick = () => { this.closeModal('modal-publication-view'); this.openModal('modal-deadline', pub.caseId); }; document.getElementById('modal-publication-view').classList.add('active');
+                const pub = this.data.updates.find(u => u.id === id); if(!pub) return;
+                
+                const titles = {
+                    b1: "Identificação", b2: "Partes", b3: "Natureza",
+                    b4: "Resumo", b5: "Determinações", b6: "Pedidos/Recursos",
+                    b7: "Prazo Fatal", b8: "Próximo Cenário", b9: "Resumo Cliente"
+                };
+
+                // Reconstrói texto completo se não estiver salvo bruto com emojis
+                let textToParse = pub.rawText;
+                if (pub.analysis && pub.analysis.blocks) {
+                    const b = pub.analysis.blocks;
+                    textToParse = `1️⃣ ${b.b1||''}\n2️⃣ ${b.b2||''}\n3️⃣ ${b.b3||''}\n4️⃣ ${b.b4||''}\n5️⃣ ${b.b5||''}\n6️⃣ ${b.b6||''}\n7️⃣ ${b.b7||''}\n8️⃣ ${b.b8||''}\n9️⃣ ${b.b9||''} ⚖️`;
+                }
+
+                document.getElementById('pub-view-summary').innerHTML = this.buildAccordionView(textToParse, titles, 'pub');
+                document.getElementById('pub-view-text').innerText = pub.rawText || 'Texto original não disponível.';
+                
+                // Configura botão de ação
+                document.getElementById('pub-view-action-btn').onclick = () => { app.closeModal('modal-publication-view'); app.openModal('modal-deadline', pub.caseId); };
+                document.getElementById('pub-view-edit-btn').style.display = 'none'; // Sem edição complexa para pub por enquanto
+                
+                document.getElementById('modal-publication-view').classList.add('active');
             },
 
-            editUpdate(id) { const u = this.data.updates.find(x => x.id === id); if(!u) return; document.getElementById('import-id').value = u.id; document.getElementById('import-text').value = u.rawText; const b = u.analysis.blocks; const rebuilt = `1️⃣\n${b.b1}\n2️⃣\n${b.b2}\n3️⃣\n${b.b3}\n4️⃣\n${b.b4}\n5️⃣\n${b.b5}\n6️⃣\n${b.b6}\n7️⃣\n${b.b7}\n8️⃣\n${b.b8}\n9️⃣\n${b.b9}`; document.getElementById('ai-result-text').value = rebuilt; document.getElementById('modal-import').classList.add('active'); },
-            deleteUpdate(id) { if(confirm('Tem certeza que deseja excluir esta publicação do sistema?')) { this.data.updates = this.data.updates.filter(u => u.id !== id); this.saveToStorage(); this.renderUpdatesFull(); } },
+            // Visualização de Análise Estratégica (Item 1 e 2)
+            viewStrategicAnalysis(caseId, analysisId) {
+                const c = this.data.cases.find(x => x.id === caseId);
+                const item = c.full_analyses.find(a => a.id === analysisId);
+                if (!item) return;
 
-            renderUpdatesFull() { 
-                const c = document.getElementById('updates-list-full'); c.innerHTML = ''; 
-                if(this.data.updates.length === 0) { c.innerHTML = '<p style="color:var(--text-muted)">Nenhuma publicação analisada ainda.</p>'; return; }
-                let arr = [...this.data.updates];
-                const sortBy = this.sortState.updates || 'date';
-                if (sortBy === 'name') { arr.sort((a,b) => { let ca = this.data.cases.find(x=>x.id===a.caseId); let cb = this.data.cases.find(x=>x.id===b.caseId); return (ca ? ca.client : 'Z').localeCompare(cb ? cb.client : 'Z'); }); } else { arr.sort((a,b)=>new Date(b.date)-new Date(a.date)); }
-                arr.forEach(u => { 
-                    const a = u.analysis || {}; const caseRef = this.data.cases.find(caseItem => caseItem.id === u.caseId); const clientRole = caseRef ? (caseRef.client_role || 'autor') : 'autor'; const clientName = caseRef ? caseRef.client : "Cliente Não Vinculado";
-                    let outcomeColor = this.getOutcomeColor(a.blocks?.b4 || a.outcome, clientRole); let displayLabel = 'Movimentação'; if (outcomeColor.includes('success')) displayLabel = "Positivo"; if (outcomeColor.includes('danger')) displayLabel = "Negativo";
-                    c.innerHTML += `<div class="smart-summary" onclick="app.viewPublication(${u.id})"><div class="summary-header"><span style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${a.type || 'Ato Judicial'}</span> <span ${outcomeColor}>${displayLabel}</span></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; font-size:0.9rem;"><div><b style="color:var(--text-secondary)">Processo:</b> ${a.caseNumber || 'N/A'}</div><div><b style="color:var(--text-secondary)">Cliente:</b> <span style="color:var(--primary); font-weight:600;">${clientName}</span></div><div><b style="color:var(--text-secondary)">Publicado em:</b> ${new Date(u.date).toLocaleDateString('pt-BR')}</div></div><div style="background:var(--bg-body); padding:15px; border-radius:var(--radius-md); border-left:4px solid var(--primary); font-size:0.95rem; line-height:1.5;"><b>Resumo Técnico:</b><br> ${(a.blocks && a.blocks.b4) ? a.blocks.b4.substring(0, 200) + '...' : 'Sem resumo.'}</div><div style="margin-top:20px; text-align:right; border-top:1px solid var(--border-color); padding-top:15px;"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); app.editUpdate(${u.id})">✏️ Editar</button> <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); app.deleteUpdate(${u.id})">🗑 Excluir</button></div></div>`; 
-                }); 
+                const titles = {
+                    b1: "Diagnóstico Geral", b2: "Análise das Partes", b3: "Postura do Juiz",
+                    b4: "Análise Técnica", b5: "Recursos Cabíveis", b6: "Simulação de Recurso",
+                    b7: "Oportunidades", b8: "Próximo Cenário", b9: "Resumo para Advogada"
+                };
+
+                document.getElementById('pub-view-summary').innerHTML = this.buildAccordionView(item.text, titles, 'strat');
+                document.getElementById('pub-view-text').innerText = item.text; 
+                
+                // Configura botão de edição (Item 4)
+                const editBtn = document.getElementById('pub-view-edit-btn');
+                editBtn.style.display = 'inline-block';
+                editBtn.onclick = () => {
+                    app.closeModal('modal-publication-view');
+                    app.openFullAnalysisModal(item.id, item.text);
+                };
+
+                document.getElementById('pub-view-action-btn').onclick = () => { app.closeModal('modal-publication-view'); };
+                document.getElementById('modal-publication-view').classList.add('active');
             },
 
-            exportBackup() { const dataStr = JSON.stringify(this.data, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `LexManager_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); },
-            importBackup(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importedData = JSON.parse(e.target.result); if (importedData && importedData.cases !== undefined) { if (confirm('Atenção: Restaurar o backup substituirá todos os dados atuais na sua tela. Deseja continuar?')) { this.data = importedData; this.saveToStorage(); alert('✅ Backup restaurado com sucesso! A página será recarregada.'); location.reload(); } } else { alert('❌ Arquivo de backup inválido. Não parece ser um backup do LexManager.'); } } catch (err) { alert('❌ Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON válido.'); } }; reader.readAsText(file); event.target.value = ''; },
+            renderStrategies() {
+                const container = document.getElementById('strategies-list-full');
+                container.innerHTML = '';
+                
+                // Coleta todas as estratégias de todos os processos
+                let allStrategies = [];
+                this.data.cases.forEach(c => {
+                    if (c.full_analyses) {
+                        c.full_analyses.forEach(a => {
+                            allStrategies.push({...a, caseClient: c.client, caseNumber: c.number, caseId: c.id});
+                        });
+                    }
+                });
 
-            fixDate(dateStr) { if(!dateStr) return null; return new Date(dateStr + 'T12:00:00'); },
+                allStrategies.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                if (allStrategies.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-muted); padding:20px;">Nenhuma análise estratégica realizada ainda.</p>';
+                    return;
+                }
+
+                allStrategies.forEach(s => {
+                    // Extrai resumo do bloco 1 ou 9 para o card
+                    const match = s.text.match(/1️⃣([\s\S]*?)2️⃣/);
+                    let preview = match ? match[1].substring(0, 150) + '...' : 'Clique para ver detalhes.';
+                    
+                    container.innerHTML += `
+                    <div class="smart-summary" onclick="app.viewStrategicAnalysis(${s.caseId}, ${s.id})">
+                        <div class="summary-header">
+                            <span style="font-size:1rem; font-weight:800; color:var(--warning);">🧠 Diagnóstico Estratégico</span>
+                            <span class="summary-tag" style="background:var(--bg-body); border:1px solid var(--border-color); color:var(--text-secondary);">${new Date(s.date).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div style="margin-bottom:10px; font-size:0.9rem;">
+                            <div style="font-weight:700; color:var(--primary);">${s.caseClient}</div>
+                            <div style="font-family:monospace; color:var(--text-secondary); font-size:0.8rem;">${s.caseNumber}</div>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-main); line-height:1.4;">${preview}</div>
+                    </div>`;
+                });
+            },
+
             toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); },
             navigate(view) {
                 document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
@@ -1193,6 +1451,7 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 document.getElementById('sidebar').classList.remove('active');
                 if(view === 'dashboard') this.renderDashboard(); 
                 if(view === 'updates') this.renderUpdatesFull(); 
+                if(view === 'strategies') this.renderStrategies(); // Nova renderização
                 if(view === 'cases') this.renderCases(); 
                 if(view === 'deadlines') this.renderDeadlines(); 
                 if(view === 'finance') this.renderFinance(); 
@@ -1287,10 +1546,11 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
                 let timeline = []; const initialDate = c.date_start || c.date_created; timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
-                // ADICIONADO: Análise Completa na Linha do Tempo
+                // ADICIONADO: Análise Completa na Linha do Tempo (Item 1)
                 if(c.full_analyses) {
                     c.full_analyses.forEach(fa => {
-                        timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Análise completa dos autos via IA', id: null, fullText: fa.text});
+                        // Renderização como CARD CLICÁVEL que chama a nova função viewStrategicAnalysis
+                        timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Clique para ver a análise completa', id: null, originalId: fa.id});
                     });
                 }
                 timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
@@ -1329,10 +1589,10 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                     <div class="full-timeline">
                         ${timeline.map(t => { 
                             let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; 
-                            // Renderização especial para análise estratégica
+                            // Evento de clique para a Análise Estratégica (Item 3: Ícone Cerebro)
                             if (t.type === 'analysis') {
-                                const safeText = t.fullText.replace(/"/g, '&quot;');
-                                return `<div class="ft-item"><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary); white-space:pre-wrap; max-height:200px; overflow-y:auto; margin-top:10px; border-top:1px solid var(--border-color); padding-top:10px;">${t.fullText}</div></div></div>`;
+                                clickAct = `onclick="app.viewStrategicAnalysis(${c.id}, ${t.originalId})" style="cursor:pointer;"`;
+                                return `<div class="ft-item" ${clickAct}><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`;
                             }
                             return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; 
                         }).join('')}
