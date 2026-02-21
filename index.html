@@ -200,7 +200,7 @@
         .full-timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
         .ft-item { position: relative; margin-bottom: 24px; padding-left: 60px; }
         .ft-icon { position: absolute; left: 8px; top: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border: 4px solid var(--bg-surface); z-index: 2; box-shadow: var(--shadow-sm); }
-        .ft-icon.finance { background: var(--success); } .ft-icon.create { background: var(--text-secondary); } .ft-icon.update { background: var(--info); }
+        .ft-icon.finance { background: var(--success); } .ft-icon.create { background: var(--text-secondary); } .ft-icon.update { background: var(--info); } .ft-icon.analysis { background: var(--warning); }
         .ft-card { background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: var(--transition); }
         
         .finance-summary-bar { margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-body); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
@@ -523,6 +523,7 @@
                     <div><h2 id="dash-greeting">Olá, Doutor(a)</h2><p style="color:var(--text-secondary); margin-top:4px;">Resumo estratégico do escritório.</p></div>
                     <div class="quick-actions flex-gap">
                         <button class="btn btn-outline" onclick="app.openModal('modal-case')">➕ Processo</button>
+                        <button class="btn btn-outline" onclick="app.openFullAnalysisModal()">📂 Analisar Autos</button>
                         <button class="btn btn-primary" onclick="app.openModal('modal-import')">📋 Importar Pub.</button>
                     </div>
                 </div>
@@ -747,6 +748,33 @@
                         <button class="btn btn-primary" onclick="app.saveParsedImport()">💾 Finalizar Registro</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="modal-full-analysis" class="modal">
+            <div class="modal-content">
+                <div class="flex-between" style="margin-bottom:20px;"><h3>Análise Completa de Autos</h3><button class="btn-outline btn-sm" style="border:none;" onclick="app.closeModal('modal-full-analysis')">✕</button></div>
+                
+                <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 1: Selecionar Arquivo ou Texto</label>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Anexe o PDF ou cole o texto completo do processo para gerar uma estratégia.</p>
+                
+                <input type="file" style="margin-bottom:10px;">
+                <textarea id="full-analysis-text" rows="5" placeholder="Ou cole o texto do processo aqui..."></textarea>
+
+                <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M11.1 2.89c.35-1.12 1.45-1.12 1.8 0 .96 3.08 3.39 5.51 6.47 6.47 1.12.35 1.12 1.45 0 1.8-3.08.96-5.51 3.39-6.47 6.47-.35 1.12-1.45 1.12-1.8 0-.96-3.08-3.39-5.51-6.47-6.47-1.12-.35-1.12-1.45 0-1.8 3.08-.96 5.51-3.39 6.47-6.47z"/></svg> Gemini
+                    </button>
+                    <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('chatgpt')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.0002 0.899902C12.9806 0.899902 13.9298 1.1274 14.8115 1.54716C15.6932 1.96693 16.5028 2.56947 17.1852 3.29285C17.8676 4.01623 18.4232 4.86937 18.8256 5.81169C19.2279 6.75402 19.4678 7.76189 19.5298 8.78652L21.0267 8.71189C20.9599 7.47291 20.6698 6.25539 20.1834 5.11624C19.697 3.97709 19.0253 2.94589 18.2001 2.07125C17.3749 1.19661 16.396 0.468239 15.3299 -0.0392336C14.2638 -0.546706 13.1163 -0.821731 11.9312 -0.821731C10.7461 -0.821731 9.5986 -0.546706 8.5325 -0.0392336C7.4664 0.468239 6.48753 1.19661 5.66228 2.07125C4.83704 2.94589 4.16538 3.97709 3.67897 5.11624C3.19256 6.25539 2.90249 7.47291 2.83572 8.71189L4.33261 8.78652C4.39462 7.76189 4.6345 6.75402 5.03683 5.81169C5.43916 4.86937 5.99482 4.01623 6.67721 3.29285C7.3596 2.56947 8.16918 1.96693 9.05088 1.54716C9.93259 1.1274 10.8818 0.899902 11.8622 0.899902H12.0002Z"/></svg> ChatGPT
+                    </button>
+                </div>
+
+                <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
+                
+                <label style="color:var(--primary); font-weight:800; font-size:1rem;">PASSO 2: Resultado da Análise</label>
+                <textarea id="full-analysis-result" rows="8" placeholder="Cole aqui a análise estratégica gerada pela IA..."></textarea>
+                <button class="btn btn-primary" style="width:100%; margin-top:10px; padding:15px; font-size:1rem;" onclick="app.saveFullAnalysis()">💾 Salvar na Ficha do Processo</button>
             </div>
         </div>
 
@@ -976,16 +1004,116 @@ ${textToAnalyze}`;
                     
                     // Universal Links (Deep Links)
                     if(platform === 'gemini') {
-                        // Tenta abrir o App do Gemini/Google, fallback para site
                         window.open('https://gemini.google.com/app', '_blank'); 
                     } else {
-                        // Tenta abrir o App do ChatGPT, fallback para site
                         window.open('https://chatgpt.com', '_blank'); 
                     }
                 }).catch(err => { 
                     console.error('Falha ao copiar:', err); 
                     alert('Seu navegador bloqueou a cópia automática. Verifique as permissões.'); 
                 });
+            },
+
+            openFullAnalysisModal() {
+                document.getElementById('modal-full-analysis').classList.add('active');
+            },
+
+            analyzeFullCase(platform) {
+                const textToAnalyze = document.getElementById('full-analysis-text').value;
+                // Nota: O prompt não exige o texto anexado aqui se for PDF, mas se o usuário colou texto, vai junto.
+                
+                const strategicPrompt = `Vou anexar um PDF contendo um processo judicial.
+Quero que você atue como analista jurídico estratégico, com foco em prática forense.
+Sou estudante do 5º semestre de Direito e quero compreender o caso para auxiliar minha advogada e desenvolver pensamento estratégico.
+Analise o processo e entregue:
+1) Diagnóstico Geral do Caso
+Qual é o conflito central?
+Qual é a tese jurídica de cada parte?
+Qual parte está em posição mais favorável no momento?
+Quais são os principais riscos processuais?
+2) Análise Estratégica das Partes 
+A estratégia do autor é consistente?
+A estratégia da defesa é tecnicamente adequada?
+Houve erro tático relevante?
+Há pedido mal formulado?
+Há preliminares não exploradas?
+O ônus da prova foi bem trabalhado?
+O que poderia ser feito de forma mais estratégica?
+3) Análise da Postura do Juiz 
+A decisão é tecnicamente sólida?
+Há fragilidade na fundamentação?
+Existe risco de nulidade?
+Houve enfrentamento de todos os argumentos?
+A decisão demonstra tendência favorável a alguma tese?
+Há margem clara para reforma em recurso?
+4) Análise Técnica Processual Profunda
+Natureza jurídica da ação
+Competência correta?
+Pressupostos processuais preenchidos?
+Há nulidades arguíveis?
+Preclusões ocorridas?
+Momento processual atual e próximos passos possíveis
+5) Simulação Estratégica de Recurso
+Se você fosse advogado da parte vencida, qual seria a linha argumentativa principal?
+Quais fundamentos legais utilizaria?
+Haveria tese de nulidade?
+Qual seria o ponto mais forte para tentar reforma?
+Vale a pena recorrer estrategicamente ou é melhor outra medida?
+
+6) Mapa de Oportunidades Estratégicas
+Existe possibilidade de acordo vantajoso?
+Existe tese alternativa não explorada?
+Existe risco de sucumbência agravada?
+Existe argumento que pode virar o jogo?
+
+7) Checklist para Auxiliar Minha Advogada
+Pontos que merecem atenção imediata
+Prazos críticos
+Provas que deveriam ser reforçadas
+Argumentos que merecem aprofundamento
+Seja técnico, estratégico e direto.
+
+Quero aprender a pensar como advogado e não apenas entender o conteúdo do processo.
+
+${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
+
+                navigator.clipboard.writeText(strategicPrompt).then(() => { 
+                    alert(`✅ Prompt de Análise Estratégica copiado!\n\nCole no ${platform === 'gemini' ? 'Gemini' : 'ChatGPT'} e anexe o PDF do processo.`); 
+                    if(platform === 'gemini') { window.open('https://gemini.google.com/app', '_blank'); } else { window.open('https://chatgpt.com', '_blank'); }
+                }).catch(err => alert('Erro ao copiar prompt. Verifique permissões.'));
+            },
+
+            saveFullAnalysis() {
+                const analysisText = document.getElementById('full-analysis-result').value;
+                if(!analysisText.trim()) return alert("Cole o resultado da análise antes de salvar.");
+
+                // Tenta encontrar número de processo no texto
+                const caseMatch = analysisText.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+                const caseNum = caseMatch ? caseMatch[0] : null;
+                
+                let linkedCaseId = null;
+                if (caseNum) {
+                    const found = this.data.cases.find(c => c.number === caseNum);
+                    if (found) linkedCaseId = found.id;
+                }
+
+                if (linkedCaseId) {
+                    const cIndex = this.data.cases.findIndex(c => c.id === linkedCaseId);
+                    if (!this.data.cases[cIndex].full_analyses) this.data.cases[cIndex].full_analyses = [];
+                    
+                    this.data.cases[cIndex].full_analyses.push({
+                        id: Date.now(),
+                        date: new Date().toISOString(),
+                        text: analysisText,
+                        type: 'strategic_analysis'
+                    });
+                    this.saveToStorage();
+                    alert(`Análise salva e vinculada ao processo ${caseNum}!`);
+                    this.closeModal('modal-full-analysis');
+                    this.openCaseDetail(linkedCaseId);
+                } else {
+                    alert('Não encontrei um número de processo cadastrado correspondente nesta análise. Crie o processo primeiro ou verifique se o número CNJ consta no texto.');
+                }
             },
 
             parseAIResult() {
@@ -1159,6 +1287,12 @@ ${textToAnalyze}`;
                 const contracted = c.fees||0; const received = this.data.transactions.filter(t=>t.caseId===id && t.type==='income').reduce((acc,t)=>acc+t.amount,0); const pctReceived = contracted > 0 ? Math.min((received/contracted)*100, 100) : 0; 
                 let timeline = []; const initialDate = c.date_start || c.date_created; timeline.push({date:initialDate, type:'create', title:'Início do Processo / Cadastro', desc:'Registro do caso', id:null}); 
                 this.data.deadlines.filter(d=>d.caseId===id).forEach(d => timeline.push({date:d.date, type:'deadline', title:`Prazo: ${d.type}`, desc:d.done?'Status: Concluído ✅':'Status: Pendente ⏳', id:d.id}) ); this.data.transactions.filter(t=>t.caseId===id).forEach(t => timeline.push({date:t.id, type:'finance', title:t.type==='income'?'Honorários Recebidos':'Despesa Registrada', desc:`Valor: ${this.formatCurrency(t.amount)}`, id:null}) ); this.data.updates.filter(u=>u.caseId===id).forEach(u => timeline.push({date:u.date, type:'update', title:'Publicação Analisada', desc:`Ato: ${u.analysis.type}`, id:u.id}) ); 
+                // ADICIONADO: Análise Completa na Linha do Tempo
+                if(c.full_analyses) {
+                    c.full_analyses.forEach(fa => {
+                        timeline.push({date: fa.date, type: 'analysis', title: 'Diagnóstico Estratégico', desc: 'Análise completa dos autos via IA', id: null, fullText: fa.text});
+                    });
+                }
                 timeline.sort((a,b)=>new Date(b.date)-new Date(a.date)); 
 
                 // MOBILE OPTIMIZED LAYOUT STRUCTURE
@@ -1195,6 +1329,11 @@ ${textToAnalyze}`;
                     <div class="full-timeline">
                         ${timeline.map(t => { 
                             let clickAct = ''; if(t.type === 'update') clickAct = `onclick="app.viewPublication(${t.id})" style="cursor:pointer;"`; if(t.type === 'deadline') clickAct = `onclick="app.openModal('modal-deadline', ${t.id})" style="cursor:pointer;"`; 
+                            // Renderização especial para análise estratégica
+                            if (t.type === 'analysis') {
+                                const safeText = t.fullText.replace(/"/g, '&quot;');
+                                return `<div class="ft-item"><div class="ft-icon analysis">🧠</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--warning); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary); white-space:pre-wrap; max-height:200px; overflow-y:auto; margin-top:10px; border-top:1px solid var(--border-color); padding-top:10px;">${t.fullText}</div></div></div>`;
+                            }
                             return `<div class="ft-item" ${clickAct}><div class="ft-icon ${t.type}">${t.type==='create'?'★':(t.type==='deadline'?'⏳':(t.type==='finance'?'$':'📄'))}</div><div class="ft-card"><div class="ft-date">${new Date(t.date).toLocaleDateString('pt-BR')}</div><b style="color:var(--primary); font-size:1rem; display:block; margin-bottom:2px;">${t.title}</b><div style="font-size:0.85rem; color:var(--text-secondary);">${t.desc}</div></div></div>`; 
                         }).join('')}
                     </div>`; 
