@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================
@@ -59,6 +58,7 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
+        /* Correção Dark Mode Específica */
         body.dark-mode .pub-full-text {
             color: var(--text-main); 
             border-color: var(--border-color);
@@ -70,44 +70,7 @@
             color: #fcd34d;
         }
 
-        /* ESTILOS BOTÕES AI (ATUALIZADO) */
-        .btn-gemini {
-            background: linear-gradient(90deg, #4E86F8 0%, #D64669 100%);
-            color: white;
-            font-family: 'Google Sans', sans-serif; /* Fonte estilo Google */
-            font-weight: 500;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 18px;
-            border-radius: 20px; /* Mais arredondado estilo Google */
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-gemini:hover {
-            box-shadow: 0 4px 15px rgba(78, 134, 248, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .btn-chatgpt {
-            background-color: #10A37F; /* Verde oficial OpenAI */
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 18px;
-            border-radius: 8px; /* Borda padrão OpenAI */
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .btn-chatgpt:hover {
-            background-color: #0d8a6a;
-            transform: translateY(-1px);
-        }
-
-        /* ESTILOS PARA ACCORDION */
+        /* ESTILOS PARA ACCORDION (EXPANSIVO) */
         .accordion-item {
             background: var(--bg-body);
             border: 1px solid var(--border-color);
@@ -140,7 +103,7 @@
         }
         .accordion-item.open .accordion-content {
             padding: 16px;
-            max-height: 2000px;
+            max-height: 2000px; /* Valor alto para permitir conteúdo longo */
             opacity: 1;
             border-top: 1px solid var(--border-color);
         }
@@ -153,6 +116,7 @@
             transform: rotate(180deg);
         }
 
+        /* Reutilizando estilos da análise para manter consistência */
         .analysis-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
         .analysis-val { font-weight: 500; color: var(--text-main); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; line-height: 1.5; margin-bottom: 12px; display:block; }
 
@@ -820,12 +784,12 @@
                     </select>
 
                     <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
-                        <a href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer" class="btn btn-gemini" onclick="app.analyzeWithAI('gemini'); return false;">
+                        <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('gemini')">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
-                        </a>
-                        <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" class="btn btn-chatgpt" onclick="app.analyzeWithAI('chatgpt'); return false;">
+                        </button>
+                        <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeWithAI('chatgpt')">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
-                        </a>
+                        </button>
                     </div>
 
                     <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
@@ -871,12 +835,12 @@
                 <textarea id="full-analysis-text" rows="5" placeholder="Cole o texto do processo ou histórico aqui..."></textarea>
 
                 <div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
-                     <a href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer" class="btn btn-gemini" onclick="app.analyzeFullCase('gemini'); return false;">
+                    <button class="btn" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('gemini')">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Google_Gemini_logo_2025.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> Gemini
-                    </a>
-                    <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" class="btn btn-chatgpt" onclick="app.analyzeFullCase('chatgpt'); return false;">
+                    </button>
+                    <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color:white; display:inline-flex; align-items:center; gap:8px;" onclick="app.analyzeFullCase('chatgpt')">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="20" height="20" style="filter: brightness(0) invert(1);"> ChatGPT
-                    </a>
+                    </button>
                 </div>
 
                 <hr style="margin: 25px 0; border:0; border-top:1px dashed var(--border-color)">
@@ -933,7 +897,7 @@
                     <input type="hidden" name="id"><input type="hidden" name="caseId" id="deadline-case-id">
                     <div id="case-selector-container"><label>Processo</label><select id="case-select-dropdown" name="caseSelect" onchange="document.getElementById('deadline-case-id').value=this.value"><option value="">Selecione...</option></select></div>
                     <label>Tipo</label><input type="text" name="type" required>
-                    <div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required id="deadline-date-input"></div></div>
+                    <div class="flex-gap"><div style="flex:1"><label>Data Início</label><input type="date" name="date_start"></div><div style="flex:1"><label>Data Fatal</label><input type="date" name="date" required></div></div>
                     
                     <div style="margin-top:15px; margin-bottom:5px; padding:10px; background:var(--bg-body); border-radius:var(--radius-md); display:flex; align-items:center; gap:10px;">
                         <input type="checkbox" name="googleCalendar" id="gcal-check" style="width:auto; margin:0;">
@@ -1036,9 +1000,7 @@
                 if(roleFromImport === 'reu') specificClientInstruction = "Meu cliente é o RÉU/RECLAMADO";
                 
                 const geminiPrompt = `Analise a publicação judicial abaixo e extraia as informações de forma ESTRUTURADA, EXTREMAMENTE CONCISA e DIRETA.
-
 🚨 ATENÇÃO: ${specificClientInstruction}. Indique claramente se a decisão foi POSITIVA ou NEGATIVA para ele no Resumo (Bloco 9).
-
 🚨 ATENÇÃO ESPECIAL AOS PRAZOS:
 Calcule o prazo processual de forma EXATA conforme a legislação vigente aplicável ao caso (CPC, CPP, CLT ou lei específica).
 Identifique expressamente qual é o regime processual aplicável.
@@ -1052,7 +1014,6 @@ A contagem deve:
 • Indicar a DATA FINAL EXATA (prazo fatal).
 Se não houver elementos suficientes para cálculo exato, declarar EXPRESSAMENTE a limitação e NÃO estimar datas.
 Exemplo: Se a publicação ocorreu em 19/02, informe exatamente qual é o último dia para recurso segundo a lei vigente aplicável ao caso.
-
 ⚠️ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 • NÃO USE formatação Markdown (PROIBIDO usar asteriscos **, PROIBIDO usar bullet points como * ou -).
 • Use APENAS texto puro.
@@ -1060,7 +1021,6 @@ Exemplo: Se a publicação ocorreu em 19/02, informe exatamente qual é o últim
 • Responda exatamente no formato “Campo: Resposta curta” em linhas separadas.
 • Não fornecer respostas genéricas.
 • Manter coerência entre natureza do ato e recurso indicado.
-
 1️⃣ Identificação do Processo
 Número:
 Órgão:
@@ -1072,26 +1032,21 @@ Data de disponibilização:
 Data de publicação:
 Início do prazo:
 Fundamento legal da contagem:
-
 2️⃣ Partes do Processo
 Autor:
 Réu:
 Advogados:
 Intimado:
-
 3️⃣ Natureza do Ato Judicial
 Classificação:
 Explicação:
-
 4️⃣ Resumo Objetivo do Conteúdo
 Resumo:
-
 5️⃣ Determinações do Juiz
 Determinação:
 Quem deve cumprir:
 Prazo expresso:
 Fundamento legal do prazo:
-
 6️⃣ Pedidos e Recursos Envolvidos
 Recurso/Pedido cabível:
 Compatibilidade do recurso com a natureza do ato:
@@ -1100,7 +1055,6 @@ Fundamento legal:
 Tipo de contagem:
 Termo inicial:
 Termo final exato:
-
 7️⃣ Prazo Fatal do Próximo Passo
 Ato a ser praticado:
 Responsável:
@@ -1111,10 +1065,8 @@ Base legal aplicada:
 Forma de contagem:
 Risco:
 Consequência da inércia:
-
 8️⃣ Próximo Cenário Processual
 Cenário:
-
 9️⃣ Resumo Para o Cliente
 Resumo: Indicar expressamente se a decisão foi POSITIVA ou NEGATIVA para o meu cliente e informar a DATA FATAL exata do próximo prazo, ou declarar impossibilidade de cálculo por ausência de dados suficientes.
 
@@ -1177,11 +1129,8 @@ ${textToAnalyze}`;
                 if(role === 'reu') specificClientInstruction = "Meu cliente é o RÉU/RECLAMADO";
 
                 const strategicPrompt = `Analise o processo judicial completo contido no texto ou PDF anexado e extraia as informações de forma ESTRUTURADA, EXTREMAMENTE CONCISA, TÉCNICA e ESTRATÉGICA.
-
 Sou aluno do 5º semestre de Direito e quero utilizar esta análise para auxiliar minha advogada e desenvolver raciocínio estratégico profissional.
-
 🚨 ATENÇÃO: ${specificClientInstruction}. Indique claramente se o cenário processual atual é FAVORÁVEL, DESFAVORÁVEL ou DE RISCO no Bloco 9.
-
 🚨 ATENÇÃO ESPECIAL AOS PRAZOS:
 Calcule o prazo processual de forma EXATA conforme a legislação aplicável (CPC, CPP, CLT ou lei específica).
 Identifique expressamente o regime processual aplicável.
@@ -1196,7 +1145,6 @@ A contagem deve:
 Utilizar a data de hoje apenas se houver prazo em curso.
 Se não houver elemento suficiente para cálculo exato, indique EXPRESSAMENTE a limitação e não estime datas.
 Data de hoje: ${new Date().toLocaleDateString('pt-BR')}
-
 ⚠️ REGRAS DE FORMATAÇÃO OBRIGATÓRIAS:
 • NÃO USE formatação Markdown.
 • NÃO USE asteriscos.
@@ -1208,7 +1156,6 @@ Data de hoje: ${new Date().toLocaleDateString('pt-BR')}
 • Evite explicações longas. Priorize precisão.
 • Máximo de 2 linhas por campo.
 • Não apresentar respostas genéricas.
-
 1️⃣ Diagnóstico Geral do Caso
 Conflito central:
 Tese do autor:
@@ -1220,7 +1167,6 @@ Principais riscos processuais:
 Risco de trânsito em julgado:
 Impacto financeiro estimado:
 Probabilidade estratégica de êxito:
-
 2️⃣ Análise Estratégica das Partes
 Estratégia do autor:
 Erro estratégico do autor:
@@ -1230,7 +1176,6 @@ Erro estratégico da defesa:
 Provas frágeis:
 Preliminares não exploradas:
 Oportunidade estratégica não utilizada:
-
 3️⃣ Análise da Postura do Juiz
 Fundamentação adequada:
 Há omissão relevante:
@@ -1239,7 +1184,6 @@ Há obscuridade:
 Risco de nulidade:
 Tendência decisória identificável:
 Probabilidade de reforma em recurso:
-
 4️⃣ Análise Técnica Processual Profunda
 Natureza jurídica da ação:
 Competência adequada:
@@ -1250,7 +1194,6 @@ Nulidades arguíveis:
 Regularidade procedimental:
 Momento processual:
 Próximo ato esperado:
-
 5️⃣ Recursos e Medidas Cabíveis
 Recurso cabível:
 Compatibilidade do recurso com a fase processual:
@@ -1261,7 +1204,6 @@ Termo inicial:
 Termo final exato:
 Outra medida estratégica possível:
 Viabilidade recursal:
-
 6️⃣ Simulação Estratégica de Recurso
 Tese recursal principal:
 Fundamento jurídico central:
@@ -1269,7 +1211,6 @@ Argumento mais forte:
 Tese subsidiária:
 Pedido recursal estratégico:
 Chance estimada de êxito:
-
 7️⃣ Mapa de Oportunidades Estratégicas
 Possibilidade de acordo:
 Risco de sucumbência:
@@ -1277,13 +1218,11 @@ Risco de majoração de honorários:
 Tese alternativa viável:
 Prova que pode mudar o cenário:
 Medida preventiva recomendada:
-
 8️⃣ Próximo Cenário Processual
 Cenário provável:
 Cenário de risco:
 Movimento estratégico recomendado:
 Prioridade imediata:
-
 9️⃣ Resumo Estratégico para Auxiliar Minha Advogada
 Posição atual do cliente:
 Situação: Indicar expressamente se é FAVORÁVEL, DESFAVORÁVEL ou DE RISCO.
@@ -1292,7 +1231,6 @@ Data fatal do próximo prazo:
 Consequência imediata se nada for feito:
 Ação estratégica recomendada:
 Nível de urgência:
-
 ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
 
                 navigator.clipboard.writeText(strategicPrompt).then(() => { 
@@ -1572,7 +1510,7 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
                 this.data.tasks.forEach(t => { if(new Date(t.date).toDateString() === targetDateStr) { const c = this.data.cases.find(x => x.id == t.caseId); events.push({ type: 'task', title: t.desc, sub: c ? c.client : `Tarefa Geral - ${t.priority}`, done: t.done, id: t.id }); } });
                 this.data.updates.forEach(u => { if(new Date(u.date).toDateString() === targetDateStr) { const c = this.data.cases.find(x => x.id == u.caseId); events.push({ type: 'update', title: u.analysis?.type || 'Publicação', sub: c ? c.client : 'Sem vínculo', done: true, id: u.id }); } });
                 const body = document.getElementById('day-details-body'); document.getElementById('day-details-title').innerText = `Agenda: ${String(day).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
-                if(events.length === 0) { body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum evento registrado.</p>'; } else { body.innerHTML = events.map(e => { let icon = '📝'; let color = 'var(--info)'; if(e.type === 'deadline') { icon = '⏳'; color = 'var(--danger)'; } if(e.type === 'update') { icon = '📜'; color = 'var(--warning)'; } let actionBtn = ''; if(e.type !== 'update') { actionBtn = `<button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button>`; } else { actionBtn = `<button class="btn btn-sm btn-outline" onclick="app.closeModal('modal-day-details'); app.viewPublication(${e.id})">Visualizar</button>`; } return `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${color}; text-decoration:${(e.done && e.type !== 'update')?'line-through':'none'}">${icon} ${e.title}</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;">${actionBtn}</div></div>`; }).join(''); }
+                if(events.length === 0) { body.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">Nenhum evento registrado.</p>'; } else { body.innerHTML = events.map(e => { let icon = '📝'; let color = 'var(--info)'; if(e.type === 'deadline') { icon = '⏳'; color = 'var(--danger)'; } if(e.type === 'update') { icon = '📜'; color = 'var(--warning)'; } let actionBtn = ''; if(e.type !== 'update') { actionBtn = `<button class="btn btn-sm ${e.done?'btn-success':'btn-outline'}" onclick="app.${e.type==='deadline'?'toggleDeadline':'toggleTask'}(${e.id}); app.showDayDetails(${day},${month},${year})">${e.done?'Desfazer':'Concluir'}</button>`; } else { actionBtn = `<button class="btn btn-sm btn-outline" onclick="app.closeModal('modal-day-details'); app.viewPublication(${e.id})">Visualizar</button>`; } return `<div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); border-radius:var(--radius-md); margin-bottom:8px;"><div><div style="font-weight:700; color:${color}; text-decoration:${(e.done && e.type !== 'update')?'line-through':'none'}">${icon} ${e.title}</div><div style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">${e.sub}</div></div><div style="display:flex; gap:5px;">${actionBtn}</div></div>`; }).join(''); }
                 document.getElementById('modal-day-details').classList.add('active');
             },
 
@@ -1586,7 +1524,63 @@ ${textToAnalyze ? '\nSegue texto do processo:\n' + textToAnalyze : ''}`;
             },
             closeModal(id) { document.getElementById(id).classList.remove('active'); },
             saveCase(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const d = { number: f.get('number'), client: f.get('client'), client_role: f.get('client_role') || 'autor', opponent: f.get('opponent'), status: f.get('status'), area: f.get('area'), value: parseFloat(f.get('value')||0), fees: parseFloat(f.get('fees')||0), obs: f.get('obs'), lawyer: f.get('lawyer'), date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null }; if(id){ const i = this.data.cases.findIndex(c=>c.id==id); this.data.cases[i]={...this.data.cases[i],...d}; } else { this.data.cases.push({...d, id:Date.now(), date_created:new Date().toISOString()}); } this.saveToStorage(); this.closeModal('modal-case'); this.navigate('cases'); },
-            saveDeadline(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const cid = f.get('caseId')||f.get('caseSelect'); if(!cid) return alert('Selecione um processo.'); const payload = { caseId: parseInt(cid), type: f.get('type'), date_start: f.get('date_start') ? this.fixDate(f.get('date_start')).toISOString() : null, date: this.fixDate(f.get('date')).toISOString(), done: false }; if(id) { const idx = this.data.deadlines.findIndex(d => d.id == id); if(idx > -1) { payload.done = this.data.deadlines[idx].done; this.data.deadlines[idx] = { ...this.data.deadlines[idx], ...payload }; } } else { this.data.deadlines.push({ id: Date.now(), ...payload }); } this.saveToStorage(); this.closeModal('modal-deadline'); this.navigate('deadlines'); },
+            
+            // ATUALIZAÇÃO ITEM 1 E 2
+            saveDeadline(e) { 
+                e.preventDefault(); 
+                const f = new FormData(e.target); 
+                const id = f.get('id'); 
+                const cid = f.get('caseId')||f.get('caseSelect'); 
+                if(!cid) return alert('Selecione um processo.'); 
+                
+                const type = f.get('type');
+                const dateFatal = f.get('date');
+                const dateStart = f.get('date_start');
+                
+                const payload = { 
+                    caseId: parseInt(cid), 
+                    type: type, 
+                    date_start: dateStart ? this.fixDate(dateStart).toISOString() : null, 
+                    date: this.fixDate(dateFatal).toISOString(), 
+                    done: false 
+                }; 
+                
+                if(id) { 
+                    const idx = this.data.deadlines.findIndex(d => d.id == id); 
+                    if(idx > -1) { 
+                        payload.done = this.data.deadlines[idx].done; 
+                        this.data.deadlines[idx] = { ...this.data.deadlines[idx], ...payload }; 
+                    } 
+                } else { 
+                    this.data.deadlines.push({ id: Date.now(), ...payload }); 
+                } 
+                
+                // ITEM 2: Google Agenda Logic
+                if (f.get('googleCalendar')) {
+                    const c = this.data.cases.find(x => x.id == cid);
+                    const clientName = c ? c.client : 'Cliente';
+                    const title = `Prazo: ${type} - ${clientName}`;
+                    const details = `Processo: ${c ? c.number : ''}\nCliente: ${clientName}\nTipo: ${type}`;
+                    
+                    // Formata data para YYYYMMDD
+                    const dObj = new Date(dateFatal);
+                    // Google Calendar All Day event: Start date / End date (exclusive, so +1 day)
+                    const fmt = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "").slice(0,8);
+                    
+                    const start = fmt(dObj);
+                    const nextDay = new Date(dObj); 
+                    nextDay.setDate(dObj.getDate() + 1);
+                    const end = fmt(nextDay);
+                    
+                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}`;
+                    window.open(url, '_blank');
+                }
+
+                this.saveToStorage(); 
+                this.closeModal('modal-deadline'); 
+                this.navigate('deadlines'); 
+            },
+
             saveTask(e) { e.preventDefault(); const f = new FormData(e.target); const id = f.get('id'); const payload = { desc: f.get('desc'), priority: f.get('priority'), date: this.fixDate(f.get('date')).toISOString(), caseId: document.getElementById('task-case-select').value, done: false }; if(id) { const idx = this.data.tasks.findIndex(t => t.id == id); if(idx > -1) { payload.done = this.data.tasks[idx].done; this.data.tasks[idx] = { ...this.data.tasks[idx], ...payload }; } } else { this.data.tasks.push({ id: Date.now(), ...payload }); } this.saveToStorage(); this.closeModal('modal-task'); this.navigate('tasks'); },
             saveTransaction(e) { e.preventDefault(); const f = new FormData(e.target); this.data.transactions.push({ id: Date.now(), caseId: parseInt(f.get('caseId')), type: f.get('type'), amount: parseFloat(f.get('amount')), desc: f.get('desc') }); this.saveToStorage(); this.closeModal('modal-payment'); this.navigate('finance'); },
             deleteTransaction(id) { if(confirm('Tem certeza que deseja excluir este lançamento permanentemente?')) { this.data.transactions = this.data.transactions.filter(t => t.id !== id); this.saveToStorage(); this.navigate('finance'); } },
